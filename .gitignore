@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+.vs/
+CopilotIndices/
+v17/
+*.suo
+*.user
+*.slnx
+*.VC.db
+*.VC.opendb
