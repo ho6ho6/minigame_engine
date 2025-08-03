@@ -739,7 +739,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "Project"
+			"value" : "minigame_engine"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -1082,6 +1082,42 @@
 			"value" : "FALSE"
 		},
 		{
+			"name" : "MiniGameEngine_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/out/build/x64-Debug"
+		},
+		{
+			"name" : "MiniGameEngine_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "MiniGameEngine_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine"
+		},
+		{
 			"name" : "Project_BINARY_DIR",
 			"properties" : 
 			[
@@ -1107,6 +1143,42 @@
 		},
 		{
 			"name" : "Project_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine"
+		},
+		{
+			"name" : "minigame_engine_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/out/build/x64-Debug"
+		},
+		{
+			"name" : "minigame_engine_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "minigame_engine_SOURCE_DIR",
 			"properties" : 
 			[
 				{

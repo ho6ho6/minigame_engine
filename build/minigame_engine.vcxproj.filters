@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ED7377C3-6CA8-36B1-B18E-B6832D3E5316}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

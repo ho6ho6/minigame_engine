@@ -1,0 +1,24 @@
+^E:\プログラミング\DEVWORKSPACE\REPOS\MINIGAME_ENGINE\BUILD\CMAKEFILES\8DA6ABFFD71032F28CB5C3F6DE00FC96\RUN.RULE
+setlocal
+cd E:\プログラミング\DevWorkspace\repos\minigame_engine\build\bin
+if %errorlevel% neq 0 goto :cmEnd
+E:
+if %errorlevel% neq 0 goto :cmEnd
+E:\プログラミング\DevWorkspace\repos\minigame_engine\build\bin\Debug\minigame_engine.exe
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^E:\プログラミング\DEVWORKSPACE\REPOS\MINIGAME_ENGINE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/プログラミング/DevWorkspace/repos/minigame_engine -BE:/プログラミング/DevWorkspace/repos/minigame_engine/build --check-stamp-file E:/プログラミング/DevWorkspace/repos/minigame_engine/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

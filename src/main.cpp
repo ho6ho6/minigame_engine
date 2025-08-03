@@ -1,20 +1,37 @@
-#include "input.hpp"
-#include "renndert.hpp"
+#include "engine/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
+#include <Windows.h>
 
-/*ゲームエンジンの中心*/
+/*
+  WinMain の引数:
+    HINSTANCE   hInstance     : このアプリケーションのインスタンスハンドル
+    HINSTANCE   hPrevInstance : 常に NULL
+    LPSTR       lpCmdLine     : コマンドライン引数（ANSI）
+    int         nCmdShow      : ウィンドウの初期表示方法
+*/
 
-int main()
+using namespace engine;
+
+int APIENTRY WinMain(
+    HINSTANCE hInstance,
+    HINSTANCE hPrevInstance,
+    LPSTR     lpCmdLine,
+    int       nCmdShow
+)
 {
-    InitWindow();       // ウィンドウ初期化（Win32 APIなど）
-    InitInput();        // 入力初期化
-    InitRenderer();     // 描画初期化
+    // 1. ウィンドウ初期化
+    const int width = 1920;
+    const int height = 1080;
+    if (!InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine"))
+        return -1;
 
-    while (IsRunning()) {
-        ProcessInput(); // 入力処理
-        Update();       // ゲーム状態更新（後で追加）
-        Render();       // 描画処理
+    // 2. メインループ
+    while (IsRunning()) //window.cpp
+    {
+		PollEvents(); // イベントポーリング
+        // ここに Update() や Render() を後から追加
     }
 
-    Shutdown();         // 終了処理
+    // 3. 終了処理
+    ShutdownWindow();
     return 0;
 }

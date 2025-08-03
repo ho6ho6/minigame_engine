@@ -1,0 +1,9 @@
+﻿  Building Custom Rule E:/プログラミング/DevWorkspace/repos/minigame_engine/CMakeLists.txt
+  main.cpp
+  window.cpp
+  input.cpp
+  render.cpp
+  コードを生成中...
+E:\プログラミング\DevWorkspace\repos\minigame_engine\src\main.cpp(1,10): error C1083: include ファイルを開けません。'window.hpp':No such file or directory
+E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window.cpp(1,10): error C1083: include ファイルを開けません。'window.hpp':No such file or directory
+E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\input.cpp(1,10): error C1083: include ファイルを開けません。'input.hpp':No such file or directory

@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#inculde <windows.h>
+#include <windows.h>
 
 /*“ü—Í‚ðŽó‚¯Žæ‚é*/
 
