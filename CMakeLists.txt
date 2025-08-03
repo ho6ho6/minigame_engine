@@ -22,6 +22,7 @@ target_include_directories(minigame_engine PUBLIC
 target_link_libraries(minigame_engine PRIVATE
     user32
     gdi32
+    gdiplus
 )
 
 add_custom_target(run

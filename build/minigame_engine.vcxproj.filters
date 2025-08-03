@@ -10,6 +10,9 @@
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

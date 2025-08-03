@@ -8,14 +8,14 @@
 
 /*入力を受け取る*/
 
-namespace Input
+namespace input
 {
     // 初期化／終了
-    void InitInput();
-    void ShutdownInput();
+    void Input_Start();
+    void Input_Shutdown();
 
     // フレームごとに呼び出して状態更新
-    void ProcessInput();
+    void Input_Update();
 
     // 状態クエリ
     bool IsKeyDown(int vk);      // 押しっぱなし

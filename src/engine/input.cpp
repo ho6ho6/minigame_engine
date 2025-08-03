@@ -12,20 +12,20 @@ static std::array<BYTE, 256> gCurrKeyState{};
 namespace input
 {
 	// 初期化／終了
-	void InitInput()
+	void Input_Start()
 	{
 		// キー状態を初期化
 		gPrevKeyState.fill(0);
 		gCurrKeyState.fill(0);
 	}
 
-	void ShutdownInput()
+	void Input_Shutdown()
 	{
 		// 特に何もしない
 	}
 
 	// フレームごとに呼び出して状態更新
-	void ProcessInput()
+	void Input_Update()
 	{
 		// 前フレームの状態をコピー
 		gPrevKeyState = gCurrKeyState;

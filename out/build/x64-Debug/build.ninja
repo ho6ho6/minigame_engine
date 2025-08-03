@@ -76,6 +76,15 @@ build CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj: CXX_COMPILER__mi
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
   TARGET_PDB = bin\minigame_engine.pdb
 
+build CMakeFiles\minigame_engine.dir\src\engine\time.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\time.cpp || cmake_object_order_depends_target_minigame_engine
+  DEFINES = -DUNICODE -D_UNICODE
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include
+  OBJECT_DIR = CMakeFiles\minigame_engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine
+  TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
+  TARGET_PDB = bin\minigame_engine.pdb
+
 build CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
@@ -102,10 +111,10 @@ build CMakeFiles\minigame_engine.dir\src\main.cpp.obj: CXX_COMPILER__minigame_en
 #############################################
 # Link the executable bin\minigame_engine.exe
 
-build bin\minigame_engine.exe: CXX_EXECUTABLE_LINKER__minigame_engine_Debug CMakeFiles\minigame_engine.dir\src\engine\game.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\input.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj CMakeFiles\minigame_engine.dir\src\main.cpp.obj
+build bin\minigame_engine.exe: CXX_EXECUTABLE_LINKER__minigame_engine_Debug CMakeFiles\minigame_engine.dir\src\engine\game.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\input.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\time.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj CMakeFiles\minigame_engine.dir\src\main.cpp.obj
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
-  LINK_LIBRARIES = user32.lib  gdi32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = user32.lib  gdi32.lib  gdiplus.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

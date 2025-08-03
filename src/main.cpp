@@ -5,8 +5,11 @@
 #include "engine/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
 #include "engine/input.hpp"     // InitInput(), ShutdownInput(), ProcessInput()
 #include "engine/game.hpp"      //
+#include "engine/time.hpp"      // Time::Start(), Time::Update(), Time::GetDeltaTime()
+#include "engine/render.hpp"    // InitRenderer(), BeginFrame(), RenderFrame(), EndFrame(), ShutdownRenderer()
 
 #include <Windows.h>
+#include <iostream>
 
 /*
   WinMain の引数:
@@ -15,8 +18,6 @@
     LPSTR       lpCmdLine     : コマンドライン引数（ANSI）
     int         nCmdShow      : ウィンドウの初期表示方法
 */
-
-using namespace window;
 
 int APIENTRY WinMain(
     HINSTANCE hInstance,
@@ -28,17 +29,50 @@ int APIENTRY WinMain(
     // 1. ウィンドウ初期化
     const int width = 1920;
     const int height = 1080;
-    if (!InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine"))
+    if (!window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine"))
         return -1;
 
-    // 2. メインループ
-    while (IsRunning()) //window.cpp
+	//2. render,input,timeの初期化
+	if (!render::Render_Start(window::GetHWND(), width, height)) // render.cpp
+        return -1;
+
+    input::Input_Start(); // input.cpp
+
+	if (!game::Game_Start()) // game.cpp
+		return -1;
+
+    //3. タイム初期化,レンダー初期化
+    frame::Time::Start_Time();
+
+    //ゲームロジック初期化
+	game::Game_Start(); // game.cpp ゲーム全体の初期化
+
+
+    // 4. メインループ
+    while (window::IsRunning()) //window.cpp
     {
-		PollEvents(); // イベントポーリング
-        // ここに Update() や Render() を後から追加
+        //time更新    time.cpp
+        float deltaTime = frame::Time::Update_Time();
+		uint64_t frameTime = frame::Time::GetFrameCount();
+
+        // イベントポーリング window.cpp
+        window::PollEvents();
+        
+        // サブシステム更新
+		input::Input_Update();  // input.cpp 
+        game::Game_Update(deltaTime); // game.cpp ロジック更新
+
+        // 描画
+		game::Game_Render(); // game.cpp    高レベル描画（オブジェクト単位）
+        render::Render_Update(deltaTime, frameTime); // render.cpp  低レベル描画（背景クリア＋全オブジェクトをまとめて出力）
+
     }
 
-    // 3. 終了処理
-    ShutdownWindow();
+    // 5. 終了処理
+    input::Input_Shutdown();             // input.cpp
+    render::Render_Shutdown();        // render.cpp
+	game::Game_Shutdown();            // game.cpp
+	window::ShutdownWindow();        // window.cpp
+
     return 0;
 }
