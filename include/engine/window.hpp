@@ -1,8 +1,13 @@
+/***********************************************************
+ *  Win32　ウィンドウ生成・イベント処理・バッファ管理の宣言*
+ ***********************************************************/
+
+
 #pragma once
 
 #include <Windows.h>
 
-namespace engine
+namespace window
 {
 	// ウィンドウ初期化と終了
 	bool InitWindow(HINSTANCE hInstance, int nCmdShow, int width, int height, const wchar_t* title);

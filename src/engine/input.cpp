@@ -1,3 +1,7 @@
+/********************************************
+ *input::Update, IsKeyDown, マウス処理の定義*
+ ********************************************/
+
 #include "engine/input.hpp"
 
 /*入力*/
@@ -5,7 +9,7 @@
 static std::array<BYTE, 256> gPrevKeyState{};
 static std::array<BYTE, 256> gCurrKeyState{};
 
-namespace Input
+namespace input
 {
 	// 初期化／終了
 	void InitInput()

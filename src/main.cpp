@@ -1,4 +1,11 @@
+/***********************************************************************************
+ * WinMain とメインループの呼び出し、各サブシステムの初期化と終了処理を行う        *
+ ***********************************************************************************/
+
 #include "engine/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
+#include "engine/input.hpp"     // InitInput(), ShutdownInput(), ProcessInput()
+#include "engine/game.hpp"      //
+
 #include <Windows.h>
 
 /*
@@ -9,7 +16,7 @@
     int         nCmdShow      : ウィンドウの初期表示方法
 */
 
-using namespace engine;
+using namespace window;
 
 int APIENTRY WinMain(
     HINSTANCE hInstance,

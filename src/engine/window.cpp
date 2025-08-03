@@ -1,4 +1,9 @@
+/*******************************************************************************
+ *engine::InitWindow, PollEvents, IsRunning, ShutdownWindow, SwapBuffers の定義*
+ *******************************************************************************/
+
 #include "engine/window.hpp"
+#include <Windows.h>
 
 /*ウィンドウ生成*/
 
@@ -16,7 +21,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-namespace engine
+namespace window
 {
 
     bool InitWindow(HINSTANCE hInstance, int nCmdShow, int width, int height, const wchar_t* title)
