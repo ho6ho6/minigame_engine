@@ -2,6 +2,8 @@
  *  Win32　ウィンドウ生成・イベント処理・バッファ管理の宣言*
  ***********************************************************/
 
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
 
 #pragma once
 
@@ -24,3 +26,4 @@ namespace window
 
 }
 
+#endif // WINDOW_HPP

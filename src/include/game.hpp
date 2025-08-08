@@ -2,6 +2,10 @@
  *ゲーム全体の状態管理・シーン生成・ステートマシンなどを宣言*
  ************************************************************/
 
+#ifndef GAME_HPP
+#define GAME_HPP
+
+
 #pragma once
 
 namespace game
@@ -18,3 +22,5 @@ namespace game
 	//ゲーム終了時に呼ばれる。リソース解放や変数のクリーンアップ
 	void Game_Shutdown();
 }
+
+#endif // GAME_HPP

@@ -2,6 +2,9 @@
  *キーボード・マウス状態の収集・問い合わせインタフェース宣言*
  ************************************************************/
 
+#ifndef INPUT_HPP
+#define INPUT_HPP
+
 #pragma once
 #include <array>
 #include <windows.h>
@@ -18,7 +21,9 @@ namespace input
     void Input_Update();
 
     // 状態クエリ
-    bool IsKeyDown(int vk);      // 押しっぱなし
-    bool IsKeyPressed(int vk);   // 押した瞬間
-    bool IsKeyReleased(int vk);  // 離した瞬間
+    bool IsKeyDown(int key);      // 押しっぱなし
+    bool IsKeyPressed(int key);   // 押した瞬間
+    bool IsKeyReleased(int key);  // 離した瞬間
 }
+
+#endif // INPUT_HPP

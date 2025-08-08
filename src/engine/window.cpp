@@ -2,7 +2,7 @@
  *engine::InitWindow, PollEvents, IsRunning, ShutdownWindow, SwapBuffers の定義*
  *******************************************************************************/
 
-#include "engine/window.hpp"
+#include "../include/window.hpp"
 #include <Windows.h>
 
 /*ウィンドウ生成*/

@@ -2,11 +2,11 @@
  * WinMain とメインループの呼び出し、各サブシステムの初期化と終了処理を行う        *
  ***********************************************************************************/
 
-#include "engine/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
-#include "engine/input.hpp"     // InitInput(), ShutdownInput(), ProcessInput()
-#include "engine/game.hpp"      //
-#include "engine/time.hpp"      // Time::Start(), Time::Update(), Time::GetDeltaTime()
-#include "engine/render.hpp"    // InitRenderer(), BeginFrame(), RenderFrame(), EndFrame(), ShutdownRenderer()
+#include "include/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
+#include "include/input.hpp"     // InitInput(), ShutdownInput(), ProcessInput()
+#include "include/game.hpp"      // Game_Start(), Game_Update(), Game_Render(), Game_Shutdown()
+#include "include/time.hpp"      // Time::Start(), Time::Update(), Time::GetDeltaTime()
+#include "include/render.hpp"    // InitRenderer(), BeginFrame(), RenderFrame(), EndFrame(), ShutdownRenderer()
 
 #include <Windows.h>
 #include <iostream>

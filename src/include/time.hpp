@@ -2,6 +2,9 @@
  *ƒQ[ƒ€“à‚ÌƒtƒŒ[ƒ€ŠÔ‚ğŒˆ‚ß‚é*
  ********************************/
 
+#ifndef TIME_HPP
+#define TIME_HPP
+
 #pragma once
 #include <chrono>
 #include <cstdint>
@@ -30,3 +33,5 @@ namespace frame {
     };
 
 } // namespace time
+
+#endif // TIME_HPP
