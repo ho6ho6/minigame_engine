@@ -1,26 +1,30 @@
 # minigame_engine
 
-## �\��
-- `minigame_engine`: �G���W���{��
-- `minigame_engine.assets`: �A�Z�b�g�Ǘ�
-- `minigame_engine.game`: �Q�[���̎���
-- `minigame_engine.ui`: UI�̎���
+## 構成
+- `minigame_engine`: エンジン本体
+- `minigame_engine.assets`: アセット管理
+- `minigame_engine.game`: ゲームの実装
+- `minigame_engine.ui`: UIの実装
 
-## �J����
+## 開発環境
 - C++
 - CMake
+- Visual Studio 2022
 
-## �J���̗���
-# �����i�K
-1. ���C�����[�v -> �Q�[���̎��ԊǗ��E�X�V�E�`��
-2. ���͏��� -> ���̓C�x���g�̎擾�E����
-3. �`�揈�� -> ��ʂɃI�u�W�F�N�g����
-4. �E�B���h�E�Ǘ� -> �A�v���P�[�V�����E�B���h�E�̐����E�C�x���g����
+## 開発の流れ
+# 初期段階
+1. メインループ -> ゲームの時間管理・更新・描画
+2. 入力処理 -> 入力イベントの取得・処理
+3. 描画処理 -> 画面にオブジェクト生成
+4. ウィンドウ管理 -> アプリケーションウィンドウの生成・イベント処理
 
-# �����ȍ~
-5. ���\�[�X�Ǘ� -> �A�Z�b�g�̓ǂݍ��݁E�Ǘ� 
-6. �V�[���Ǘ� -> �I�u�W�F�N�g�̔z�u�E��ԊǗ�
+# 中期以降
+5. リソース管理 -> アセットの読み込み・管理 
+6. シーン管理 -> オブジェクトの配置・状態管理
 
-# �I��
-7. �������Z -> �Փ˔���E�͂̌v�Z
-8. �T�E���h�Ǘ� -> ���ʉ��EBGM�̍Đ�
+# 終盤
+7. 物理演算 -> 衝突判定・力の計算
+8. サウンド管理 -> 効果音・BGMの再生
+
+## 現在
+gameシーン・game製作シーンなどのeditorウィンドウを製作中
