@@ -3,15 +3,32 @@
  ****************************************/
 
 #include "../include/render.hpp"
-#include <Windows.h>
 #include <gdiplus.h>
 #include <string>
+#include <d3d11.h>
+#include <dxgi.h>
+#include <stdexcept>
+
 
 using namespace Gdiplus;
+
+// DirectX 11 のデバイスとコンテキスト
+static ID3D11Device*                    g_pd3dDevice = nullptr;
+static ID3D11DeviceContext*            g_pd3dDeviceContext = nullptr;
+static IDXGISwapChain*                 g_pSwapChain = nullptr;
+
+// シーン描画用テクスチャ + RTV + SRV
+static ID3D11Texture2D*                 g_pSceneTex = nullptr;
+static ID3D11RenderTargetView*          g_pSceneRTV = nullptr;
+static ID3D11ShaderResourceView*        g_pSceneSRV = nullptr;
+
 
 // ウィンドウハンドルをキャッシュしておく
 static HWND      g_hWnd = nullptr;
 static ULONG_PTR g_gdiplusToken = 0;
+
+static int viewport_width = 0;
+static int viewport_height = 0;
 
 
 // (1) テスト描画用関数を追加
@@ -37,6 +54,38 @@ namespace render
 
     bool Render_Start(HWND hwnd, int width, int height)
     {
+
+        // 例: スワップチェーン／デバイス生成
+        DXGI_SWAP_CHAIN_DESC sd = {};
+        sd.BufferCount = 1;
+        sd.BufferDesc.Width = width;
+        sd.BufferDesc.Height = height;
+        sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        sd.OutputWindow = hwnd;
+        sd.SampleDesc.Count = 1;
+        sd.SampleDesc.Quality = 0;
+        sd.Windowed = TRUE;
+
+        UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+        D3D_FEATURE_LEVEL featureLevel;
+        HRESULT hr = D3D11CreateDeviceAndSwapChain(
+            nullptr,
+            D3D_DRIVER_TYPE_HARDWARE,
+            nullptr,
+            createDeviceFlags,
+            nullptr, 0,
+            D3D11_SDK_VERSION,
+            &sd,
+            /* out */ nullptr,
+            &g_pd3dDevice,
+            &featureLevel,
+            &g_pd3dDeviceContext
+        );
+        if (FAILED(hr)) return false;
+
+
+
         g_hWnd = hwnd;
         GdiplusStartupInput gdiplusInput;
         if (GdiplusStartup(&g_gdiplusToken, &gdiplusInput, nullptr) != Ok)
@@ -46,6 +95,13 @@ namespace render
 
     void Render_Shutdown()
     {
+
+        if (g_pd3dDeviceContext) { g_pd3dDeviceContext->ClearState(); }
+        if (g_pd3dDeviceContext) { g_pd3dDeviceContext->Release(); }
+        if (g_pd3dDevice) { g_pd3dDevice->Release(); }
+        g_pd3dDevice = nullptr;
+        g_pd3dDeviceContext = nullptr;
+
         GdiplusShutdown(g_gdiplusToken);
     }
 
@@ -95,4 +151,63 @@ namespace render
         ReleaseDC(g_hWnd, hdc);
     }
 
+    void Render_Resizeview(int width, int height)
+    {
+        viewport_width = width;
+        viewport_height = height;
+    }
+
+    int Render_PickObject(int x, int y)
+    {
+        return -1;
+    }
+
+    // アクセサ実装
+    ID3D11Device* Render_GetDevice()
+    {
+        return g_pd3dDevice;
+    }
+
+    ID3D11DeviceContext* Render_GetDeviceContext()
+    {
+        return g_pd3dDeviceContext;
+    }
+
+    ID3D11ShaderResourceView* Render_GetSceneSRV()
+    {
+        return g_pSceneSRV;
+    }
+
+}
+
+
+// 内部ヘルパ：SceneView 用テクスチャを作成
+static void Render_GetSceneSRV(int width, int height)
+{
+    // 既存リソース破棄
+    if (g_pSceneSRV) { g_pSceneSRV->Release();     g_pSceneSRV = nullptr; }
+    if (g_pSceneRTV) { g_pSceneRTV->Release();     g_pSceneRTV = nullptr; }
+    if (g_pSceneTex) { g_pSceneTex->Release();     g_pSceneTex = nullptr; }
+
+    // テクスチャ作成
+    D3D11_TEXTURE2D_DESC desc{};
+    desc.Width = width;
+    desc.Height = height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+    HRESULT hr = g_pd3dDevice->CreateTexture2D(&desc, nullptr, &g_pSceneTex);
+    if (FAILED(hr)) throw std::runtime_error("Failed to create scene texture");
+
+    // RTV
+    hr = g_pd3dDevice->CreateRenderTargetView(g_pSceneTex, nullptr, &g_pSceneRTV);
+    if (FAILED(hr)) throw std::runtime_error("Failed to create scene RTV");
+
+    // SRV
+    hr = g_pd3dDevice->CreateShaderResourceView(g_pSceneTex, nullptr, &g_pSceneSRV);
+    if (FAILED(hr)) throw std::runtime_error("Failed to create scene SRV");
 }

@@ -3,38 +3,36 @@
  *******************************************************************************/
 
 #include "../include/window.hpp"
+#include "../include/window_editor/window_scene.hpp"
+#include "../include/window_editor/window_editor.hpp"
 #include <Windows.h>
+
 
 /*ウィンドウ生成*/
 
-static HWND g_hWnd = nullptr;
-static bool g_isRunning = true;
+//static HWND g_hWnd = nullptr;
+//static HINSTANCE g_hInstance = nullptr;
+//static bool g_isRunning = false;
 
-static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    if (msg == WM_DESTROY || msg == WM_CLOSE)
-    {
-        g_isRunning = false;
-        PostQuitMessage(0);
-        return 0;
-    }
-    return DefWindowProc(hWnd, msg, wParam, lParam);
-}
+static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 
 namespace window
 {
 
-    bool InitWindow(HINSTANCE hInstance, int nCmdShow, int width, int height, const wchar_t* title)
+    bool InitWindow(HINSTANCE hInstance, int nCmdShow, int width, int height, LPCWSTR title)
     {
-        WNDCLASS wc = {};
-        wc.lpfnWndProc = WndProc;                           // ウィンドウプロシージャへのポインタ
-        wc.hInstance = hInstance;                           // アプリケーションインスタンス hlnstanceパラメータからwWinMain()に渡される
-        wc.lpszClassName = L"MiniGameEngineWindowClass";    // ウィンドウクラス名
+        WNDCLASSEX wc = {};
+        wc.cbSize = sizeof(wc);
+        wc.style = CS_HREDRAW | CS_VREDRAW;
+        wc.lpfnWndProc = WndProc;
+        wc.hInstance = hInstance;
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        wc.lpszClassName = L"MiniGameEngineWindowClass";
+        RegisterClassEx(&wc);
 
-        if (!RegisterClass(&wc)) return false;
 
-        g_hWnd = CreateWindowExW(
+        g_hWnd = CreateWindowEx(
             0,
             wc.lpszClassName,
             title,
@@ -49,7 +47,9 @@ namespace window
         if (!g_hWnd) return false;
 
         ShowWindow(g_hWnd, nCmdShow);
+        UpdateWindow(g_hWnd);
 
+		g_isRunning = true;
         return true;
     }
 
@@ -77,7 +77,12 @@ namespace window
 
     void ShutdownWindow()
     {
-        if (g_hWnd) DestroyWindow(g_hWnd);
-        UnregisterClass(L"MiniGameEngineClass", GetModuleHandle(nullptr));
+        if (g_hWnd)
+        {
+            DestroyWindow(g_hWnd);
+            g_hWnd = nullptr;
+        }
+        UnregisterClass(L"MiniGameEngineWindowClass", g_hInstance);
+        g_isRunning = false;
     }
 }

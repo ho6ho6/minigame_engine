@@ -1154,6 +1154,18 @@
 			"value" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine"
 		},
 		{
+			"name" : "WindowsSDK_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for WindowsSDK."
+				}
+			],
+			"type" : "PATH",
+			"value" : "WindowsSDK_DIR-NOTFOUND"
+		},
+		{
 			"name" : "minigame_engine_BINARY_DIR",
 			"properties" : 
 			[
