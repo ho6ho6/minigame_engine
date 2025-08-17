@@ -23,7 +23,7 @@
 3. 描画処理 -> 画面にオブジェクト生成
 4. ウィンドウ管理 -> アプリケーションウィンドウの生成・イベント処理
 
-[!minigame_engine](./img/minigame_engine1.ong)
+![minigame_engine](./img/minigame_engine1.png)
 
 # 中期以降
 5. リソース管理 -> アセットの読み込み・管理 
