@@ -25,9 +25,6 @@
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_manager_abst.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

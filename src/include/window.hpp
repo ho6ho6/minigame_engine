@@ -8,25 +8,6 @@
 #pragma once
 #include <Windows.h>
 
-static HWND g_hWnd = nullptr;
-static HINSTANCE g_hInstance = nullptr;
-static bool g_isRunning = false;
-
-static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (msg)
-    {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        g_isRunning = false;
-        return 0;
-    case WM_SIZE:
-        // 必要なら resize イベント処理
-        break;
-    }
-    return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
 
 namespace window
 {

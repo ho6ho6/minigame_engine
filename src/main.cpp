@@ -10,10 +10,9 @@
 
 #include "include/window_editor/window_manager.hpp" // window_manager
 #include "include/window_editor/window_scene.hpp" // window_scene
-#include "include/window_editor/window_editor.hpp" // window_editor
-#include "include/window_editor/window_manager_abstra.hpp" // window_manager_abst
-#include "include/window_editor/window_manager_other.hpp" // window_manager_other
 
+/*ImGui は「既存の OS ウィンドウ」のクライアント領域内に GUI を即時モードで描画するライブラリ*/
+// Begin/End で開くウィンドウ
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
@@ -58,15 +57,17 @@ int APIENTRY WinMain(
 
     game::Game_Start();
 
+
     /*----------------------------------初期化----------------------------------*/
 
 
     /*-----------------------------ウィンドウの登録------------------------------*/
 
-    engine::window::window_manager wm;
-	wm.window_manager_Register<engine::editor::window_scene>(); // シーンビューを登録
+    n_windowmanager::window_manager wm;
+    wm.RegisterSceneWindow();           // ImGui,DX11の初期化
 	//wm.window_manager_Register<engine::editor::window_game>(); // シーンビューを登録
 	//wm.window_manager_Register<engine::editor::window_input>(); // シーンビューを登録
+
 
     /*-----------------------------ウィンドウの登録------------------------------*/
 
@@ -98,10 +99,11 @@ int APIENTRY WinMain(
 
         // ImGui::ShowDemoWindow();
 
-		wm.window_manager_RenderAll(); // window_manager.cpp
+		wm.RenderAll(); // window_manager.cpp
 
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // ImGuiの描画を行うために、DirectX11のレンダリングを開始
+        
     }
 
     /*----------------------------------メイン----------------------------------*/

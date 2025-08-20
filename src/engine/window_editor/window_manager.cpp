@@ -1,15 +1,17 @@
-#include "../../include/window_editor/window_manager.hpp"
+// window_manager.cpp
 
-namespace engine::window
-{
-	void window_manager::window_manager_RenderAll()
-	{
-		for (auto& window : windows_)
-		{
-			if (window->window_manager_other_IsVisible())
-			{
-				window->window_manager_other_Render();
-			}
-		}
-	}
-}
+//#include "../../include/window_editor/window_manager.hpp"
+//
+//namespace engine::window
+//{
+//	void window_manager::window_manager_RenderAll()
+//	{
+//		for (auto& window : windows_)
+//		{
+//			if (window->window_manager_other_IsVisible())
+//			{
+//				window->window_manager_other_Render();
+//			}
+//		}
+//	}
+//}

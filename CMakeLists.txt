@@ -11,7 +11,6 @@ set(IMGUI_SOURCES
     ${PROJECT_SOURCE_DIR}/third_party/imgui/imgui_draw.cpp
     ${PROJECT_SOURCE_DIR}/third_party/imgui/imgui_tables.cpp
     ${PROJECT_SOURCE_DIR}/third_party/imgui/imgui_widgets.cpp
-    # ${PROJECT_SOURCE_DIR}/third_party/imgui/imgui_demo.cpp
     ${PROJECT_SOURCE_DIR}/third_party/imgui/backends/imgui_impl_win32.cpp
     ${PROJECT_SOURCE_DIR}/third_party/imgui/backends/imgui_impl_dx11.cpp
 )
@@ -33,8 +32,8 @@ add_executable(minigame_engine
 # windows固有
 add_definitions(-DUNICODE -D_UNICODE)
 target_include_directories(minigame_engine PUBLIC
-  ${PROJECT_SOURCE_DIR}            # ルートを追加
-  ${PROJECT_SOURCE_DIR}/include    # これも残す
+  ${PROJECT_SOURCE_DIR}            
+  ${PROJECT_SOURCE_DIR}/include    
   ${PROJECT_SOURCE_DIR}/include/window_editor
   ${PROJECT_SOURCE_DIR}/third_party/imgui
   ${PROJECT_SOURCE_DIR}/third_party/imgui/backends

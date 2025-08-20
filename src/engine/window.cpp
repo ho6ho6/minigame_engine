@@ -3,8 +3,11 @@
  *******************************************************************************/
 
 #include "../include/window.hpp"
-#include "../include/window_editor/window_scene.hpp"
-#include "../include/window_editor/window_editor.hpp"
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+#include "../include/render.hpp"
+#include "../include/window_editor/window_manager.hpp"
 #include <Windows.h>
 
 
@@ -13,8 +16,30 @@
 //static HWND g_hWnd = nullptr;
 //static HINSTANCE g_hInstance = nullptr;
 //static bool g_isRunning = false;
+static HWND g_hWnd = nullptr;
+static HINSTANCE g_hInstance = nullptr;
+static bool g_isRunning = false;
 
-static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+        return true; // なぜかインクルード出来ない
+
+    switch (msg)
+    {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        g_isRunning = false;
+        return 0;
+    case WM_SIZE:
+        // 必要なら resize イベント処理
+        if (render::Render_GetDevice()) // DX デバイスが作られていれば
+            render::Render_Resizeview(LOWORD(lParam), HIWORD(lParam));
+        break;
+    }
+    return DefWindowProc(hWnd, msg, wParam, lParam);
+}
 
 
 namespace window
