@@ -51,6 +51,10 @@ int APIENTRY WinMain(
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 	ImGui::StyleColorsDark(); // ImGui のテーマをダークに設定
+
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Docking機能をON
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // （任意）別ウィンドウへの展開も可能に
+
     
     ImGui_ImplWin32_Init(window::GetHWND());
     ImGui_ImplDX11_Init(render::Render_GetDevice(), render::Render_GetDeviceContext());
@@ -78,11 +82,11 @@ int APIENTRY WinMain(
     /*-----------------------------ウィンドウの登録------------------------------*/
 
 
+
     /*----------------------------------メイン----------------------------------*/
 
     while (window::IsRunning()) //window.cpp
     {
-        // 1) OSメッセージ処理 は必ず NewFrame より前
         window::PollEvents();
 
         // 2) 各サブシステム更新
@@ -91,33 +95,77 @@ int APIENTRY WinMain(
         input::Input_Update();
         game::Game_Update(deltaTime);
 
+        static const float clear_col[4] = { 0.45f, 0.55f, 0.60f, 1.00f };
+        render::Render_BegineFrame(clear_col);
+
         // 3) ImGui フレーム開始
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        // 4) ImGui ウィンドウ群の描画
-        //    まずデバッグ用にデモウィンドウを出してみる
-        //ImGui::ShowDemoWindow();
+        // ── ここから DockSpace ──
+        // (A) ホスト用フルスクリーンウィンドウを立てて
+        ImGuiWindowFlags hostFlags =
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoNavFocus;
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
+        ImGui::Begin("##MainDockHost", nullptr, hostFlags);
 
-        //    あなたの Scene ウィンドウ登録・描画
-        wm.RenderAll();
+        // (B) DockSpace 本体
+        ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
+        ImGui::DockSpace(
+            dockspaceID, ImVec2(0, 0),
+            ImGuiDockNodeFlags_PassthruCentralNode
+        );
 
-        // 5) ImGui 描画コマンドを確定
+
+
+		// デフォルトで DockSpace を作成する場合は以下のようにコメントアウトを外す
+        //static bool firstTime = true;
+        //if (firstTime)
+        //{
+        //    firstTime = false;
+        //    ImGuiID dockMain = dockspaceID;
+        //    ImGui::DockBuilderRemoveNode(dockMain);
+        //    ImGui::DockBuilderAddNode(dockMain, ImGuiDockNodeFlags_DockSpace);
+        //    ImGui::DockBuilderSetNodeSize(dockMain, ImGui::GetIO().DisplaySize);
+
+        //    // 左にヒエラルキー、右にインスペクタ用に縦分割
+        //    ImGuiID leftID = ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Left, 0.2f, nullptr, &dockMain);
+        //    ImGuiID rightID = ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Right, 0.2f, nullptr, &dockMain);
+
+        //    // 下部にコンソール用の横分割
+        //    ImGuiID bottomID = ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Down, 0.25f, nullptr, &dockMain);
+
+        //    // パネルをそれぞれ配置
+        //    ImGui::DockBuilderDockWindow("Hierarchy", leftID);
+        //    ImGui::DockBuilderDockWindow("Inspector", rightID);
+        //    ImGui::DockBuilderDockWindow("Console", bottomID);
+        //    ImGui::DockBuilderDockWindow("Scene", dockMain);
+
+        //    ImGui::DockBuilderFinish(dockMain);
+        //}
+
+        ImGui::End();
+        // ── DockSpace 設置ここまで ──
+
+        // 4) 各パネルを描画する
+        //    ※Begin()/End() のタイトルが "Hierarchy" など一致していること
+        //DrawHierarchy();   // 例: void DrawHierarchy() { ImGui::Begin("Hierarchy"); … ImGui::End(); }
+        //DrawInspector();   // 例:
+        //wm.RenderAll();    // Scene View (window_manager経由)
+        //DrawConsole();     // 例:
+
+        // 5) ImGui 描画確定
         ImGui::Render();
-
-        // 6) レンダラーのバッファクリア＋ゲームオブジェクト描画
-        //    （Render_Update がここで背景クリア→Game_Renderもしくは
-        //     swapChain->Present を行っていない場合は、Begin/Endを整形してください）
-        FLOAT clear_color[4] = { 0.1f,0.1f,0.1f,1.0f };
-
-        // game::Game_Render();                        // ← 高レベル描画
-        // 7) ImGui 描画をバックバッファへ上書き
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-        // 8) 最後に Present
-        render::Render_Present();                   // ← swapChain->Present(1,0)
 
-        render::Render_Update(deltaTime, frameTime);
+        // 6) 最後に DirectX の Present
+        render::Render_Present();
     }
 
     /*----------------------------------メイン----------------------------------*/
@@ -135,3 +183,38 @@ int APIENTRY WinMain(
 
     return 0;
 }
+
+//void DrawHierarchy()
+//{
+//    ImGui::Begin("Hierarchy");
+//    // ツリー表示など
+//    ImGui::Text("GameObject A");
+//    ImGui::Text("GameObject B");
+//    ImGui::End();
+//}
+//
+//void DrawInspector()
+//{
+//    ImGui::Begin("Inspector");
+//    // 選択中オブジェクトのプロパティ
+//    ImGui::Text("Position");
+//    ImGui::DragFloat3("##pos", glm::value_ptr(selectedPos));
+//    ImGui::End();
+//}
+//
+//void DrawScene()
+//{
+//    ImGui::Begin("Scene");
+//    // シーントレース、またはDirectXのシェアテクスチャなどを描画
+//    ImGui::Image((void*)sceneTextureSRV, ImGui::GetContentRegionAvail());
+//    ImGui::End();
+//}
+//
+//void DrawConsole()
+//{
+//    ImGui::Begin("Console");
+//    // ログ出力
+//    for (auto& msg : logBuffer)
+//        ImGui::TextUnformatted(msg.c_str());
+//    ImGui::End();
+//}

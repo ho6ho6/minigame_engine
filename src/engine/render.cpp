@@ -18,9 +18,11 @@ static ID3D11DeviceContext*            g_context = nullptr;
 static IDXGISwapChain*                 g_swapChain = nullptr;
 
 // シーン描画用テクスチャ + RTV + SRV
-static ID3D11RenderTargetView*          g_rtv = nullptr;
+static ID3D11RenderTargetView*          g_rtv = nullptr;    // static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 static ID3D11DepthStencilView*          g_dsv = nullptr;
 static ID3D11ShaderResourceView*        g_srv = nullptr;
+
+
 
 
 // ウィンドウハンドルをキャッシュしておく
@@ -30,25 +32,6 @@ static ULONG_PTR g_gdiplusToken = 0;
 static int viewport_width = 0;
 static int viewport_height = 0;
 
-
-//// (1) テスト描画用関数を追加
-//static void DrawTest(Graphics& g)
-//{
-//    // 背景は Render() 側でクリア済み
-//    //Pen pen(Color(255, 0, 0, 0), 3.0f);
-//    //g.DrawRectangle(&pen, 50, 50, 200, 100);
-//
-//    //SolidBrush brush(Color(255, 255, 0, 0));
-//    //g.FillEllipse(&brush, 300, 50, 100, 100);
-//
-//    FontFamily family(L"しねきゃぷしょん");
-//    Font font(&family, 24, FontStyleBold, UnitPixel);
-//    PointF pt(50.0f, 200.0f);
-//    SolidBrush textBrush(Color(255, 0, 0, 255));
-//    g.DrawString(L"ミニゲームエンジンを作成している", -1, &font, pt, &textBrush);
-//}
-
-
 namespace render
 {
 
@@ -57,8 +40,8 @@ namespace render
         // 例: スワップチェーン／デバイス生成
         DXGI_SWAP_CHAIN_DESC sd = {};
         sd.BufferCount = 1;
-        sd.BufferDesc.Width = width;
-        sd.BufferDesc.Height = height;
+        sd.BufferDesc.Width = 6000;
+        sd.BufferDesc.Height = 100;
         sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.OutputWindow = hwnd;
@@ -83,6 +66,21 @@ namespace render
             &g_context
         );
 
+        ID3D11Texture2D* pBackBuffer = nullptr;
+        g_swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+        g_device->CreateRenderTargetView(pBackBuffer, nullptr, &g_rtv);
+
+        D3D11_VIEWPORT vpInit{};
+        vpInit.TopLeftX = 0.0f;
+        vpInit.TopLeftY = 0.0f;
+        vpInit.Width = static_cast<float>(width);   // 引数 width
+        vpInit.Height = static_cast<float>(height);  // 引数 height
+        vpInit.MinDepth = 0.0f;
+        vpInit.MaxDepth = 1.0f;
+        g_context->RSSetViewports(1, &vpInit);
+
+        pBackBuffer->Release();
+
         if (FAILED(hr)) return false;
 
         g_hWnd = hwnd;
@@ -104,14 +102,30 @@ namespace render
 
     }
 
+
+
     void Render_BegineFrame(const float clearColor[4])
     {
+
+        g_context->OMSetRenderTargets(1, &g_rtv, nullptr);
         // 1) RenderTargetView のクリア
         g_context->ClearRenderTargetView(g_rtv, clearColor);
-        // 2) DepthStencilView のクリア（必要なら）
-        g_context->ClearDepthStencilView(g_dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+        // 2) DepthStencilView のクリア
+        // g_context->ClearDepthStencilView(g_dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
         // Viewport 設定など
+        RECT rc{};
+        GetClientRect(g_hWnd, &rc);
+        D3D11_VIEWPORT vp{};
+        vp.TopLeftX = 0.0f;
+        vp.TopLeftY = 0.0f;
+        vp.Width = static_cast<float>(rc.right - rc.left);
+        vp.Height = static_cast<float>(rc.bottom - rc.top);
+        vp.MinDepth = 0.0f;
+        vp.MaxDepth = 1.0f;
+        g_context->RSSetViewports(1, &vp);
+
     }
 
     void render::Render_EndFrame()
@@ -124,7 +138,7 @@ namespace render
         g_swapChain->Present(1, 0);
     }
 
-    //--- 追加：Render を実装 ---
+    //--- Render を実装 ---
     void Render_Update(float deltaTime, uint64_t frameCount)
     {
         // 1) クライアント領域サイズ取得
