@@ -19,16 +19,23 @@ namespace render
     // ここに追加：毎フレーム呼び出す Render 関数
     void Render_Update(float , uint64_t );
 
+	//   clearColor: {r, g, b, a}
+	void Render_BegineFrame(const float clearColor[4]);
+
+	// 描画コマンド確定（Present は行わない）
+	void Render_EndFrame();
+
+	// SwapChain→Present
+	void Render_Present();
+
 	// ビューポートのサイズ変更
-	void Render_Resizeview(int width, int height);
+	void Render_Resizeviewport(int width, int height);
 
 	// 画面 (x, y) からオブジェクトをピックし、ID を返す
     // -1 を返したら「何も選択されていない」
 	int Render_PickObject(int x, int y);
 
 	ID3D11ShaderResourceView* Render_GetSceneSRV(); // ビューポートのテクスチャを取得
-
-
 	// DirectX 11 のデバイスとコンテキストを取得
 	ID3D11Device*				Render_GetDevice();
 	ID3D11DeviceContext*		Render_GetDeviceContext();

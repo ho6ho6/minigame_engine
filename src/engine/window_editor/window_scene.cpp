@@ -12,7 +12,7 @@ namespace n_windowscene
         ImVec2 avail = ImGui::GetContentRegionAvail();
         if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {
             m_LastSize = avail;
-            render::Render_Resizeview((int)avail.x, (int)avail.y);
+            render::Render_Resizeviewport((int)avail.x, (int)avail.y);
         }
 
         ImTextureID texID = reinterpret_cast<ImTextureID>(render::Render_GetSceneSRV());

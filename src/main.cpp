@@ -46,8 +46,12 @@ int APIENTRY WinMain(
 	if (!game::Game_Start()) return -1;
 
     if (!render::Render_Start(window::GetHWND(), width, height)) return -1;
-
+    
+    IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+	ImGui::StyleColorsDark(); // ImGui のテーマをダークに設定
+    
     ImGui_ImplWin32_Init(window::GetHWND());
     ImGui_ImplDX11_Init(render::Render_GetDevice(), render::Render_GetDeviceContext());
 
@@ -56,6 +60,8 @@ int APIENTRY WinMain(
     input::Input_Start();
 
     game::Game_Start();
+
+
 
 
     /*----------------------------------初期化----------------------------------*/
@@ -76,34 +82,42 @@ int APIENTRY WinMain(
 
     while (window::IsRunning()) //window.cpp
     {
-
-        // イベントポーリング window.cpp
+        // 1) OSメッセージ処理 は必ず NewFrame より前
         window::PollEvents();
 
-        //time更新    time.cpp
+        // 2) 各サブシステム更新
         float deltaTime = frame::Time::Update_Time();
         uint64_t frameTime = frame::Time::GetFrameCount();
+        input::Input_Update();
+        game::Game_Update(deltaTime);
 
-
+        // 3) ImGui フレーム開始
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        // サブシステム更新
-		input::Input_Update();  // input.cpp 
-        game::Game_Update(deltaTime); // game.cpp ロジック更新
+        // 4) ImGui ウィンドウ群の描画
+        //    まずデバッグ用にデモウィンドウを出してみる
+        //ImGui::ShowDemoWindow();
 
-        // 描画
-		game::Game_Render(); // game.cpp    高レベル描画（オブジェクト単位）
-        render::Render_Update(deltaTime, frameTime); // render.cpp  低レベル描画（背景クリア＋全オブジェクトをまとめて出力）
+        //    あなたの Scene ウィンドウ登録・描画
+        wm.RenderAll();
 
-        // ImGui::ShowDemoWindow();
-
-		wm.RenderAll(); // window_manager.cpp
-
+        // 5) ImGui 描画コマンドを確定
         ImGui::Render();
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // ImGuiの描画を行うために、DirectX11のレンダリングを開始
-        
+
+        // 6) レンダラーのバッファクリア＋ゲームオブジェクト描画
+        //    （Render_Update がここで背景クリア→Game_Renderもしくは
+        //     swapChain->Present を行っていない場合は、Begin/Endを整形してください）
+        FLOAT clear_color[4] = { 0.1f,0.1f,0.1f,1.0f };
+
+        // game::Game_Render();                        // ← 高レベル描画
+        // 7) ImGui 描画をバックバッファへ上書き
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+        // 8) 最後に Present
+        render::Render_Present();                   // ← swapChain->Present(1,0)
+
+        render::Render_Update(deltaTime, frameTime);
     }
 
     /*----------------------------------メイン----------------------------------*/
