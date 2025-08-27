@@ -29,6 +29,9 @@
 - 現状2 --> ImGuiモジュールを用いたWindow分割(これがWindow_scene{UnityならばHierarchy}などのサブウィンドウになる) </br>
 ![minigame_engine](./img/minigame_engine2.png)
 
+- 現状3 --> window_sceneに描画を行った </br>
+![minigame_engine](./img/minigame_engine3.png)
+
 # 中期以降
 5. リソース管理 -> アセットの読み込み・管理
 6. シーン管理 -> オブジェクトの配置・状態管理
