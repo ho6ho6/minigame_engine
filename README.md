@@ -29,7 +29,8 @@
 - 現状2 --> ImGuiモジュールを用いたWindow分割(これがWindow_scene{UnityならばHierarchy}などのサブウィンドウになる) </br>
 ![minigame_engine](./img/minigame_engine2.png)
 
-- 現状3 --> window_sceneに描画を行った </br>
+- 現状3 --> サブウィンドウの描画を行った。</br>
+左下の縦長長方形はInputウィンドウ、右下の横長長方形にはAssetsやhierarchyウィンドウになる。 </br>
 ![minigame_engine](./img/minigame_engine3.png)
 
 # 中期以降
