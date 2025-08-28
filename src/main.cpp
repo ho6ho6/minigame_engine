@@ -204,24 +204,7 @@ int APIENTRY WinMain(
 //    ImGui::Text("GameObject B");
 //    ImGui::End();
 //}
-//
-//void DrawInspector()
-//{
-//    ImGui::Begin("Inspector");
-//    // 選択中オブジェクトのプロパティ
-//    ImGui::Text("Position");
-//    ImGui::DragFloat3("##pos", glm::value_ptr(selectedPos));
-//    ImGui::End();
-//}
-//
-//void DrawScene()
-//{
-//    ImGui::Begin("Scene");
-//    // シーントレース、またはDirectXのシェアテクスチャなどを描画
-//    ImGui::Image((void*)sceneTextureSRV, ImGui::GetContentRegionAvail());
-//    ImGui::End();
-//}
-//
+
 //void DrawConsole()
 //{
 //    ImGui::Begin("Console");
