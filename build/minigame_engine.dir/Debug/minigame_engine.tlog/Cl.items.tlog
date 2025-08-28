@@ -5,6 +5,7 @@ E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\render.cp
 E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\time.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\time.obj
 E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\window.obj
 E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_editor.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\window_editor.obj
+E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_game.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\window_game.obj
 E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_manager.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\window_manager.obj
 E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_scene.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\window_scene.obj
 E:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\imgui.cpp;E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.dir\Debug\imgui.obj

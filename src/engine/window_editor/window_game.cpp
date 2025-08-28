@@ -1,21 +1,21 @@
 /*シーンウィンドウ*/
-#include "../../include/window_editor/window_scene.hpp"
+#include "../../include/window_editor/window_game.hpp"
 #include "../../include/render.hpp"	//フレームバッファ取得用
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
 
-namespace n_windowscene
+namespace n_windowgame
 {
 
-    void window_scene::Render()
+    void window_game::Render()
     {
         /*windowの座標とサイズ*/
-        ImGui::SetNextWindowPos(ImVec2(400, 0), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(600, 400), ImVec2(FLT_MAX, FLT_MAX));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(400, 200), ImVec2(FLT_MAX, FLT_MAX));
 
 
         // Window表示に関して
-        ImGui::Begin("Scene_View", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+        ImGui::Begin("Game_View", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
 
         ImVec2 avail = ImGui::GetContentRegionAvail();
         if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {

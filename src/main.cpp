@@ -1,6 +1,6 @@
-/***********************************************************************************
+/**************************************************************************
  * WinMain とメインループの呼び出し、各サブシステムの初期化と終了処理を行う        *
- ***********************************************************************************/
+ **************************************************************************/
 
 #include "include/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
 #include "include/input.hpp"     // InitInput(), ShutdownInput(), ProcessInput()
@@ -9,7 +9,6 @@
 #include "include/render.hpp"    // InitRenderer(), BeginFrame(), RenderFrame(), EndFrame(), ShutdownRenderer()
 
 #include "include/window_editor/window_manager.hpp" // window_manager
-#include "include/window_editor/window_scene.hpp" // window_scene
 
 /*ImGui は「既存の OS ウィンドウ」のクライアント領域内に GUI を即時モードで描画するライブラリ*/
 // Begin/End で開くウィンドウ
@@ -45,7 +44,7 @@ int APIENTRY WinMain(
 
 	if (!game::Game_Start()) return -1;
 
-    if (!render::Render_Start(window::GetHWND(), width, height)) return -1;
+    if (!n_render::Render_Start(window::GetHWND(), width, height)) return -1;
     
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -57,13 +56,13 @@ int APIENTRY WinMain(
 
     
     ImGui_ImplWin32_Init(window::GetHWND());
-    ImGui_ImplDX11_Init(render::Render_GetDevice(), render::Render_GetDeviceContext());
+    ImGui_ImplDX11_Init(n_render::Render_GetDevice(), n_render::Render_GetDeviceContext());
 
     frame::Time::Start_Time();
 
-    input::Input_Start();
+    //input::Input_Start();
 
-    game::Game_Start();
+    //game::Game_Start();
 
 
 
@@ -74,9 +73,9 @@ int APIENTRY WinMain(
     /*-----------------------------ウィンドウの登録------------------------------*/
 
     n_windowmanager::window_manager wm;
-    wm.RegisterSceneWindow();           // ImGui,DX11の初期化
-	//wm.window_manager_Register<engine::editor::window_game>(); // シーンビューを登録
-	//wm.window_manager_Register<engine::editor::window_input>(); // シーンビューを登録
+    wm.Register_SceneWindow();           // ImGui,DX11の初期化
+    wm.Register_GameWindow();
+    //wm.Register_InputWindow();
 
 
     /*-----------------------------ウィンドウの登録------------------------------*/
@@ -92,16 +91,17 @@ int APIENTRY WinMain(
         // 2) 各サブシステム更新
         float deltaTime = frame::Time::Update_Time();
         uint64_t frameTime = frame::Time::GetFrameCount();
-        input::Input_Update();
-        game::Game_Update(deltaTime);
+        //input::Input_Update();
+        //game::Game_Update(deltaTime);
 
-        static const float clear_col[4] = { 0.45f, 0.55f, 0.60f, 1.00f };
-        render::Render_BegineFrame(clear_col);
 
         // 3) ImGui フレーム開始
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+
+        static const float clear_col[4] = { 0.5f, 0.5f, 0.5f, 0.1f };
+        n_render::Render_Frame(clear_col, deltaTime, frameTime);
 
         // ── ここから DockSpace ──
         // (A) ホスト用フルスクリーンウィンドウを立てて
@@ -121,7 +121,22 @@ int APIENTRY WinMain(
             dockspaceID, ImVec2(0, 0),
             ImGuiDockNodeFlags_PassthruCentralNode
         );
+        ImGui::End();
 
+        wm.RenderAll();
+
+        // 5) ImGui 描画確定
+        ImGui::Render();
+        
+        auto ctx = n_render::Render_GetDeviceContext();
+        auto rtv = n_render::Render_GetRenderTargetView();
+
+        ctx->OMSetRenderTargets(1, &rtv, nullptr);
+        ctx->ClearRenderTargetView(rtv, clear_col);
+
+        //game::Game_Render(); // game.cpp
+        
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 
 		// デフォルトで DockSpace を作成する場合は以下のようにコメントアウトを外す
@@ -150,7 +165,6 @@ int APIENTRY WinMain(
         //    ImGui::DockBuilderFinish(dockMain);
         //}
 
-        ImGui::End();
         // ── DockSpace 設置ここまで ──
 
         // 4) 各パネルを描画する
@@ -160,12 +174,10 @@ int APIENTRY WinMain(
         //wm.RenderAll();    // Scene View (window_manager経由)
         //DrawConsole();     // 例:
 
-        // 5) ImGui 描画確定
-        ImGui::Render();
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 
         // 6) 最後に DirectX の Present
-        render::Render_Present();
+        n_render::Render_Present();
     }
 
     /*----------------------------------メイン----------------------------------*/
@@ -177,7 +189,7 @@ int APIENTRY WinMain(
 	ImGui::DestroyContext();            // ImGuiコンテキストを破棄
 
     input::Input_Shutdown();             // input.cpp
-    render::Render_Shutdown();        // render.cpp
+    n_render::Render_Shutdown();        // render.cpp
 	game::Game_Shutdown();            // game.cpp
 	window::ShutdownWindow();        // window.cpp
 

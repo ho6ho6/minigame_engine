@@ -18,6 +18,7 @@ set(IMGUI_SOURCES
 # src ˆÈ‰º‚Ì .cpp ‚ð‘SŽ©“®ŽûW
 file(GLOB_RECURSE ENGINE_SOURCES
     "${PROJECT_SOURCE_DIR}/src/engine/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/engine/window_editor/*.cpp"
 )
 
 

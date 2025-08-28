@@ -6,29 +6,20 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "window_scene.hpp"
+#include "window_base.hpp"
 
 namespace n_windowmanager
 {
     class window_manager
     {
     public:
-
-        void RegisterSceneWindow()
-        {
-            windows_.emplace_back(std::make_unique<n_windowscene::window_scene>());
-        }
-
-        void RenderAll()
-        {
-            for (auto& window : windows_)
-            {
-                window->window_scene_Render();
-            }
-        }
+        void Register_SceneWindow();
+        void Register_GameWindow();
+        //void Register_InputWindow();
+        void RenderAll();
 
     private:
-        std::vector<std::unique_ptr<n_windowscene::window_scene>> windows_;
+        std::vector<std::unique_ptr<n_windowbase::window_base>> windows_;
     };
 }
 

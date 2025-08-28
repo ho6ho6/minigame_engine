@@ -1,13 +1,19 @@
 /****************************************
- *毎フレームの描画処理だけ行う             *
+ *      毎フレームの描画処理だけ行う        *
  ****************************************/
 
 #include "../include/render.hpp"
+#include "../include/game.hpp"
+
 #include <gdiplus.h>
 #include <string>
 #include <d3d11.h>
 #include <dxgi.h>
 #include <stdexcept>
+
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
 
 
 using namespace Gdiplus;
@@ -18,7 +24,7 @@ static ID3D11DeviceContext*            g_context = nullptr;
 static IDXGISwapChain*                 g_swapChain = nullptr;
 
 // シーン描画用テクスチャ + RTV + SRV
-static ID3D11RenderTargetView*          g_rtv = nullptr;    // static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
+static ID3D11RenderTargetView*          g_rtv = nullptr;    
 static ID3D11DepthStencilView*          g_dsv = nullptr;
 static ID3D11ShaderResourceView*        g_srv = nullptr;
 
@@ -32,7 +38,7 @@ static ULONG_PTR g_gdiplusToken = 0;
 static int viewport_width = 0;
 static int viewport_height = 0;
 
-namespace render
+namespace n_render
 {
 
     bool Render_Start(HWND hwnd, int width, int height)
@@ -40,8 +46,8 @@ namespace render
         // 例: スワップチェーン／デバイス生成
         DXGI_SWAP_CHAIN_DESC sd = {};
         sd.BufferCount = 1;
-        sd.BufferDesc.Width = 6000;
-        sd.BufferDesc.Height = 100;
+        sd.BufferDesc.Width = 1000;
+        sd.BufferDesc.Height = 1000;
         sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.OutputWindow = hwnd;
@@ -104,8 +110,9 @@ namespace render
 
 
 
-    void Render_BegineFrame(const float clearColor[4])
+    void Render_Frame(const float clearColor[4], float dt, uint64_t frameTime)
     {
+
 
         g_context->OMSetRenderTargets(1, &g_rtv, nullptr);
         // 1) RenderTargetView のクリア
@@ -113,6 +120,14 @@ namespace render
 
         // 2) DepthStencilView のクリア
         // g_context->ClearDepthStencilView(g_dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+
+
+        ImGui::Begin("Stats");
+		ImGui::Text("Frame: %llu", frameTime * 1000.0f);
+		ImGui::Text("Delta Time: %.3f ms", dt * 1000.0f);
+		ImGui::End();
+
 
         // Viewport 設定など
         RECT rc{};
@@ -124,63 +139,20 @@ namespace render
         vp.Height = static_cast<float>(rc.bottom - rc.top);
         vp.MinDepth = 0.0f;
         vp.MaxDepth = 1.0f;
+
         g_context->RSSetViewports(1, &vp);
+		g_swapChain->Present(1, 0); // VSync あり
 
     }
 
-    void render::Render_EndFrame()
+    void Render_EndFrame()
     {
         // （必要に応じてコマンドバッファのフェンス設定など）
     }
 
-    void render::Render_Present()
+    void Render_Present()
     {
         g_swapChain->Present(1, 0);
-    }
-
-    //--- Render を実装 ---
-    void Render_Update(float deltaTime, uint64_t frameCount)
-    {
-        // 1) クライアント領域サイズ取得
-        RECT rc;
-        GetClientRect(g_hWnd, &rc);
-        int width = rc.right - rc.left;
-        int height = rc.bottom - rc.top;
-
-        // 2) 画面 DC / メモリ DC / バックバッファ生成
-        HDC hdc = GetDC(g_hWnd);
-        HDC memDC = CreateCompatibleDC(hdc);
-        HBITMAP hBmp = CreateCompatibleBitmap(hdc, width, height);
-        HBITMAP hOldBmp = (HBITMAP)SelectObject(memDC, hBmp);
-
-        // 3) GDI+ 描画：メモリ DC に対してクリア＆テキスト描画
-        {
-            Graphics g(memDC);
-            g.Clear(Color::White);
-
-            FontFamily ff(L"Consolas");
-            Font       font(&ff, 16, FontStyleRegular, UnitPixel);
-            SolidBrush brush(Color(255, 0, 0, 0));
-
-            // Frame
-            std::wstring txt1 = L"Frame: " + std::to_wstring(frameCount);
-            g.DrawString(txt1.c_str(), -1, &font, PointF(10, 10), &brush);
-
-            // Delta
-            std::wstring txt2 = L"Delta: " + std::to_wstring(deltaTime).substr(0, 6);
-            g.DrawString(txt2.c_str(), -1, &font, PointF(10, 30), &brush);
-        }
-
-		//DrawTest(Graphics(memDC)); // テスト描画関数を呼び出す
-
-        // 4) 画面に一括転送
-        BitBlt(hdc, 0, 0, width, height, memDC, 0, 0, SRCCOPY);
-
-        // 5) 後片付け
-        SelectObject(memDC, hOldBmp);
-        DeleteObject(hBmp);
-        DeleteDC(memDC);
-        ReleaseDC(g_hWnd, hdc);
     }
 
     void Render_Resizeviewport(int width, int height)
@@ -207,6 +179,11 @@ namespace render
     ID3D11DeviceContext* Render_GetDeviceContext()
     {
         return g_context;
+    }
+
+    ID3D11RenderTargetView* Render_GetRenderTargetView()
+    {
+        return g_rtv;
     }
 
     ID3D11ShaderResourceView* Render_GetSceneSRV()

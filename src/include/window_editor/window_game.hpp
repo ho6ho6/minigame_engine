@@ -1,13 +1,14 @@
-#ifndef WINDOW_SCENE
-#define WINDOW_SCENE
+#ifndef WINDOW_GAME
+#define WINDOW_GAME
 
 #pragma once
 #include <imgui.h>
+#include <memory>
 #include "window_base.hpp"
 
-namespace n_windowscene
+namespace n_windowgame
 {
-    class window_scene : public n_windowbase::window_base
+    class window_game : public n_windowbase::window_base
     {
     public:
         void Render() override;
@@ -16,4 +17,4 @@ namespace n_windowscene
     };
 }
 
-#endif // !WINDOW_SCENE
+#endif // !WINDOW_GAME

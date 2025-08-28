@@ -32,8 +32,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
         return 0;
     case WM_SIZE:
         // 必要なら resize イベント処理
-        if (render::Render_GetDevice()) // DX デバイスが作られていれば
-            render::Render_Resizeviewport(LOWORD(lParam), HIWORD(lParam));
+        if (n_render::Render_GetDevice()) // DX デバイスが作られていれば
+            n_render::Render_Resizeviewport(LOWORD(lParam), HIWORD(lParam));
         break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);

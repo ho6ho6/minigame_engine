@@ -41,14 +41,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "minigame_engine::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-minigame_engine-Debug-9cb4dda026957a15a44d.json",
+					"jsonFile" : "target-minigame_engine-Debug-cf0d70afd03cc7b922d5.json",
 					"name" : "minigame_engine",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "run::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-run-Debug-9bf034a64807ae74f79e.json",
+					"jsonFile" : "target-run-Debug-74868b03ff1d96670b2f.json",
 					"name" : "run",
 					"projectIndex" : 0
 				}

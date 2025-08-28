@@ -11,16 +11,13 @@
 #include <cstdint>
 #include <d3d11.h>
 
-namespace render
+namespace n_render
 {
 	bool Render_Start(HWND hwnd, int width, int height);    // GDI+ 初期化
 	void Render_Shutdown();                                    // GDI+ 終了処理
 
-    // ここに追加：毎フレーム呼び出す Render 関数
-    void Render_Update(float , uint64_t );
-
 	//   clearColor: {r, g, b, a}
-	void Render_BegineFrame(const float clearColor[4]);
+	void Render_Frame(const float clearColor[4], float dt, uint64_t frameCount);
 
 	// 描画コマンド確定（Present は行わない）
 	void Render_EndFrame();
@@ -39,6 +36,7 @@ namespace render
 	// DirectX 11 のデバイスとコンテキストを取得
 	ID3D11Device*				Render_GetDevice();
 	ID3D11DeviceContext*		Render_GetDeviceContext();
+	ID3D11RenderTargetView* Render_GetRenderTargetView();
 
 }
 
