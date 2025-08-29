@@ -3,7 +3,6 @@
 
 #pragma once
 #include <imgui.h>
-#include <memory>
 #include "window_base.hpp"
 
 namespace n_windowgame

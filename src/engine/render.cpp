@@ -123,10 +123,10 @@ namespace n_render
 
 
 
-        ImGui::Begin("Stats");
+        /*ImGui::Begin("Stats");
 		ImGui::Text("Frame: %llu", frameTime * 1000.0f);
 		ImGui::Text("Delta Time: %.3f ms", dt * 1000.0f);
-		ImGui::End();
+		ImGui::End();*/
 
 
         // Viewport ê›íËÇ»Ç«

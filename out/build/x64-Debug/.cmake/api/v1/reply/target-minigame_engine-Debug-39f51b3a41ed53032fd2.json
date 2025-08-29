@@ -122,7 +122,9 @@
 				12,
 				13,
 				14,
-				15
+				15,
+				16,
+				17
 			]
 		}
 	],
@@ -199,7 +201,9 @@
 				12,
 				13,
 				14,
-				15
+				15,
+				16,
+				17
 			]
 		}
 	],
@@ -244,6 +248,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
+			"path" : "src/engine/window_editor/window_assets.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
 			"path" : "src/engine/window_editor/window_editor.cpp",
 			"sourceGroupIndex" : 0
 		},
@@ -251,6 +261,12 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "src/engine/window_editor/window_game.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/window_editor/window_hierarchy.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

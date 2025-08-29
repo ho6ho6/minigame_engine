@@ -75,7 +75,9 @@ int APIENTRY WinMain(
     n_windowmanager::window_manager wm;
     wm.Register_SceneWindow();           // ImGui,DX11の初期化
     wm.Register_GameWindow();
-    //wm.Register_InputWindow();
+    //wm.Register_InputWindow();    //別ウィンドウを生成して操作する可能性もある。
+    wm.Register_Hierarchywindow();
+    wm.Register_Assetswindow();
 
 
     /*-----------------------------ウィンドウの登録------------------------------*/
@@ -104,7 +106,7 @@ int APIENTRY WinMain(
         n_render::Render_Frame(clear_col, deltaTime, frameTime);
 
         // ── ここから DockSpace ──
-        // (A) ホスト用フルスクリーンウィンドウを立てて
+        // ホスト用フルスクリーンウィンドウを立てて
         ImGuiWindowFlags hostFlags =
             ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoResize |
@@ -115,7 +117,7 @@ int APIENTRY WinMain(
         ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
         ImGui::Begin("##MainDockHost", nullptr, hostFlags);
 
-        // (B) DockSpace 本体
+        // DockSpace 本体
         ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
         ImGui::DockSpace(
             dockspaceID, ImVec2(0, 0),
@@ -125,7 +127,7 @@ int APIENTRY WinMain(
 
         wm.RenderAll();
 
-        // 5) ImGui 描画確定
+        // ImGui 描画確定
         ImGui::Render();
         
         auto ctx = n_render::Render_GetDeviceContext();

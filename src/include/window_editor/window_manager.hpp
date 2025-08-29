@@ -16,6 +16,8 @@ namespace n_windowmanager
         void Register_SceneWindow();
         void Register_GameWindow();
         //void Register_InputWindow();
+        void Register_Hierarchywindow();
+        void Register_Assetswindow();
         void RenderAll();
 
     private:
