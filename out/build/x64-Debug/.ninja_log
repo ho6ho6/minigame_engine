@@ -1,13 +1,12 @@
 # ninja log v6
-21	358	7767890672280271	CMakeFiles/minigame_engine.dir/src/engine/window_editor/window_manager_abst.cpp.obj	4c64f04f0de0628d
 35	623	7767890672415515	CMakeFiles/minigame_engine.dir/third_party/imgui/imgui_tables.cpp.obj	bfc3f5a5681029a5
 40	638	7767890672465557	CMakeFiles/minigame_engine.dir/third_party/imgui/backends/imgui_impl_win32.cpp.obj	6300641f7631c780
 13	680	7767890672206610	CMakeFiles/minigame_engine.dir/src/engine/time.cpp.obj	a1157c814cd03444
+43	813	7767890672495549	CMakeFiles/minigame_engine.dir/third_party/imgui/backends/imgui_impl_dx11.cpp.obj	2bd0b22621c4cd6f
 37	690	7767890672445560	CMakeFiles/minigame_engine.dir/third_party/imgui/imgui_widgets.cpp.obj	4c99b4cb108a9c7c
 9	698	7767890672156576	CMakeFiles/minigame_engine.dir/src/engine/input.cpp.obj	b8f4fec17f309a2b
 32	748	7767890672385424	CMakeFiles/minigame_engine.dir/third_party/imgui/imgui_draw.cpp.obj	13610b5decce3a1c
 14	792	7774030552046714	CMakeFiles/minigame_engine.dir/src/engine/game.cpp.obj	ebfebed183dd21ff
-43	813	7767890672495549	CMakeFiles/minigame_engine.dir/third_party/imgui/backends/imgui_impl_dx11.cpp.obj	2bd0b22621c4cd6f
 19	841	7774030552091256	CMakeFiles/minigame_engine.dir/src/engine/window.cpp.obj	2e9c383f4a59a89
 29	851	7767890672355433	CMakeFiles/minigame_engine.dir/third_party/imgui/imgui.cpp.obj	106ba1b6490a44b8
 26	808	7774030552161253	CMakeFiles/minigame_engine.dir/src/engine/window_editor/window_scene.cpp.obj	f0ab0dd987477349

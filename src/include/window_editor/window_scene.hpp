@@ -13,6 +13,7 @@ namespace n_windowscene
             void Render() override;
         private:
             ImVec2 m_LastSize = { 0, 0 };
+			ImVec2 m_PanOffset = { 0, 0 };
     };
 }
 

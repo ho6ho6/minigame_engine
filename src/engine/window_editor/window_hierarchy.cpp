@@ -10,7 +10,7 @@ namespace n_windowhierarchy
         /*windowの座標とサイズ*/
         ImGui::SetNextWindowPos(ImVec2(0, 568), ImGuiCond_Always);
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(400, 450), ImVec2(400, 450));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(400, 435), ImVec2(400, 435));
 
 
         // Window表示に関して
