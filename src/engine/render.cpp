@@ -3,7 +3,6 @@
  ****************************************/
 
 #include "../include/render.hpp"
-#include "../include/game.hpp"
 
 #include <gdiplus.h>
 #include <string>
@@ -76,6 +75,7 @@ namespace n_render
         g_swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         g_device->CreateRenderTargetView(pBackBuffer, nullptr, &g_rtv);
 
+
         D3D11_VIEWPORT vpInit{};
         vpInit.TopLeftX = 0.0f;
         vpInit.TopLeftY = 0.0f;
@@ -86,6 +86,7 @@ namespace n_render
         g_context->RSSetViewports(1, &vpInit);
 
         pBackBuffer->Release();
+
 
         if (FAILED(hr)) return false;
 
@@ -120,7 +121,6 @@ namespace n_render
 
         // 2) DepthStencilView ‚ÌƒNƒŠƒA
         // g_context->ClearDepthStencilView(g_dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 
 
         /*ImGui::Begin("Stats");

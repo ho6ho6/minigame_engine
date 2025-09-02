@@ -11,6 +11,15 @@
 #include <cstdint>
 #include <d3d11.h>
 
+#include <directXMath.h>
+using namespace DirectX;
+
+struct CBChangesEveryFrame
+{
+	XMMATRIX View;			// XMMatrixTranspose()Ç∑ÇÈ
+	XMMATRIX Projection;
+};
+
 namespace n_render
 {
 	bool Render_Start(HWND hwnd, int width, int height);    // GDI+ èâä˙âª

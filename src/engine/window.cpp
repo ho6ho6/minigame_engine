@@ -20,12 +20,26 @@ static HWND g_hWnd = nullptr;
 static HINSTANCE g_hInstance = nullptr;
 static bool g_isRunning = false;
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+        return true;
 
     switch (msg)
     {
+    case WM_RBUTTONDOWN:
+        printf("WndProc: WM_RBUTTONDOWN\n");
+		fflush(stdout);
+        break;
+
+    case WM_RBUTTONUP:
+        printf("WndProc: WM_RBUTTONUP\n");
+        fflush(stdout);
+		break;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         g_isRunning = false;

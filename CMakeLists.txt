@@ -21,6 +21,11 @@ file(GLOB_RECURSE ENGINE_SOURCES
     "${PROJECT_SOURCE_DIR}/src/engine/window_editor/*.cpp"
 )
 
+# シェーダーファイルも収集
+file(GLOB_RECURSE SHADER_FILES
+    "${PROJECT_SOURCE_DIR}/shaders/*.hlsl"
+)
+
 
 # 収集したソースでターゲットを一度だけ定義
 add_executable(minigame_engine
