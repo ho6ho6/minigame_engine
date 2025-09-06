@@ -33,6 +33,9 @@ namespace n_windowgame
 
         ImGui::Image((void*)n_render::Render_GetSceneSRV(), avail);
 
+
+        /*window_scene‚Ì‰æ–Ê‚ğÀ•WŒn‚ğíœ‚µ‚ÄA‚»‚Ì‚Ü‚ÜƒQ[ƒ€‰æ–Ê‚Æ‚µ‚Ä“Š‰e‚·‚é*/
+
         ImGui::End();
     }
 }

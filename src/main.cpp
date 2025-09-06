@@ -9,6 +9,10 @@
 #include "include/render.hpp"    // InitRenderer(), BeginFrame(), RenderFrame(), EndFrame(), ShutdownRenderer()
 
 #include "include/window_editor/window_manager.hpp" // window_manager
+#include "include/assets/assets_manager/texture_manager.hpp" // texture_manager
+#include "include/window_editor/window_assets.hpp"
+#include "include/assets/assets_manager/assets_manager.hpp"
+#include "include/assets/util.hpp"
 
 /*ImGui は「既存の OS ウィンドウ」のクライアント領域内に GUI を即時モードで描画するライブラリ*/
 // Begin/End で開くウィンドウ
@@ -18,6 +22,7 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <filesystem>
 
 /*
   WinMain の引数:
@@ -26,6 +31,9 @@
     LPSTR       lpCmdLine     : コマンドライン引数（ANSI）
     int         nCmdShow      : ウィンドウの初期表示方法
 */
+
+n_texturemanager::texture_manager g_TextureManager("../../Assets/textures"); // グローバルなテクスチャマネージャ
+n_assetsmanager::assets_manager g_AssetsManager(g_TextureManager); // グローバルなアセットマネージャ
 
 int APIENTRY WinMain(
     HINSTANCE hInstance,
@@ -82,6 +90,13 @@ int APIENTRY WinMain(
     /*-----------------------------ウィンドウの登録------------------------------*/
 
 
+	/*------------------------------Assetsの登録-------------------------------*/
+
+    // テクスチャを読み込む
+    g_TextureManager.LoadAllTextures();
+
+    /*------------------------------Assetsの登録-------------------------------*/
+
 
     /*----------------------------------メイン----------------------------------*/
 
@@ -100,6 +115,9 @@ int APIENTRY WinMain(
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+
+        //Assets テクスチャの描画
+		g_AssetsManager.assets_Show();
 
         static const float clear_col[4] = { 0.5f, 0.5f, 0.5f, 0.1f };
         n_render::Render_Frame(clear_col, deltaTime, frameTime);
@@ -139,44 +157,6 @@ int APIENTRY WinMain(
         
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-
-		// デフォルトで DockSpace を作成する場合は以下のようにコメントアウトを外す
-        //static bool firstTime = true;
-        //if (firstTime)
-        //{
-        //    firstTime = false;
-        //    ImGuiID dockMain = dockspaceID;
-        //    ImGui::DockBuilderRemoveNode(dockMain);
-        //    ImGui::DockBuilderAddNode(dockMain, ImGuiDockNodeFlags_DockSpace);
-        //    ImGui::DockBuilderSetNodeSize(dockMain, ImGui::GetIO().DisplaySize);
-
-        //    // 左にヒエラルキー、右にインスペクタ用に縦分割
-        //    ImGuiID leftID = ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Left, 0.2f, nullptr, &dockMain);
-        //    ImGuiID rightID = ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Right, 0.2f, nullptr, &dockMain);
-
-        //    // 下部にコンソール用の横分割
-        //    ImGuiID bottomID = ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Down, 0.25f, nullptr, &dockMain);
-
-        //    // パネルをそれぞれ配置
-        //    ImGui::DockBuilderDockWindow("Hierarchy", leftID);
-        //    ImGui::DockBuilderDockWindow("Inspector", rightID);
-        //    ImGui::DockBuilderDockWindow("Console", bottomID);
-        //    ImGui::DockBuilderDockWindow("Scene", dockMain);
-
-        //    ImGui::DockBuilderFinish(dockMain);
-        //}
-
-        // ── DockSpace 設置ここまで ──
-
-        // 4) 各パネルを描画する
-        //    ※Begin()/End() のタイトルが "Hierarchy" など一致していること
-        //DrawHierarchy();   // 例: void DrawHierarchy() { ImGui::Begin("Hierarchy"); … ImGui::End(); }
-        //DrawInspector();   // 例:
-        //wm.RenderAll();    // Scene View (window_manager経由)
-        //DrawConsole();     // 例:
-
-
-
         // 6) 最後に DirectX の Present
         n_render::Render_Present();
     }
@@ -196,21 +176,3 @@ int APIENTRY WinMain(
 
     return 0;
 }
-
-//void DrawHierarchy()
-//{
-//    ImGui::Begin("Hierarchy");
-//    // ツリー表示など
-//    ImGui::Text("GameObject A");
-//    ImGui::Text("GameObject B");
-//    ImGui::End();
-//}
-
-//void DrawConsole()
-//{
-//    ImGui::Begin("Console");
-//    // ログ出力
-//    for (auto& msg : logBuffer)
-//        ImGui::TextUnformatted(msg.c_str());
-//    ImGui::End();
-//}

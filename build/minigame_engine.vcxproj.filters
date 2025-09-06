@@ -4,6 +4,33 @@
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\external\stb_image_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\assets_manager\assets_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\assets_manager\prefab_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\assets_manager\texture_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\prefab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

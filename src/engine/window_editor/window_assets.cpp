@@ -1,7 +1,9 @@
 #include "../../include/window_editor/window_assets.hpp"
 #include "../../include/render.hpp"	//フレームバッファ取得用
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
+#include <imgui.h>
 
+/*Assetsウィンドウの描画*/
 namespace n_windowassets
 {
 	void window_assets::Render()

@@ -15,6 +15,7 @@
 		[
 			"add_executable",
 			"target_link_libraries",
+			"add_dependencies",
 			"add_definitions",
 			"target_include_directories"
 		],
@@ -30,25 +31,31 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 31,
+				"line" : 46,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 48,
+				"line" : 66,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 39,
+				"line" : 81,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 40,
+				"line" : 55,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 57,
 				"parent" : 0
 			}
 		]
@@ -65,34 +72,38 @@
 			"defines" : 
 			[
 				{
-					"backtrace" : 3,
+					"backtrace" : 4,
 					"define" : "UNICODE"
 				},
 				{
-					"backtrace" : 3,
+					"backtrace" : 4,
 					"define" : "_UNICODE"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/include/window_editor"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
+					"path" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/external"
+				},
+				{
+					"backtrace" : 5,
 					"path" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/third_party/imgui"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "E:/\u30d7\u30ed\u30b0\u30e9\u30df\u30f3\u30b0/DevWorkspace/repos/minigame_engine/third_party/imgui/backends"
 				}
 			],
@@ -124,8 +135,24 @@
 				14,
 				15,
 				16,
-				17
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26
 			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "CopyAssets::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "minigame_engine::@6890427a1f51a3e7e1df",
@@ -203,7 +230,16 @@
 				14,
 				15,
 				16,
-				17
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26
 			]
 		}
 	],
@@ -213,6 +249,60 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "src/main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/external/stb_image_impl.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/assets_manager/assets_manager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/assets_manager/prefab_manager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/assets_manager/texture_manager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/material.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/mesh.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/prefab.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/scene.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/engine/assets/texture.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

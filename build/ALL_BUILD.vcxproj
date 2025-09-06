@@ -174,6 +174,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
+    <ProjectReference Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\build\CopyAssets.vcxproj">
+      <Project>{DAAF8924-8B83-33EC-9435-AD3FAE146E9B}</Project>
+      <Name>CopyAssets</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
     <ProjectReference Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\build\minigame_engine.vcxproj">
       <Project>{35BB4865-AA64-38F4-AADE-21D8EF8FB1B7}</Project>
       <Name>minigame_engine</Name>

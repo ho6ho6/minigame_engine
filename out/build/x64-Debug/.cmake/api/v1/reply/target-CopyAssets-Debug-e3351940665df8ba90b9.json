@@ -18,20 +18,13 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 56,
+				"line" : 36,
 				"parent" : 0
 			}
 		]
 	},
-	"dependencies" : 
-	[
-		{
-			"backtrace" : 1,
-			"id" : "minigame_engine::@6890427a1f51a3e7e1df"
-		}
-	],
-	"id" : "run::@6890427a1f51a3e7e1df",
-	"name" : "run",
+	"id" : "CopyAssets::@6890427a1f51a3e7e1df",
+	"name" : "CopyAssets",
 	"paths" : 
 	{
 		"build" : ".",
@@ -59,13 +52,13 @@
 		{
 			"backtrace" : 1,
 			"isGenerated" : true,
-			"path" : "out/build/x64-Debug/CMakeFiles/run",
+			"path" : "out/build/x64-Debug/CMakeFiles/CopyAssets",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 0,
 			"isGenerated" : true,
-			"path" : "out/build/x64-Debug/CMakeFiles/run.rule",
+			"path" : "out/build/x64-Debug/CMakeFiles/CopyAssets.rule",
 			"sourceGroupIndex" : 1
 		}
 	],
