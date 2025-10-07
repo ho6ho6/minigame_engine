@@ -8,13 +8,13 @@ namespace n_windowhierarchy
     void window_hierarchy::Render()
     {
         /*windowの座標とサイズ*/
-        ImGui::SetNextWindowPos(ImVec2(0, 568), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Always);
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(400, 435), ImVec2(400, 435));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(400, 435), ImVec2(400, 480));
 
 
         // Window表示に関して
-        ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+        ImGui::Begin("Hierarchy");
 
         ImVec2 avail = ImGui::GetContentRegionAvail();
         if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {

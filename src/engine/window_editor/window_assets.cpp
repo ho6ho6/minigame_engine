@@ -11,7 +11,7 @@ namespace n_windowassets
         /*windowの座標とサイズ*/
         ImGui::SetNextWindowPos(ImVec2(400, 600), ImGuiCond_Always);
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(600, 400), ImVec2(600, 400));
+        //ImGui::SetNextWindowSizeConstraints(ImVec2(600, 400), ImVec2(600, 400));
 
 
         // Window表示に関して

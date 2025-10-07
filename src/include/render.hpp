@@ -11,6 +11,9 @@
 #include <cstdint>
 #include <d3d11.h>
 
+#include <imgui.h>
+#include <imgui_internal.h> // 追加: ImGuiWindow型の定義
+
 #include <directXMath.h>
 using namespace DirectX;
 
@@ -22,6 +25,7 @@ struct CBChangesEveryFrame
 
 namespace n_render
 {
+
 	bool Render_Start(HWND hwnd, int width, int height);    // GDI+ 初期化
 	void Render_Shutdown();                                    // GDI+ 終了処理
 
@@ -40,6 +44,9 @@ namespace n_render
 	// 画面 (x, y) からオブジェクトをピックし、ID を返す
     // -1 を返したら「何も選択されていない」
 	int Render_PickObject(int x, int y);
+
+	// シーン描画用テクスチャを作成する
+	bool Render_CreateSceneTexture(int width, int height);
 
 	ID3D11ShaderResourceView* Render_GetSceneSRV(); // ビューポートのテクスチャを取得
 	// DirectX 11 のデバイスとコンテキストを取得

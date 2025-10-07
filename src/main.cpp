@@ -53,15 +53,16 @@ int APIENTRY WinMain(
 
     if (!n_render::Render_Start(n_window::GetHWND(), width, height)) return -1;
     
+	// ImGui 初期化
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 	ImGui::StyleColorsDark(); // ImGui のテーマをダークに設定
 
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Docking機能をON
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // （任意）別ウィンドウへの展開も可能に
+    // Dock機能は使わない
+    io.ConfigFlags &= ~ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
 
-    
     ImGui_ImplWin32_Init(n_window::GetHWND());
     ImGui_ImplDX11_Init(n_render::Render_GetDevice(), n_render::Render_GetDeviceContext());
 
@@ -124,23 +125,14 @@ int APIENTRY WinMain(
 
         // ── ここから DockSpace ──
         // ホスト用フルスクリーンウィンドウを立てて
-        ImGuiWindowFlags hostFlags =
-            ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoNavFocus;
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
-        ImGui::Begin("##MainDockHost", nullptr, hostFlags);
+        //ImGuiWindowFlags hostFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        //                             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-        // DockSpace 本体
-        ImGuiID dockspaceID = ImGui::GetID("MainDockSpace");
-        ImGui::DockSpace(
-            dockspaceID, ImVec2(0, 0),
-            ImGuiDockNodeFlags_PassthruCentralNode
-        );
-        ImGui::End();
+        //ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+        //ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
+        //ImGui::Begin("##MainDockHost", nullptr, hostFlags);
+
+        //ImGui::End();
 
         wm.RenderAll();
 

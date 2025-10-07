@@ -12,8 +12,8 @@ namespace n_windowscene
         public:
             void Render() override;
         private:
-            ImVec2 m_LastSize = { 0, 0 };
-			ImVec2 m_PanOffset = { 0, 0 };
+			ImVec2 m_LastSize = { 0, 0 };   // 最後に確定したサイズ
+			ImVec2 m_PanOffset = { 0, 0 };  // パン（ドラッグ移動）量
     };
 }
 

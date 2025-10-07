@@ -11,6 +11,7 @@
 #include <stdexcept>
 
 #include <imgui.h>
+#include <imgui_internal.h> // 追加: ImGuiWindow型の定義
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
@@ -45,8 +46,8 @@ namespace n_render
         // 例: スワップチェーン／デバイス生成
         DXGI_SWAP_CHAIN_DESC sd = {};
         sd.BufferCount = 1;
-        sd.BufferDesc.Width = 1000;
-        sd.BufferDesc.Height = 1000;
+		sd.BufferDesc.Width = 1920;     //マウスの座標が合わないのはここを変えていないから
+		sd.BufferDesc.Height = 1080;    //本来は1920x1080にしたいが、この数値だと多少のズレが発生する
         sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.OutputWindow = hwnd;
@@ -56,7 +57,7 @@ namespace n_render
 
         UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
         D3D_FEATURE_LEVEL featureLevel;
-        HRESULT hr = D3D11CreateDeviceAndSwapChain(
+        HRESULT hr = D3D11CreateDeviceAndSwapChain( // Microsoft のドキュメントによれば、この関数は「レンダリングに使用されるスワップチェーンと表示アダプタを表すデバイス」
             nullptr,
             D3D_DRIVER_TYPE_HARDWARE,
             nullptr,
@@ -96,6 +97,9 @@ namespace n_render
             return false;
         OutputDebugStringA("=== Render_Start: D3D11 initialized successfully ===\n");
         return true;
+
+        Render_CreateSceneTexture(width, height);
+
     }
 
     void Render_Shutdown()
@@ -108,8 +112,6 @@ namespace n_render
         if (g_device)    g_device->Release();
 
     }
-
-
 
     void Render_Frame(const float clearColor[4], float dt, uint64_t frameTime)
     {
@@ -165,6 +167,38 @@ namespace n_render
     {
         return -1;
     }
+    
+    bool Render_CreateSceneTexture(int width, int height)
+    {
+        if (g_rtv) { g_rtv->Release(); g_rtv = nullptr; }
+        if (g_srv) { g_srv->Release(); g_srv = nullptr; }
+
+        D3D11_TEXTURE2D_DESC texDesc{};
+        texDesc.Width = width;
+        texDesc.Height = height;
+        texDesc.MipLevels = 1;
+        texDesc.ArraySize = 1;
+        texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        texDesc.SampleDesc.Count = 1;
+        texDesc.Usage = D3D11_USAGE_DEFAULT;
+        texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+        ID3D11Texture2D* pTexture = nullptr;
+        HRESULT hr = g_device->CreateTexture2D(&texDesc, nullptr, &pTexture);
+        if (FAILED(hr)) return false;
+
+        // RTV作成
+        hr = g_device->CreateRenderTargetView(pTexture, nullptr, &g_rtv);
+        if (FAILED(hr)) { pTexture->Release(); return false; }
+
+        // SRV作成
+        hr = g_device->CreateShaderResourceView(pTexture, nullptr, &g_srv);
+        if (FAILED(hr)) { pTexture->Release(); return false; }
+
+        pTexture->Release();
+        return true;
+	}
+
 
     // アクセサ実装
     ID3D11Device* Render_GetDevice()
@@ -188,7 +222,7 @@ namespace n_render
 
     ID3D11ShaderResourceView* Render_GetSceneSRV()
     {
-        return nullptr;
+        return g_srv;
     }
 
 }

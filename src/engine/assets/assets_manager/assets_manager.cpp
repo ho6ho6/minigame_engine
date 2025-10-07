@@ -4,11 +4,11 @@
 #include "../../../include/assets/texture.hpp"
 #include "../../../include/assets/assets_manager/assets_manager.hpp"
 
-/*
+
 void OnAssetClicked(const std::string& name);
 void OnAssetDoubleClicked(const std::string& name);
 void OnShowExplorer(const std::string& name);
-*/
+
 
 void n_assetsmanager::assets_manager::assets_Show()
 {
@@ -39,7 +39,7 @@ void n_assetsmanager::assets_manager::assets_Show()
 		const std::string& name = kv.first;
 		const Texture& tex = kv.second;
 
-		/*ImGui::PushID(index); // ユニークIDを設定
+		ImGui::PushID(index); // ユニークIDを設定
 
 		// 画像ボタン ImageButtonを用いる
 		if (tex.tx_id)
@@ -84,13 +84,11 @@ void n_assetsmanager::assets_manager::assets_Show()
 	}	// for ループの終わり こっちが本当の終わり
 
 	ImGui::Columns(1); // 列設定を解除
-	*/
-	} // for ループの終わり 便宜上ここに}を置いてる
+
     ImGui::End();
 }
 
 
-/*
 // アセットがクリックされたときの処理
 void OnAssetClicked(const std::string& name)
 {
@@ -119,4 +117,3 @@ void OnShowExplorer(const std::string& name)
 	std::string command = "explorer.exe /select,\"" + std::string("../../Assets/textures/") + name + "\"";
 	system(command.c_str());
 }
-*/

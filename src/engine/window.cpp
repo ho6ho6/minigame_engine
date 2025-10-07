@@ -28,6 +28,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
         return true;
 
+
     switch (msg)
     {
     case WM_RBUTTONDOWN:
@@ -39,6 +40,12 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
         printf("WndProc: WM_RBUTTONUP\n");
         fflush(stdout);
 		break;
+
+  //  case WM_MOUSEMOVE:
+  //      ImGuiIO& io = ImGui::GetIO();
+  //      io.MousePos.x = (signed short)(lParam);
+  //      io.MousePos.y = (signed short)(lParam);
+		//break;
 
     case WM_DESTROY:
         PostQuitMessage(0);

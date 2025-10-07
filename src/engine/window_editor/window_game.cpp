@@ -11,11 +11,11 @@ namespace n_windowgame
         /*windowの座標とサイズ*/
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(400, 200), ImVec2(FLT_MAX, FLT_MAX));
+        //ImGui::SetNextWindowSizeConstraints(ImVec2(400, 200), ImVec2(FLT_MAX, FLT_MAX));
 
 
         // Window表示に関して
-        ImGui::Begin("Game_View", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+        ImGui::Begin("Game_View");
 
         ImVec2 avail = ImGui::GetContentRegionAvail();
         if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {
