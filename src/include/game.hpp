@@ -8,7 +8,7 @@
 
 #pragma once
 
-namespace game
+namespace n_game
 {
 	//ゲーム全体の初期化。リソース読み込みや変数初期化
 	bool Game_Start();

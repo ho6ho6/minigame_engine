@@ -11,7 +11,7 @@
 
 /*“ü—Í‚ğó‚¯æ‚é*/
 
-namespace input
+namespace n_input
 {
     // ‰Šú‰»^I—¹
     void Input_Start();

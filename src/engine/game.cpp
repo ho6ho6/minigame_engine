@@ -1,18 +1,18 @@
 /************************************************************
- *ゲーム全体の状態管理・シーン生成・ステートマシンなどを宣言*
+ *ゲーム全体の状態管理・シーン生成・ステートマシンなどを宣言			*
  ************************************************************/
 
 #include "../include/game.hpp"
 #include "../include/input.hpp"
 #include "../include/render.hpp"
 
-namespace
+namespace 
 {
 	float rectX, rectY;
 	float speedX;
 }
 
-namespace game
+namespace n_game
 {
 	bool Game_Start()
 	{
@@ -26,8 +26,8 @@ namespace game
 	void Game_Update(float deltaTime)
 	{
 		// 簡易入力: ←→ キーで四角を左右に動かす
-		if (input::IsKeyDown(VK_LEFT))  rectX -= speedX * deltaTime;
-		if (input::IsKeyDown(VK_RIGHT)) rectX += speedX * deltaTime;
+		if (n_input::IsKeyDown(VK_LEFT))  rectX -= speedX * deltaTime;
+		if (n_input::IsKeyDown(VK_RIGHT)) rectX += speedX * deltaTime;
 
 		// 画面端で跳ね返す
 		const float winW = 1920.0f - 50.0f; // 四角の幅 50px

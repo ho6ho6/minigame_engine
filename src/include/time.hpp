@@ -9,7 +9,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace frame {
+namespace n_time {
 
     class Time {
     public:

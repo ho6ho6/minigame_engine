@@ -9,7 +9,7 @@
 #include <Windows.h>
 
 
-namespace window
+namespace n_window
 {
 	// ウィンドウ初期化と終了
 	bool InitWindow(HINSTANCE hInstance, int nCmdShow, int width, int height, LPCWSTR title);

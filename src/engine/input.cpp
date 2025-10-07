@@ -8,7 +8,7 @@
 /*“ü—Í*/
 
 
-namespace input
+namespace n_input
 {
 	// ‰Šú‰»^I—¹
 	void Input_Start()

@@ -2,7 +2,7 @@
 
 #include "../include/time.hpp"
 
-namespace frame {
+namespace n_time {
 
     // static メンバのインスタンス化（必須）
     Time::Clock::time_point Time::prevTime;

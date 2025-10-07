@@ -47,11 +47,11 @@ int APIENTRY WinMain(
     const int width = 1920;
     const int height = 1080;
 
-    if (!window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine")) return -1;
+    if (!n_window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine")) return -1;
 
-	if (!game::Game_Start()) return -1;
+	if (!n_game::Game_Start()) return -1;
 
-    if (!n_render::Render_Start(window::GetHWND(), width, height)) return -1;
+    if (!n_render::Render_Start(n_window::GetHWND(), width, height)) return -1;
     
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -62,10 +62,10 @@ int APIENTRY WinMain(
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // （任意）別ウィンドウへの展開も可能に
 
     
-    ImGui_ImplWin32_Init(window::GetHWND());
+    ImGui_ImplWin32_Init(n_window::GetHWND());
     ImGui_ImplDX11_Init(n_render::Render_GetDevice(), n_render::Render_GetDeviceContext());
 
-    frame::Time::Start_Time();
+    n_time::Time::Start_Time();
 
     //input::Input_Start();
 
@@ -100,13 +100,13 @@ int APIENTRY WinMain(
 
     /*----------------------------------メイン----------------------------------*/
 
-    while (window::IsRunning()) //window.cpp
+    while (n_window::IsRunning()) //window.cpp
     {
-        window::PollEvents();
+        n_window::PollEvents();
 
         // 2) 各サブシステム更新
-        float deltaTime = frame::Time::Update_Time();
-        uint64_t frameTime = frame::Time::GetFrameCount();
+        float deltaTime = n_time::Time::Update_Time();
+        uint64_t frameTime = n_time::Time::GetFrameCount();
         //input::Input_Update();
         //game::Game_Update(deltaTime);
 
@@ -169,10 +169,10 @@ int APIENTRY WinMain(
 	ImGui_ImplWin32_Shutdown();       // ImGuiのWin32プラットフォームを終了
 	ImGui::DestroyContext();            // ImGuiコンテキストを破棄
 
-    input::Input_Shutdown();             // input.cpp
+    n_input::Input_Shutdown();             // input.cpp
     n_render::Render_Shutdown();        // render.cpp
-	game::Game_Shutdown();            // game.cpp
-	window::ShutdownWindow();        // window.cpp
+	n_game::Game_Shutdown();            // game.cpp
+	n_window::ShutdownWindow();        // window.cpp
 
     return 0;
 }

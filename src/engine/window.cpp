@@ -54,7 +54,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 }
 
 
-namespace window
+namespace n_window
 {
 
     bool InitWindow(HINSTANCE hInstance, int nCmdShow, int width, int height, LPCWSTR title)
