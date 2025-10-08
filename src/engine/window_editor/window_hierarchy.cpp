@@ -19,7 +19,20 @@ namespace n_windowhierarchy
         ImVec2 avail = ImGui::GetContentRegionAvail();
         if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {
             m_LastSize = avail;
-            n_render::Render_Resizeviewport((int)avail.x, (int)avail.y);
+        }
+
+        // 論理サイズとフレームバッファサイズ
+        if (avail.x > 1.0f && avail.y > 1.0f) {
+            int logical_w = (int)avail.x;
+            int logical_h = (int)avail.y;
+            ImGuiIO& io = ImGui::GetIO();
+            int fb_w = (int)roundf(avail.x * io.DisplayFramebufferScale.x);
+            int fb_h = (int)roundf(avail.y * io.DisplayFramebufferScale.y);
+
+            if (logical_w != m_LastSize.x || logical_h != m_LastSize.y) {
+                m_LastSize = ImVec2((float)logical_w, (float)logical_h);
+                n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
+            }
         }
 
         ImTextureID texID = reinterpret_cast<ImTextureID>(n_render::Render_GetSceneSRV());

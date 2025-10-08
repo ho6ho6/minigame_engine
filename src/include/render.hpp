@@ -38,8 +38,8 @@ namespace n_render
 	// SwapChain→Present
 	void Render_Present();
 
-	// ビューポートのサイズ変更
-	void Render_Resizeviewport(int width, int height);
+	// win_w, win_h: ウィンドウのクライアント領域のサイズ
+	void Render_Resizeviewport(int win_w, int win_h, int fb_w, int fb_h);
 
 	// 画面 (x, y) からオブジェクトをピックし、ID を返す
     // -1 を返したら「何も選択されていない」

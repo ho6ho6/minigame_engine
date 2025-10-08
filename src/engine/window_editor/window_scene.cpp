@@ -37,8 +37,17 @@ namespace n_windowscene
 
         if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {
             m_LastSize = avail;
-            n_render::Render_Resizeviewport((int)avail.x, (int)avail.y);
         }
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		// 論理サイズとフレームバッファサイズ
+		int logical_w = (int)avail.x;
+		int logical_h = (int)avail.y;
+		int fb_w = (int)roundf(avail.x * io.DisplayFramebufferScale.x);
+		int fb_h = (int)roundf(avail.y * io.DisplayFramebufferScale.y);
+
+        n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
         // ヒット領域を先に作る（描画と同じサイズ・位置にするため cursor を取得）
         ImVec2 contentPos = ImGui::GetCursorScreenPos(); // 領域のスクリーン左上 ****注1****

@@ -45,7 +45,7 @@ int APIENTRY WinMain(
     /*----------------------------------初期化----------------------------------*/
 
     const int width = 1920;
-    const int height = 1080;
+    const int height = 1000;
 
     if (!n_window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine")) return -1;
 
@@ -105,14 +105,23 @@ int APIENTRY WinMain(
     {
         n_window::PollEvents();
 
-        // 2) 各サブシステム更新
+		// マウス座標を取得して ImGui に渡す
+        POINT p;
+		GetCursorPos(&p);
+		ScreenToClient(n_window::GetHWND(), &p);
+
+		// ImGui にマウス位置を設定
+		ImVec2 fbScale = io.DisplayFramebufferScale;
+		io.MousePos = ImVec2((float)p.x / fbScale.x, (float)p.y / fbScale.y);
+        
+        // 各サブシステム更新
         float deltaTime = n_time::Time::Update_Time();
         uint64_t frameTime = n_time::Time::GetFrameCount();
         //input::Input_Update();
         //game::Game_Update(deltaTime);
 
 
-        // 3) ImGui フレーム開始
+        // ImGui フレーム開始
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();

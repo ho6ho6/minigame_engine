@@ -47,7 +47,7 @@ namespace n_render
         DXGI_SWAP_CHAIN_DESC sd = {};
         sd.BufferCount = 1;
 		sd.BufferDesc.Width = 1920;     //マウスの座標が合わないのはここを変えていないから
-		sd.BufferDesc.Height = 1080;    //本来は1920x1080にしたいが、この数値だと多少のズレが発生する
+		sd.BufferDesc.Height = 1000;    //本来は1920x1280にしたいが、この数値だと多少のズレが発生する
         sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.OutputWindow = hwnd;
@@ -118,17 +118,8 @@ namespace n_render
 
 
         g_context->OMSetRenderTargets(1, &g_rtv, nullptr);
-        // 1) RenderTargetView のクリア
+        // RenderTargetView のクリア
         g_context->ClearRenderTargetView(g_rtv, clearColor);
-
-        // 2) DepthStencilView のクリア
-        // g_context->ClearDepthStencilView(g_dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-
-        /*ImGui::Begin("Stats");
-		ImGui::Text("Frame: %llu", frameTime * 1000.0f);
-		ImGui::Text("Delta Time: %.3f ms", dt * 1000.0f);
-		ImGui::End();*/
 
 
         // Viewport 設定など
@@ -143,7 +134,6 @@ namespace n_render
         vp.MaxDepth = 1.0f;
 
         g_context->RSSetViewports(1, &vp);
-		g_swapChain->Present(1, 0); // VSync あり
 
     }
 
@@ -157,10 +147,28 @@ namespace n_render
         g_swapChain->Present(1, 0);
     }
 
-    void Render_Resizeviewport(int width, int height)
+    void Render_Resizeviewport(int win_w, int win_h, int fb_w, int fb_h)
     {
-        viewport_width = width;
-        viewport_height = height;
+        if (win_w <= 0 || win_h <= 0)
+            return;
+
+        // コンテキストが無ければ処理せずログ
+        if (ImGui::GetCurrentContext() == nullptr) {
+            // ログ出力: CreateContext が呼ばれていない/コンテキストがおかしい
+            printf("Render_Resizeviewport: ImGui context is null. Skipping.\n");
+            return;
+        }
+
+        ImGuiIO& io = ImGui::GetIO(); // CreateContext() が既に呼ばれていることを前提とする
+
+        io.DisplaySize = ImVec2((float)win_w, (float)win_h);
+
+        float sx = 1.0f, sy = 1.0f;
+        if (win_w > 0) sx = (float)fb_w / (float)win_w;
+        if (win_h > 0) sy = (float)fb_h / (float)win_h;
+        if (!isfinite(sx) || !isfinite(sy) || sx <= 0.0f || sy <= 0.0f) { sx = sy = 1.0f; }
+
+        io.DisplayFramebufferScale = ImVec2(sx, sy);
     }
 
     int Render_PickObject(int x, int y)
@@ -198,6 +206,7 @@ namespace n_render
         pTexture->Release();
         return true;
 	}
+
 
 
     // アクセサ実装

@@ -41,20 +41,18 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
         fflush(stdout);
 		break;
 
-  //  case WM_MOUSEMOVE:
-  //      ImGuiIO& io = ImGui::GetIO();
-  //      io.MousePos.x = (signed short)(lParam);
-  //      io.MousePos.y = (signed short)(lParam);
-		//break;
 
     case WM_DESTROY:
         PostQuitMessage(0);
         g_isRunning = false;
         return 0;
+
     case WM_SIZE:
-        // 必要なら resize イベント処理
-        if (n_render::Render_GetDevice()) // DX デバイスが作られていれば
-            n_render::Render_Resizeviewport(LOWORD(lParam), HIWORD(lParam));
+		int client_w = LOWORD(lParam);
+		int client_h = HIWORD(lParam);
+		int fb_w = client_w;
+		int fb_h = client_h;
+		n_render::Render_Resizeviewport(client_w, client_h, fb_w, fb_h);
         break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
