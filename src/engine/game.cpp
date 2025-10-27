@@ -2,9 +2,9 @@
  *ゲーム全体の状態管理・シーン生成・ステートマシンなどを宣言			*
  ************************************************************/
 
-#include "../include/game.hpp"
-#include "../include/input.hpp"
-#include "../include/render.hpp"
+#include "include/game.hpp"
+#include "include/input.hpp"
+#include "include/render.hpp"
 
 namespace 
 {

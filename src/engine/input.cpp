@@ -2,7 +2,7 @@
  *input::Update, IsKeyDown, マウス処理の定義*
  ********************************************/
 
-#include "../include/input.hpp"
+#include "include/input.hpp"
 #include <Windows.h>
 
 /*入力*/

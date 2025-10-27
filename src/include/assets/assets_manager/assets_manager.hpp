@@ -4,8 +4,8 @@
 #define ASSETS_MANAGER
 
 #pragma once
-#include "../../../include/assets/assets_manager/texture_manager.hpp"
-#include "../../../include/assets/texture.hpp"
+#include "include/assets/assets_manager/texture_manager.hpp"
+#include "include/assets/texture.hpp"
 
 
 /*Assetsウィンドウに表示される画像のサムネだけ表示*/

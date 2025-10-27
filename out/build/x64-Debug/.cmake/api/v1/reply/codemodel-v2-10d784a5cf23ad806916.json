@@ -16,8 +16,7 @@
 					"targetIndexes" : 
 					[
 						0,
-						1,
-						2
+						1
 					]
 				}
 			],
@@ -33,8 +32,7 @@
 					"targetIndexes" : 
 					[
 						0,
-						1,
-						2
+						1
 					]
 				}
 			],
@@ -42,22 +40,15 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "CopyAssets::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-CopyAssets-Debug-e3351940665df8ba90b9.json",
-					"name" : "CopyAssets",
-					"projectIndex" : 0
-				},
-				{
-					"directoryIndex" : 0,
 					"id" : "minigame_engine::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-minigame_engine-Debug-072aeb3613d5fed34492.json",
+					"jsonFile" : "target-minigame_engine-Debug-39774119e2fe38fd516f.json",
 					"name" : "minigame_engine",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "run::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-run-Debug-8d765271f4620aceca3d.json",
+					"jsonFile" : "target-run-Debug-c30fd26aca3e0b6bce6b.json",
 					"name" : "run",
 					"projectIndex" : 0
 				}

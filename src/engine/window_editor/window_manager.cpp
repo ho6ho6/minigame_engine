@@ -1,11 +1,11 @@
 // window_manager.cpp
 
-#include "../../include/window_editor/window_manager.hpp"
-#include "../../include/window_editor/window_scene.hpp"
-#include "../../include/window_editor/window_game.hpp"
-#include "../../include/window_editor/window_hierarchy.hpp"
-#include "../../include/window_editor/window_assets.hpp"
-//#include "../../include/window_editor/window_input.hpp"
+#include "include/window_editor/window_manager.hpp"
+#include "include/window_editor/window_scene.hpp"
+#include "include/window_editor/window_game.hpp"
+#include "include/window_editor/window_hierarchy.hpp"
+#include "include/window_editor/window_assets.hpp"
+//#include "include/window_editor/window_input.hpp"
 
 namespace n_windowmanager
 {

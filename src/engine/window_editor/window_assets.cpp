@@ -1,5 +1,5 @@
-#include "../../include/window_editor/window_assets.hpp"
-#include "../../include/render.hpp"	//フレームバッファ取得用
+#include "include/window_editor/window_assets.hpp"
+#include "include/render.hpp"	//フレームバッファ取得用
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
 #include <imgui.h>
 
@@ -9,32 +9,38 @@ namespace n_windowassets
 	void window_assets::Render()
 	{
         /*windowの座標とサイズ*/
-        ImGui::SetNextWindowPos(ImVec2(400, 600), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(920, 600), ImGuiCond_Always);
 
         //ImGui::SetNextWindowSizeConstraints(ImVec2(600, 400), ImVec2(600, 400));
 
-
         // Window表示に関して
-        ImGui::Begin("Assets", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+        ImGui::Begin("Assets", nullptr, ImGuiWindowFlags_NoResize);
+
+        // window サイズを固定
+        ImGui::SetWindowSize(ImVec2(1000, 400));
 
         ImVec2 avail = ImGui::GetContentRegionAvail();
-        if (avail.x != m_LastSize.x || avail.y != m_LastSize.y) {
+
+        // サイズ変更の検出　安全策として 0 以下は無視
+        if (avail.x <= 0.0f || avail.y <= 0.0f)
+        {
+            if (m_LastSize.x <= 0.0f || m_LastSize.y <= 0.0f) m_LastSize = ImVec2(1.0f, 1.0f);
+        }
+        else if (avail.x != m_LastSize.x || avail.y != m_LastSize.y)
+        {
             m_LastSize = avail;
         }
 
-        // 論理サイズとフレームバッファサイズ
-        if (avail.x > 1.0f && avail.y > 1.0f) {
-            int logical_w = (int)avail.x;
-            int logical_h = (int)avail.y;
-            ImGuiIO& io = ImGui::GetIO();
-            int fb_w = (int)roundf(avail.x * io.DisplayFramebufferScale.x);
-            int fb_h = (int)roundf(avail.y * io.DisplayFramebufferScale.y);
 
-            if (logical_w != m_LastSize.x || logical_h != m_LastSize.y) {
-                m_LastSize = ImVec2((float)logical_w, (float)logical_h);
-                n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
-            }
-        }
+        ImGuiIO& io = ImGui::GetIO();
+
+        // 論理サイズとフレームバッファサイズ
+        int logical_w = (int)avail.x;
+        int logical_h = (int)avail.y;
+        int fb_w = (int)roundf(avail.x * io.DisplayFramebufferScale.x);
+        int fb_h = (int)roundf(avail.y * io.DisplayFramebufferScale.y);
+
+        n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
         ImTextureID texID = reinterpret_cast<ImTextureID>(n_render::Render_GetSceneSRV());
         ImGui::Image(texID, m_LastSize);

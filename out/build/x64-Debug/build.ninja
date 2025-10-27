@@ -40,12 +40,6 @@ include CMakeFiles\rules.ninja
 # Logical path to working directory; prefix for absolute paths.
 
 cmake_ninja_workdir = E$:\プログラミング\DevWorkspace\repos\minigame_engine\out\build\x64-Debug\
-
-#############################################
-# Utility command for CopyAssets
-
-build CopyAssets: phony CMakeFiles\CopyAssets
-
 # =============================================================================
 # Object build statements for EXECUTABLE target minigame_engine
 
@@ -53,12 +47,12 @@ build CopyAssets: phony CMakeFiles\CopyAssets
 #############################################
 # Order-only phony target for minigame_engine
 
-build cmake_object_order_depends_target_minigame_engine: phony || CopyAssets
+build cmake_object_order_depends_target_minigame_engine: phony || .
 
 build CMakeFiles\minigame_engine.dir\src\main.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\main.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -67,7 +61,7 @@ build CMakeFiles\minigame_engine.dir\src\main.cpp.obj: CXX_COMPILER__minigame_en
 build CMakeFiles\minigame_engine.dir\src\external\stb_image_impl.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\external\stb_image_impl.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\external
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -76,7 +70,7 @@ build CMakeFiles\minigame_engine.dir\src\external\stb_image_impl.cpp.obj: CXX_CO
 build CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\assets_manager.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\assets_manager\assets_manager.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -85,7 +79,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\assets_man
 build CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\prefab_manager.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\assets_manager\prefab_manager.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -94,7 +88,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\prefab_man
 build CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\texture_manager.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\assets_manager\texture_manager.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -103,7 +97,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\texture_ma
 build CMakeFiles\minigame_engine.dir\src\engine\assets\material.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\material.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -112,7 +106,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\material.cpp.obj: CXX_COM
 build CMakeFiles\minigame_engine.dir\src\engine\assets\mesh.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\mesh.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -121,7 +115,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\mesh.cpp.obj: CXX_COMPILE
 build CMakeFiles\minigame_engine.dir\src\engine\assets\prefab.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\prefab.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -130,7 +124,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\prefab.cpp.obj: CXX_COMPI
 build CMakeFiles\minigame_engine.dir\src\engine\assets\scene.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\scene.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -139,7 +133,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\scene.cpp.obj: CXX_COMPIL
 build CMakeFiles\minigame_engine.dir\src\engine\assets\texture.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\assets\texture.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -148,7 +142,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\assets\texture.cpp.obj: CXX_COMP
 build CMakeFiles\minigame_engine.dir\src\engine\game.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\game.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -157,7 +151,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\game.cpp.obj: CXX_COMPILER__mini
 build CMakeFiles\minigame_engine.dir\src\engine\input.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\input.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -166,7 +160,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\input.cpp.obj: CXX_COMPILER__min
 build CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\render.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -175,7 +169,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj: CXX_COMPILER__mi
 build CMakeFiles\minigame_engine.dir\src\engine\time.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\time.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -184,7 +178,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\time.cpp.obj: CXX_COMPILER__mini
 build CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -193,7 +187,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj: CXX_COMPILER__mi
 build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_assets.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_assets.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\window_editor
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -202,7 +196,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_assets.cpp.
 build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_editor.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_editor.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\window_editor
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -211,7 +205,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_editor.cpp.
 build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_game.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_game.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\window_editor
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -220,7 +214,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_game.cpp.ob
 build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_hierarchy.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_hierarchy.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\window_editor
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -229,7 +223,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_hierarchy.c
 build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_manager.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_manager.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\window_editor
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -238,7 +232,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_manager.cpp
 build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_scene.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_scene.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\src\engine\window_editor
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -247,7 +241,7 @@ build CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_scene.cpp.o
 build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\imgui.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\third_party\imgui
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -256,7 +250,7 @@ build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui.cpp.obj: CXX_COMPIL
 build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_draw.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\imgui_draw.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\third_party\imgui
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -265,7 +259,7 @@ build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_draw.cpp.obj: CXX_C
 build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_tables.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\imgui_tables.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\third_party\imgui
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -274,7 +268,7 @@ build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_tables.cpp.obj: CXX
 build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\imgui_widgets.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\third_party\imgui
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -283,7 +277,7 @@ build CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_widgets.cpp.obj: CX
 build CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_win32.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends\imgui_impl_win32.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\third_party\imgui\backends
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -292,7 +286,7 @@ build CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_win32
 build CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_dx11.cpp.obj: CXX_COMPILER__minigame_engine_unscanned_Debug E$:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends\imgui_impl_dx11.cpp || cmake_object_order_depends_target_minigame_engine
   DEFINES = -DUNICODE -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17
-  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include -IE:\プログラミング\DevWorkspace\repos\minigame_engine\include\window_editor -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
+  INCLUDES = -IE:\プログラミング\DevWorkspace\repos\minigame_engine\src -IE:\プログラミング\DevWorkspace\repos\minigame_engine\external -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui -IE:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends
   OBJECT_DIR = CMakeFiles\minigame_engine.dir
   OBJECT_FILE_DIR = CMakeFiles\minigame_engine.dir\third_party\imgui\backends
   TARGET_COMPILE_PDB = CMakeFiles\minigame_engine.dir\
@@ -306,7 +300,7 @@ build CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_dx11.
 #############################################
 # Link the executable bin\minigame_engine.exe
 
-build bin\minigame_engine.exe: CXX_EXECUTABLE_LINKER__minigame_engine_Debug CMakeFiles\minigame_engine.dir\src\main.cpp.obj CMakeFiles\minigame_engine.dir\src\external\stb_image_impl.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\assets_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\prefab_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\texture_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\material.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\mesh.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\prefab.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\scene.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\texture.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\game.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\input.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\time.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_assets.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_editor.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_game.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_hierarchy.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_scene.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_draw.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_tables.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_widgets.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_win32.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_dx11.cpp.obj || CopyAssets
+build bin\minigame_engine.exe: CXX_EXECUTABLE_LINKER__minigame_engine_Debug CMakeFiles\minigame_engine.dir\src\main.cpp.obj CMakeFiles\minigame_engine.dir\src\external\stb_image_impl.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\assets_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\prefab_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\assets_manager\texture_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\material.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\mesh.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\prefab.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\scene.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\assets\texture.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\game.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\input.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\render.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\time.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_assets.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_editor.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_game.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_hierarchy.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_manager.cpp.obj CMakeFiles\minigame_engine.dir\src\engine\window_editor\window_scene.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_draw.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_tables.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\imgui_widgets.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_win32.cpp.obj CMakeFiles\minigame_engine.dir\third_party\imgui\backends\imgui_impl_dx11.cpp.obj
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
   LINK_LIBRARIES = user32.lib  gdi32.lib  gdiplus.lib  d3d11.lib  dxgi.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -349,17 +343,9 @@ build rebuild_cache: phony CMakeFiles\rebuild_cache.util
 
 
 #############################################
-# Custom command for CMakeFiles\CopyAssets
-
-build CMakeFiles\CopyAssets | ${cmake_ninja_workdir}CMakeFiles\CopyAssets: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D E:\プログラミング\DevWorkspace\repos\minigame_engine\out\build\x64-Debug && "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory E:/プログラミング/DevWorkspace/repos/minigame_engine/Assets /Assets"
-  DESC = Copying Assets folder to output directory
-
-
-#############################################
 # Custom command for CMakeFiles\run
 
-build CMakeFiles\run | ${cmake_ninja_workdir}CMakeFiles\run: CUSTOM_COMMAND bin\minigame_engine.exe || CopyAssets bin\minigame_engine.exe
+build CMakeFiles\run | ${cmake_ninja_workdir}CMakeFiles\run: CUSTOM_COMMAND bin\minigame_engine.exe || bin\minigame_engine.exe
   COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D E:\プログラミング\DevWorkspace\repos\minigame_engine\out\build\x64-Debug\bin && E:\プログラミング\DevWorkspace\repos\minigame_engine\out\build\x64-Debug\bin\minigame_engine.exe"
 
 # =============================================================================
@@ -377,7 +363,7 @@ build minigame_engine.exe: phony bin\minigame_engine.exe
 #############################################
 # Folder: E:/プログラミング/DevWorkspace/repos/minigame_engine/out/build/x64-Debug
 
-build all: phony CopyAssets bin\minigame_engine.exe
+build all: phony bin\minigame_engine.exe
 
 # =============================================================================
 # Built-in targets

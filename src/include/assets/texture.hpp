@@ -20,4 +20,5 @@ struct Texture
     int height = 0;
 };
 
+
 #endif // !TEXTURE

@@ -2,7 +2,7 @@
  *      –ˆƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚¾‚¯s‚¤        *
  ****************************************/
 
-#include "../include/render.hpp"
+#include "include/render.hpp"
 
 #include <gdiplus.h>
 #include <string>

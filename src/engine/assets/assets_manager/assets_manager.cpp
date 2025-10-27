@@ -1,13 +1,11 @@
 #include <iostream>
 #include <imgui.h>
-#include "../../../include/assets/assets_manager/texture_manager.hpp"
-#include "../../../include/assets/texture.hpp"
-#include "../../../include/assets/assets_manager/assets_manager.hpp"
+#include "include/assets/assets_manager/texture_manager.hpp"
+#include "include/assets/texture.hpp"
+#include "include/assets/assets_manager/assets_manager.hpp"
 
 
 void OnAssetClicked(const std::string& name);
-void OnAssetDoubleClicked(const std::string& name);
-void OnShowExplorer(const std::string& name);
 
 
 void n_assetsmanager::assets_manager::assets_Show()
@@ -44,15 +42,35 @@ void n_assetsmanager::assets_manager::assets_Show()
 		// 画像ボタン ImageButtonを用いる
 		if (tex.tx_id)
 		{
-			//if (ImGui::ImageButton(name.c_str(), (ImTextureID)tex.tx_id, thumbSize))
-			//{	// クリックされたときの処理
-			//	printf("[AssetsWindow] Clicked on texture \n");
-			//	OnAssetClicked(name);
-
-			//}
-			if (ImGui::Button("test_Button", ImVec2(64, 64)))
-			{
+			if (ImGui::ImageButton(name.c_str(), (ImTextureID)tex.tx_id, thumbSize))
+			{	// クリックされたときの処理
 				printf("[AssetsWindow] Clicked on texture \n");
+				OnAssetClicked(name);
+			}
+			
+			// ドラッグ＆ドロップのソース設定
+			if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+			{
+				//printf("[Assetes_manager] テクスチャ選択 PAYLOAD");
+
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) 
+				{	
+					//printf("[AssetsWindow] Begin DragDrop Source \n");
+					
+					const char* d = name.c_str();
+					printf("Send payload name='%s' size=%d \n", d, (int)name.size() + 1);
+					/*for (int i = 0; i < (int)name.size() + 1 && i < 32; ++i) {
+						printf(" %02X \n", (unsigned char)d[i]);
+					}*/
+
+
+					// ペイロードにアセット名を設定
+					ImGui::SetDragDropPayload("ASSET_PAYLOAD", (const void*)name.c_str(), (int)name.size() + 1); // +1はnull終端のため
+					ImGui::Image((ImTextureID)tex.tx_id, thumbSize); // ドラッグ中に表示するプレビュー
+					ImGui::TextUnformatted(name.c_str());
+					ImGui::EndDragDropSource();
+					// window_scene.cppで受け取る処理がある
+				}
 			}
 		}
 		else
@@ -62,20 +80,6 @@ void n_assetsmanager::assets_manager::assets_Show()
 
 		// テクスチャ名を表示
 		ImGui::TextWrapped("%s", name.c_str());
-
-		// コンテキストメニュー
-		if (ImGui::BeginPopup("asset_ctx"))
-		{
-			if (ImGui::MenuItem("place in Scene"))
-			{
-				OnAssetDoubleClicked(name);
-			}
-			if (ImGui::MenuItem("Show in Explorer"))
-			{
-				OnShowExplorer(name);
-			}
-			ImGui::EndPopup();
-		}
 
 		ImGui::PopID(); // IDを戻す
 
@@ -94,26 +98,4 @@ void OnAssetClicked(const std::string& name)
 {
 	// クリックされたアセット名をコンソールに出力
 	printf("[AssetsWindow] Asset clicked \n");
-}
-
-
-void OnAssetDoubleClicked(const std::string& name)
-{
-	// ダブルクリックされたアセット名をコンソールに出力
-	printf("[AssetsWindow] Asset double-clicked \n");
-
-	// sceneにDD
-	ImVec2 mousePos = ImGui::GetMousePos();
-
-	// シーンにアセットを配置する
-	//n_windowscene::window_scene::Get().AddAssetToScene(name, mousePos.x, mousePos.y);
-}
-
-void OnShowExplorer(const std::string& name)
-{
-	// アセット名をコンソールに出力
-	printf("[AssetsWindow] Show in Explorer \n");
-	// ファイルエクスプローラーでアセットの場所を開く
-	std::string command = "explorer.exe /select,\"" + std::string("../../Assets/textures/") + name + "\"";
-	system(command.c_str());
 }

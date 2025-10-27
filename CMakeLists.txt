@@ -33,13 +33,13 @@ file(GLOB_RECURSE SHADER_FILES
 
 
 # Assets/フォルダを出力先へコピー　(これはテクスチャフォルダを見つけるため)
-add_custom_target(
-    CopyAssets ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${PROJECT_SOURCE_DIR}/Assets
-    ${CMAKE_RUNTIME_OUTPUT_PATH}/Assets
-    COMMENT "Copying Assets folder to output directory"
-)
+#add_custom_target(
+#    CopyAssets ALL
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#    ${PROJECT_SOURCE_DIR}/Assets
+#    ${CMAKE_RUNTIME_OUTPUT_PATH}/Assets
+#    COMMENT "Copying Assets folder to output directory"
+#)
 
 
 # 収集したソースでターゲットを一度だけ定義
@@ -51,13 +51,19 @@ add_executable(minigame_engine
     ${IMGUI_SOURCES}        
 )
 
+# 重複排除
+list(REMOVE_DUPLICATES ENGINE_SOURCES)
+
+# debug用の定義
+foreach(src ${ENGINE_SOURCES})
+    message(STATUS "Source File: ${src}")
+    endforeach()
+
 # windows固有
 add_definitions(-DUNICODE -D_UNICODE)
 
 target_include_directories(minigame_engine PUBLIC
-  ${PROJECT_SOURCE_DIR}
-  ${PROJECT_SOURCE_DIR}/include    
-  ${PROJECT_SOURCE_DIR}/include/window_editor
+  ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_SOURCE_DIR}/external
   ${PROJECT_SOURCE_DIR}/third_party/imgui
   ${PROJECT_SOURCE_DIR}/third_party/imgui/backends
@@ -78,4 +84,4 @@ add_custom_target(run
 )
 
 # minigame_engine をビルドする前に CopyAssets を実行
-add_dependencies(minigame_engine CopyAssets)
+#add_dependencies(minigame_engine CopyAssets)
