@@ -46,9 +46,11 @@ namespace n_render
         // 例: スワップチェーン／デバイス生成
         DXGI_SWAP_CHAIN_DESC sd = {};
         sd.BufferCount = 1;
-		sd.BufferDesc.Width = 1920;     //マウスの座標が合わないのはここを変えていないから
-		sd.BufferDesc.Height = 1000;    //本来は1920x1280にしたいが、この数値だと多少のズレが発生する
+		sd.BufferDesc.Width = width;     //マウスの座標が合わないのはここを変えていないから
+		sd.BufferDesc.Height = height;    //本来は1920x1280にしたいが、この数値だと多少のズレが発生する
         sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        sd.BufferDesc.RefreshRate.Numerator = 60;
+        sd.BufferDesc.RefreshRate.Denominator = 1;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.OutputWindow = hwnd;
         sd.SampleDesc.Count = 1;

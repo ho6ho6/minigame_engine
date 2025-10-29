@@ -15,6 +15,7 @@ namespace n_texturemanager
 {
     texture_manager instance_texmag("Assets/textures");
 
+
 	// テクスチャ名で取得
     std::vector<std::string> texture_manager::GetTextureKeys() const {
         std::vector<std::string> keys;
@@ -38,23 +39,23 @@ namespace n_texturemanager
     void texture_manager::LoadAllTextures() // 起動時に一度だけ
     {
 
-        printf("[TextureManager] this=%p file=%s\n", (void*)this, __FILE__);
+        //printf("[texture_manager] instance_texmag addr=%p file=%s\n", (void*)&instance_texmag, __FILE__);
 
         namespace fs = std::filesystem;
 
+        printf("[TextureManager/APP] cwd = %s\n", std::filesystem::current_path().string().c_str());
+        //std::cout
+        //    << "[TextureManager] BaseDir    = " << m_baseDir << "\n"
+        //    << "[TextureManager] exists     = " << std::boolalpha
+        //    << fs::exists(m_baseDir) << "\n"
+        //    << "[TextureManager] is_directory = "
+        //    << fs::is_directory(m_baseDir) << "\n";
 
-        std::cout
-            << "[TextureManager] BaseDir    = " << m_baseDir << "\n"
-            << "[TextureManager] exists     = " << std::boolalpha
-            << fs::exists(m_baseDir) << "\n"
-            << "[TextureManager] is_directory = "
-            << fs::is_directory(m_baseDir) << "\n";
 
-
-        if (!fs::exists(m_baseDir) || !fs::is_directory(m_baseDir)) {
-            std::cerr << "[TextureManager] Texture directory not found: " << m_baseDir << "\n";
-            return;
-        }
+        //if (!fs::exists(m_baseDir) || !fs::is_directory(m_baseDir)) {
+        //    std::cerr << "[TextureManager] Texture directory not found: " << m_baseDir << "\n";
+        //    return;
+        //}
 
         size_t count = 0;
         for (auto& entry : fs::directory_iterator(m_baseDir)) {
@@ -65,8 +66,8 @@ namespace n_texturemanager
             ++count;
         }
 
-        std::cout << "[TextureManager] Loaded textures: "
-            << count << " from " << m_baseDir << "\n";
+        //std::cout << "[TextureManager] Loaded textures: "
+        //    << count << " from " << m_baseDir << "\n";
     }
 
 
@@ -75,7 +76,7 @@ namespace n_texturemanager
         std::cout << "[TextureManager] Loading texture from: "
             << filepath << std::endl;
 
-        // 1) ファイル読み込み (RGBA)
+        // ファイル読み込み (RGBA)
         int w, h, channels;
         unsigned char* data = stbi_load(
             filepath.string().c_str(), &w, &h, &channels, 4);
@@ -85,7 +86,7 @@ namespace n_texturemanager
                 "[TextureManager] stbi_load failed: " + filepath.string() + " (" + reason + ")");
         }
 
-        // 2) D3D11 テクスチャ作成
+        // D3D11 テクスチャ作成
         D3D11_TEXTURE2D_DESC desc = {};
         desc.Width = w;
         desc.Height = h;
@@ -108,7 +109,7 @@ namespace n_texturemanager
                 + std::to_string(hr));
         }
 
-        // 3) SRV (ShaderResourceView) を作成
+        // SRV (ShaderResourceView) を作成
         ID3D11ShaderResourceView* srv = nullptr;
         hr = n_render::Render_GetDevice()->CreateShaderResourceView(tex2d, nullptr, &srv);
         tex2d->Release();  // テクスチャ本体は不要なので Release
@@ -117,14 +118,19 @@ namespace n_texturemanager
                 + std::to_string(hr));
         }
 
-        // 4) Texture 構造体を作成・初期化
+        // Texture 構造体を作成・初期化
         Texture tex;
         tex.name = filepath.filename().string();
         tex.width = w;
         tex.height = h;
         tex.tx_id = (ImTextureID)srv;  // ImGui は void* 扱い
 
-        // 5) マップに必ず登録する
+        // Debug
+        printf("[TextureManager/DBG] Loaded Texture name=%s width=%d height=%d; srv=%p\n",
+            tex.name.c_str(), tex.width, tex.height, (void*)tex.tx_id);
+
+
+        // マップに登録
         m_Textures[tex.name] = tex;
         std::cout << "[TextureManager] Inserted: "
             << tex.name << " (Total=" << m_Textures.size() << ")\n";

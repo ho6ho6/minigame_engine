@@ -32,8 +32,7 @@
     int         nCmdShow      : ウィンドウの初期表示方法
 */
 
-n_texturemanager::texture_manager g_TextureManager("../../Assets/textures"); // グローバルなテクスチャマネージャ
-n_assetsmanager::assets_manager g_AssetsManager(g_TextureManager); // グローバルなアセットマネージャ
+n_assetsmanager::assets_manager g_AssetsManager(n_texturemanager::instance_texmag); // グローバルなアセットマネージャ
 
 int APIENTRY WinMain(
     HINSTANCE hInstance,
@@ -94,7 +93,7 @@ int APIENTRY WinMain(
 	/*------------------------------Assetsの登録-------------------------------*/
 
     // テクスチャを読み込む
-    g_TextureManager.LoadAllTextures();
+    n_texturemanager::instance_texmag.LoadAllTextures();
 
     /*------------------------------Assetsの登録-------------------------------*/
 
@@ -132,15 +131,6 @@ int APIENTRY WinMain(
         static const float clear_col[4] = { 0.5f, 0.5f, 0.5f, 0.1f };
         n_render::Render_Frame(clear_col, deltaTime, frameTime);
 
-        // ── ここから DockSpace ──
-        // ホスト用フルスクリーンウィンドウを立てて
-        //ImGuiWindowFlags hostFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-        //                             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-        //ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        //ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
-        //ImGui::Begin("##MainDockHost", nullptr, hostFlags);
-
         //ImGui::End();
 
         wm.RenderAll();
@@ -149,10 +139,10 @@ int APIENTRY WinMain(
         ImGui::Render();
         
         auto ctx = n_render::Render_GetDeviceContext();
-        auto rtv = n_render::Render_GetRenderTargetView();
+        auto g_rtv = n_render::Render_GetRenderTargetView();
 
-        ctx->OMSetRenderTargets(1, &rtv, nullptr);
-        ctx->ClearRenderTargetView(rtv, clear_col);
+        ctx->OMSetRenderTargets(1, &g_rtv, nullptr);
+        ctx->ClearRenderTargetView(g_rtv, clear_col);
 
         //game::Game_Render(); // game.cpp
         

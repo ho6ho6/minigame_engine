@@ -15,9 +15,9 @@ struct SceneSprite
     Texture* texture;    // テクスチャハンドル
     float pos_x = 0.0f;   // シーン内のX座標
     float pos_y = 0.0f;   // シーン内のY座標
-    float width = 32.0f;  // スプライトの幅
-    float height = 32.0f; // スプライトの高さ
-    int z_order = 0;   // 描画順序（大きいほど前面に描画）
+    int width = 32;  // スプライトの幅
+    int height = 32; // スプライトの高さ
+    int z_order = 1;   // 描画順序（大きいほど前面に描画）
     bool selected = false; // 選択状態
 };
 

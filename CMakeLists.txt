@@ -21,8 +21,8 @@ set(IMGUI_SOURCES
 # src 以下の .cpp を全自動収集
 file(GLOB_RECURSE ENGINE_SOURCES
     "${PROJECT_SOURCE_DIR}/src/engine/*.cpp"
-    "${PROJECT_SOURCE_DIR}/src/engine/assets/*.cpp"
-    "${PROJECT_SOURCE_DIR}/src/engine/window_editor/*.cpp"
+    #"${PROJECT_SOURCE_DIR}/src/engine/assets/*.cpp"
+    #"${PROJECT_SOURCE_DIR}/src/engine/window_editor/*.cpp"
 )
 
 # シェーダーファイルも収集
@@ -42,6 +42,10 @@ file(GLOB_RECURSE SHADER_FILES
 #)
 
 
+# 重複排除
+list(REMOVE_DUPLICATES ENGINE_SOURCES)
+
+
 # 収集したソースでターゲットを一度だけ定義
 add_executable(minigame_engine
     WIN32
@@ -51,8 +55,6 @@ add_executable(minigame_engine
     ${IMGUI_SOURCES}        
 )
 
-# 重複排除
-list(REMOVE_DUPLICATES ENGINE_SOURCES)
 
 # debug用の定義
 foreach(src ${ENGINE_SOURCES})
