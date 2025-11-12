@@ -10,12 +10,6 @@
 - 空のオブジェクトをステージに置くことで、フラグ設定を行う。
 - 各オブジェクトに個別で条件を付けれるようにし、ギミックに自由度を持たせる。
 
-## 構成
-- `minigame_engine`: エンジン本体
-- `minigame_engine.assets`: アセット管理
-- `minigame_engine.game`: ゲームの実装
-- `minigame_engine.ui`: UIの実装
-
 ## 開発環境
 - C++
 - CMake
