@@ -47,7 +47,7 @@
 - 現状5 --> Assetをscene上に配置を完了(描画は取り組み中) </br>
 ![minigame_engine](./img/minigame_engine5.png)
 
-- 現状6 --> オブジェクトの配置完了、座標がオブジェクト固有の座標とシーンの座標とでズレているため見直す必要がある。
+- 現状6 --> オブジェクトの配置完了、座標がオブジェクト固有の座標とシーンの座標とでズレているため見直す必要がある。</br>
 ![minigame_engine](./img/minigame_engine6.gif)
 
 # 終盤
