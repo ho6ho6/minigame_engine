@@ -148,7 +148,7 @@ int APIENTRY WinMain(
         
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-        // 6) ç≈å„Ç… DirectX ÇÃ Present
+        // ç≈å„Ç… DirectX ÇÃ Present
         n_render::Render_Present();
     }
 

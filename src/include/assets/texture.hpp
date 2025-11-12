@@ -16,8 +16,8 @@ struct Texture
     ImTextureID tx_id;
 
     /// 元画像の幅・高さ（必要に応じて参照用）
-    int width = 0;
-    int height = 0;
+    int width = 16;
+    int height = 16;
 };
 
 

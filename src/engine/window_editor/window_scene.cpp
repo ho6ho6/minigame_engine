@@ -36,13 +36,13 @@ namespace n_windowscene
 
         ImGui::Begin("Scene_View", nullptr, ImGuiWindowFlags_NoResize);
 
-		// window サイズを固定
+        // window サイズを固定
         ImGui::SetWindowSize(ImVec2(1000, 600));
 
         ImVec2 avail = ImGui::GetContentRegionAvail();  // 利用可能な領域を取得
 
-		// サイズ変更の検出　安全策として 0 以下は無視
-        if(avail.x <= 0.0f || avail.y <= 0.0f)
+        // サイズ変更の検出　安全策として 0 以下は無視
+        if (avail.x <= 0.0f || avail.y <= 0.0f)
         {
             if (m_LastSize.x <= 0.0f || m_LastSize.y <= 0.0f) m_LastSize = ImVec2(1.0f, 1.0f);
         }
@@ -66,7 +66,6 @@ namespace n_windowscene
         ImVec2 contentSize = avail;                       // content のサイズ（ヒット領域として使用）
 
         //### デバック
-        {
             
             ImVec2 mouse = ImGui::GetMousePos();
             ImDrawList* draw = ImGui::GetWindowDrawList();
@@ -115,38 +114,37 @@ namespace n_windowscene
             draw->AddLine(ImVec2(mappedOnImage.x - 8, mappedOnImage.y), ImVec2(mappedOnImage.x + 8, mappedOnImage.y), IM_COL32(0, 255, 0, 200), 2.0f);
             draw->AddLine(ImVec2(mappedOnImage.x, mappedOnImage.y - 8), ImVec2(mappedOnImage.x, mappedOnImage.y + 8), IM_COL32(0, 255, 0, 200), 2.0f);
             
-        }
         //###
 
+        {
+            // --- 以下は座標系／グリッド描画（クリップや origin 計算はそのまま） ---
+            ImDrawList* draw = ImGui::GetWindowDrawList();
+            const ImVec2 winPos = ImGui::GetWindowPos();
+            const ImVec2 winSize = ImGui::GetWindowSize();
+            draw->PushClipRect(winPos, ImVec2(winPos.x + winSize.x, winPos.y + winSize.y), true);
 
-        // --- 以下は座標系／グリッド描画（クリップや origin 計算はそのまま） ---
-        ImDrawList* draw = ImGui::GetWindowDrawList();
-        const ImVec2 winPos = ImGui::GetWindowPos();
-        const ImVec2 winSize = ImGui::GetWindowSize();
-        draw->PushClipRect(winPos, ImVec2(winPos.x + winSize.x, winPos.y + winSize.y), true);
+            float centerX = winPos.x + winSize.x * 0.5f + ViewOffset.x;
+            float centerY = winPos.y + winSize.y * 0.5f + ViewOffset.y;
+            ImVec2 origin(centerX, centerY);
 
-        float centerX = winPos.x + winSize.x * 0.5f + ViewOffset.x;
-        float centerY = winPos.y + winSize.y * 0.5f + ViewOffset.y;
-        ImVec2 origin(centerX, centerY);
+            const float gridStep = 20.0f;
+            const ImU32 colGrid = IM_COL32(200, 200, 200, 50);
 
-        const float gridStep = 20.0f;
-        const ImU32 colGrid = IM_COL32(200, 200, 200, 50);
+            for (float x = fmodf(origin.x, gridStep); x < winPos.x + winSize.x; x += gridStep)
+                draw->AddLine(ImVec2(x, origin.y - winSize.y * 0.5f), ImVec2(x, origin.y + winSize.y * 0.5f), colGrid);
+            for (float y = fmodf(origin.y, gridStep); y < winPos.y + winSize.y; y += gridStep)
+                draw->AddLine(ImVec2(origin.x - winSize.x * 0.5f, y), ImVec2(origin.x + winSize.x * 0.5f, y), colGrid);
 
-        for (float x = fmodf(origin.x, gridStep); x < winPos.x + winSize.x; x += gridStep)
-            draw->AddLine(ImVec2(x, origin.y - winSize.y * 0.5f), ImVec2(x, origin.y + winSize.y * 0.5f), colGrid);
-        for (float y = fmodf(origin.y, gridStep); y < winPos.y + winSize.y; y += gridStep)
-            draw->AddLine(ImVec2(origin.x - winSize.x * 0.5f, y), ImVec2(origin.x + winSize.x * 0.5f, y), colGrid);
+            const ImU32 colAxisX = IM_COL32(255, 0, 0, 255);
+            draw->AddLine(ImVec2(origin.x - winSize.x * 10.0f, origin.y), ImVec2(origin.x + winSize.x * 10.0f, origin.y), colAxisX, 2.0f);
+            const ImU32 colAxisY = IM_COL32(0, 255, 0, 255);
+            draw->AddLine(ImVec2(origin.x, origin.y - winSize.y * 10.0f), ImVec2(origin.x, origin.y + winSize.y * 10.0f), colAxisY, 2.0f);
 
-        const ImU32 colAxisX = IM_COL32(255, 0, 0, 255);
-        draw->AddLine(ImVec2(origin.x - winSize.x * 10.0f, origin.y), ImVec2(origin.x + winSize.x * 10.0f, origin.y), colAxisX, 2.0f);
-        const ImU32 colAxisY = IM_COL32(0, 255, 0, 255);
-        draw->AddLine(ImVec2(origin.x, origin.y - winSize.y * 10.0f), ImVec2(origin.x, origin.y + winSize.y * 10.0f), colAxisY, 2.0f);
+            const ImU32 colText = IM_COL32(255, 255, 255, 200);
+            draw->AddText(origin, colText, "(0,0)");
 
-        const ImU32 colText = IM_COL32(255, 255, 255, 200);
-        draw->AddText(origin, colText, "(0,0)");
-
-        draw->PopClipRect();
-
+            draw->PopClipRect();
+        }
 
 
         ImGui::InvisibleButton("Scene_drag_area", contentSize, ImGuiButtonFlags_MouseButtonRight);
@@ -185,15 +183,15 @@ namespace n_windowscene
             }
         }
 
-        bool isRightActive = ImGui::IsItemActive();               // 押されている間 true
+        bool isRightActive = ImGui::IsItemActive();     // 押されている間 true
 
 
         if (isRightActive && ImGui::IsMouseDragging(ImGuiMouseButton_Right))
         {
             ImVec2 drag = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right); // 累積 delta
             // 1フレーム分に変換して反映する
-            ViewOffset.x += drag.x;
-            ViewOffset.y += drag.y;
+            ViewOffset.x -= drag.x;
+            ViewOffset.y -= drag.y;
             ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right); // 次フレームは 0 から計測
         }
 
@@ -205,7 +203,7 @@ namespace n_windowscene
             ImVec2 guiLocalPos = m_PendingDropPos[i];
             ImVec2 guiWindowPos = ImGui::GetWindowPos(); // シーンウィンドウの絶対位置
             
-			printf("[window_scene] Processing dropped asset: %s\n", asset_name.c_str());
+			//printf("[window_scene] Processing dropped asset: %s\n", asset_name.c_str());
 
             Texture* tex = n_texturemanager::instance_texmag.GetTextureName(asset_name);
             if (tex)
@@ -232,7 +230,7 @@ namespace n_windowscene
         }
 
 
-        printf("[window_scene/Render] m_SceneSprites.count=%zu\n", m_SceneSprites.size());
+        //printf("[window_scene/Render] m_SceneSprites.count=%zu\n", m_SceneSprites.size());
 
         // シーンオブジェクト一覧を走査
         for (const auto& sprite : m_SceneSprites)
@@ -245,37 +243,42 @@ namespace n_windowscene
                 continue;
             }
 
-            printf("[window_scene/Render] sizeof(SceneSprite)=%zu offsetof(name)=%zu offsetof(texture)=%zu offsetof(pos_x)=%zu offsetof(width)=%zu offsetof(height)=%zu\n",
-                sizeof(SceneSprite),
-                offsetof(SceneSprite, name),
-                offsetof(SceneSprite, texture),
-                offsetof(SceneSprite, pos_x),
-                offsetof(SceneSprite, width),
-                offsetof(SceneSprite, height));
+            //printf("[window_scene/Render] sizeof(SceneSprite)=%zu offsetof(name)=%zu offsetof(texture)=%zu offsetof(pos_x)=%zu offsetof(width)=%zu offsetof(height)=%zu\n",
+                //sizeof(SceneSprite),
+                //offsetof(SceneSprite, name),
+                //offsetof(SceneSprite, texture),
+                //offsetof(SceneSprite, pos_x),
+                //offsetof(SceneSprite, width),
+                //offsetof(SceneSprite, height));
 
             // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
             ImVec2 screenPos = ImVec2(contentPos.x + (sprite.pos_x - ViewOffset.x),
-                contentPos.y + (sprite.pos_y - ViewOffset.y));
+                                      contentPos.y + (sprite.pos_y - ViewOffset.y));
             ImGui::SetCursorScreenPos(screenPos);
 
             ImVec2 drawSize = ImVec2((float)sprite.width, (float)sprite.height);
             // ログ出力（デバッグ用）
-            printf("[window_scene/Render/DBG] draw '%s' srv=%p pos=(%f,%f) size=(%d,%d)\n",
-                sprite.name.c_str(), (void*)srv, screenPos.x, screenPos.y, sprite.width, sprite.height);
+            //printf("[window_scene/Render/DBG] draw '%s' srv=%p pos=(%f,%f) size=(%d,%d)\n",
+                //sprite.name.c_str(), (void*)srv, screenPos.x, screenPos.y, sprite.width, sprite.height);
 
             // テスト用 SRV を取得（既にロード済みの cube の SRV を流用）
-            ID3D11ShaderResourceView* testSrv = reinterpret_cast<ID3D11ShaderResourceView*>(m_SceneSprites.front().texture->tx_id);
-            ImGui::SetCursorScreenPos(ImVec2(contentPos.x + 10, contentPos.y + 10));
-            ImGui::Image((ImTextureID)testSrv, ImVec2(64.0f, 64.0f));
-            printf("[SMOKE TEST] testSrv=%p\n", (void*)testSrv);
+            //ID3D11ShaderResourceView* testSrv = reinterpret_cast<ID3D11ShaderResourceView*>(m_SceneSprites.front().texture->tx_id);
+            //ImGui::SetCursorScreenPos(ImVec2(contentPos.x + 10, contentPos.y + 10));
+            //ImGui::Image((ImTextureID)testSrv, ImVec2(16.0f, 16.0f));
+            ////printf("[SMOKE TEST] testSrv=%p\n", (void*)testSrv);
 
             // ImGui_ImplDX11 は ImTextureID に SRV ポインタを渡す実装が標準
             ImGui::Image((ImTextureID)srv, drawSize);
 
-            ImVec2 a = screenPos;
-            ImVec2 b = ImVec2(screenPos.x + sprite.width, screenPos.y + sprite.height);
-            ImGui::GetWindowDrawList()->AddRect(a, b, IM_COL32(0, 255, 255, 200), 0.0f, 0, 2.0f);
-            printf("[CLIP TEST] rect a=(%f,%f) b=(%f,%f)\n", a.x, a.y, b.x, b.y);
+            //ImVec2 a = screenPos;
+            //ImVec2 b = ImVec2(screenPos.x + sprite.width, screenPos.y + sprite.height);
+            //ImGui::GetWindowDrawList()->AddRect(a, b, IM_COL32(0, 255, 255, 200), 0.0f, 0, 2.0f);
+            //printf("[CLIP TEST] rect a=(%f,%f) b=(%f,%f)\n", a.x, a.y, b.x, b.y);
+
+            //printf("[SRVCHK] front.tx=%p front.tx_id=%p sprite.tex=%p sprite.tx_id=%p\n",
+            //    (void*)m_SceneSprites.front().texture, (void*)m_SceneSprites.front().texture->tx_id,
+            //    (void*)sprite.texture, (void*)sprite.texture->tx_id);
+
 
         }
 
@@ -286,16 +289,15 @@ namespace n_windowscene
 
 
 
-
     void window_scene::AddAssetToScene(Texture* tex, const std::string& asset_name_str, ImVec2 guiLocalPos, ImVec2 guiWindowPos)
     {
 
-        printf("[AddAssetToScene] tex_ptr=%p tx_id=%p width=%d height=%d asset='%s' guiLocal=(%f,%f) guiWin=(%f,%f)\n",
-            (void*)tex, (void*)tex->tx_id, tex->width, tex->height,
-            asset_name_str.c_str(), guiLocalPos.x, guiLocalPos.y, guiWindowPos.x, guiWindowPos.y);
+        //printf("[AddAssetToScene] tex_ptr=%p tx_id=%p width=%d height=%d asset='%s' guiLocal=(%f,%f) guiWin=(%f,%f)\n",
+            //(void*)tex, (void*)tex->tx_id, tex->width, tex->height,
+            //asset_name_str.c_str(), guiLocalPos.x, guiLocalPos.y, guiWindowPos.x, guiWindowPos.y);
 
         if (!tex) { printf("[Window_scene/ERR] tex==nullptr\n"); return; }
-        printf("[Window_scene/DBG] tex->tx_id=%p\n", tex->tx_id);
+        //printf("[Window_scene/DBG] tex->tx_id=%p\n", tex->tx_id);
 
         // シーンにアセットを追加する処理をここに実装
         ImGuiIO& io = ImGui::GetIO();
@@ -310,8 +312,8 @@ namespace n_windowscene
         float sceneY = guiAbsPos.y * scale.y;
 
         // テクスチャサイズを使って配置（中心配置）
-        int tex_w = tex->width > 0 ? tex->width : 64;
-        int tex_h = tex->height > 0 ? tex->height : 64;
+        int tex_w = tex->width > 0 ? tex->width : 16;
+        int tex_h = tex->height > 0 ? tex->height : 16;
         float placeX = sceneX - tex_w * 0.5f;
         float placeY = sceneY - tex_h * 0.5f;
 
@@ -326,17 +328,10 @@ namespace n_windowscene
 
         m_SceneSprites.push_back(sprite);
 
-        printf("[window_scene/AddAssetToScene] pushed '%s' tex=%p size=(%d,%d) pos=(%f,%f)\n",
-            sprite.name.c_str(), (void*)sprite.texture, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
+        //printf("[window_scene/AddAssetToScene] pushed '%s' tex=%p size=(%d,%d) pos=(%f,%f)\n",
+            //sprite.name.c_str(), (void*)sprite.texture, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
 
     }
-
-
-    window_scene& window_scene::Get()
-    {
-        static window_scene instance;
-        return instance;
-	}
 
 }
 
