@@ -31,9 +31,10 @@ namespace n_texturemanager
 		std::vector<std::string> GetTextureKeys() const;
 
 	private:
+		// テクスチャを1つ読み込む
 		void LoadTextureFromFile(const std::filesystem::path& filepath);
 
-		std::filesystem::path m_baseDir; //"Assets/textures/"
+		std::filesystem::path m_baseDir; //テクニックファイルを参照する baseDir "Assets/textures/"
 		std::unordered_map<std::string, Texture> m_Textures;
 	};
 

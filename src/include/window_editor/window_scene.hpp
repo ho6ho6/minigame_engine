@@ -14,8 +14,8 @@ namespace n_windowscene
     {
         public:
             void Render() override;
-            static window_scene& Get();
 			void AddAssetToScene(Texture* tex, const std::string& asset_name, ImVec2 guiLocalPos, ImVec2 guiWindowPos);
+			void RegisterSceneObjToHierarchy(Texture* tex, const std::string& assetObj_hier_name); // シーンオブジェクトをヒエラルキーに登録
 
         private:
 			ImVec2 m_LastSize = { 0, 0 };   // 最後に確定したサイズ

@@ -13,8 +13,45 @@
 
 namespace n_texturemanager 
 {
-    texture_manager instance_texmag("Assets/textures");
 
+    // exeファイルの場所から候補を探して返す
+    static std::filesystem::path ResolveTexturesDir()
+    {
+        namespace fs = std::filesystem;
+
+        // exeファイルの場所を取得
+        char exePath[MAX_PATH];
+        DWORD len = GetModuleFileNameA(NULL, exePath, MAX_PATH);
+        if (len == 0 || len == MAX_PATH)
+        {
+            std::cerr << "[TextureManager] GetModuleFileNameA failed\n";
+            return {};
+        }
+        fs::path exeDir = fs::path(exePath).remove_filename();
+
+        // 候補リスト
+        std::vector<fs::path> candidates = {
+            exeDir / "Assets" / "textures", // exe直下
+            exeDir.parent_path() / "Assets" / "textures", // 1階層上
+            fs::current_path() / "Assets" / "textures" // カレントディレクトリ
+        };
+
+        for (auto& c : candidates)
+        {
+            if (fs::exists(c) && fs::is_directory(c))   return c;
+        }
+
+        // 見つからなかった
+        std::cerr << "[TextureManager] Texture directory not found in candidates\n";
+        for (auto& c : candidates)
+        {
+            std::cerr << "  Candidate: " << c << "\n";
+        }
+        return {};
+    }
+
+
+	texture_manager instance_texmag(ResolveTexturesDir());
 
 	// テクスチャ名で取得
     std::vector<std::string> texture_manager::GetTextureKeys() const {
@@ -43,22 +80,38 @@ namespace n_texturemanager
 
         namespace fs = std::filesystem;
 
-        printf("[TextureManager/APP] cwd = %s\n", std::filesystem::current_path().string().c_str());
+        if (m_baseDir.empty()) {
+            std::cerr << "[TextureManager] base dir is empty, skipping LoadAllTextures\n";
+            return;
+        }
+
+        // base 絶対パス化 -- 相対パス／カレントディレクトリ問題の検出用
+        fs::path base = fs::absolute(m_baseDir);
+        std::cout << "[TextureManager] BaseDir= " << "\n" << base 
+                  << " cwd=" << fs::current_path() << "\n";
+
+        if (!fs::exists(base) || !fs::is_directory(base))
+        {
+            std::cerr << "[TextureManager] Texture directory not found: " << "\n" << base
+                      << "cwd = " << fs::current_path() << "\n";
+            return;
+        }
+
         //std::cout
-        //    << "[TextureManager] BaseDir    = " << m_baseDir << "\n"
+        //    << "[TextureManager] BaseDir    = " << base << "\n"
         //    << "[TextureManager] exists     = " << std::boolalpha
-        //    << fs::exists(m_baseDir) << "\n"
+        //    << fs::exists(base) << "\n"
         //    << "[TextureManager] is_directory = "
-        //    << fs::is_directory(m_baseDir) << "\n";
+        //    << fs::is_directory(base) << "\n";
 
 
-        //if (!fs::exists(m_baseDir) || !fs::is_directory(m_baseDir)) {
-        //    std::cerr << "[TextureManager] Texture directory not found: " << m_baseDir << "\n";
+        //if (!fs::exists(base) || !fs::is_directory(base)) {
+        //    std::cerr << "[TextureManager] Texture directory not found: " << base << "\n";
         //    return;
         //}
 
         size_t count = 0;
-        for (auto& entry : fs::directory_iterator(m_baseDir)) {
+        for (auto& entry : fs::directory_iterator(base)) {
             if (!entry.is_regular_file()) continue;
             auto ext = entry.path().extension().string();
             if (ext != ".png" && ext != ".jpg" && ext != ".jpeg") continue;
@@ -66,8 +119,8 @@ namespace n_texturemanager
             ++count;
         }
 
-        //std::cout << "[TextureManager] Loaded textures: "
-        //    << count << " from " << m_baseDir << "\n";
+        std::cout << "[TextureManager] Loaded textures: "
+            << count << " from " << base << "\n";
     }
 
 
@@ -136,9 +189,9 @@ namespace n_texturemanager
             << tex.name << " (Total=" << m_Textures.size() << ")\n";
     }
 
-
     const std::unordered_map<std::string, Texture>& texture_manager::GetTextureNames() const
     {
         return m_Textures;
     }
+
 }

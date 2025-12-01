@@ -3,6 +3,7 @@
 #include "include/render.hpp"	//フレームバッファ取得用
 #include "include/assets/texture.hpp"
 #include "include/assets/assets_manager/texture_manager.hpp"
+#include "include/window_editor/window_hierarchy.hpp"
 #include "imgui.h"					//ImGui本体
 #include <stdio.h>
 #include <string>
@@ -147,6 +148,11 @@ namespace n_windowscene
         }
 
 
+        if (contentSize.x <= 0.0f || contentSize.y <= 0.0f)
+        {
+            contentSize.x = 1.0f;
+            contentSize.y = 1.0f;
+        }
         ImGui::InvisibleButton("Scene_drag_area", contentSize, ImGuiButtonFlags_MouseButtonRight);
 
 
@@ -208,8 +214,7 @@ namespace n_windowscene
             Texture* tex = n_texturemanager::instance_texmag.GetTextureName(asset_name);
             if (tex)
             {
-                AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos);
-				//continue;
+				AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos);    // sceneに追加
             }
             else
             {
@@ -243,13 +248,13 @@ namespace n_windowscene
                 continue;
             }
 
-            //printf("[window_scene/Render] sizeof(SceneSprite)=%zu offsetof(name)=%zu offsetof(texture)=%zu offsetof(pos_x)=%zu offsetof(width)=%zu offsetof(height)=%zu\n",
-                //sizeof(SceneSprite),
-                //offsetof(SceneSprite, name),
-                //offsetof(SceneSprite, texture),
-                //offsetof(SceneSprite, pos_x),
-                //offsetof(SceneSprite, width),
-                //offsetof(SceneSprite, height));
+                //printf("[window_scene/Render] sizeof(SceneSprite)=%zu offsetof(name)=%zu offsetof(texture)=%zu offsetof(pos_x)=%zu offsetof(width)=%zu offsetof(height)=%zu\n",
+                    //sizeof(SceneSprite),
+                    //offsetof(SceneSprite, name),
+                    //offsetof(SceneSprite, texture),
+                    //offsetof(SceneSprite, pos_x),
+                    //offsetof(SceneSprite, width),
+                    //offsetof(SceneSprite, height));
 
             // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
             ImVec2 screenPos = ImVec2(contentPos.x + (sprite.pos_x - ViewOffset.x),
@@ -257,27 +262,28 @@ namespace n_windowscene
             ImGui::SetCursorScreenPos(screenPos);
 
             ImVec2 drawSize = ImVec2((float)sprite.width, (float)sprite.height);
-            // ログ出力（デバッグ用）
-            //printf("[window_scene/Render/DBG] draw '%s' srv=%p pos=(%f,%f) size=(%d,%d)\n",
-                //sprite.name.c_str(), (void*)srv, screenPos.x, screenPos.y, sprite.width, sprite.height);
 
-            // テスト用 SRV を取得（既にロード済みの cube の SRV を流用）
-            //ID3D11ShaderResourceView* testSrv = reinterpret_cast<ID3D11ShaderResourceView*>(m_SceneSprites.front().texture->tx_id);
-            //ImGui::SetCursorScreenPos(ImVec2(contentPos.x + 10, contentPos.y + 10));
-            //ImGui::Image((ImTextureID)testSrv, ImVec2(16.0f, 16.0f));
-            ////printf("[SMOKE TEST] testSrv=%p\n", (void*)testSrv);
+                // ログ出力（デバッグ用）
+                //printf("[window_scene/Render/DBG] draw '%s' srv=%p pos=(%f,%f) size=(%d,%d)\n",
+                    //sprite.name.c_str(), (void*)srv, screenPos.x, screenPos.y, sprite.width, sprite.height);
+
+                // テスト用 SRV を取得（既にロード済みの cube の SRV を流用）
+                //ID3D11ShaderResourceView* testSrv = reinterpret_cast<ID3D11ShaderResourceView*>(m_SceneSprites.front().texture->tx_id);
+                //ImGui::SetCursorScreenPos(ImVec2(contentPos.x + 10, contentPos.y + 10));
+                //ImGui::Image((ImTextureID)testSrv, ImVec2(16.0f, 16.0f));
+                ////printf("[SMOKE TEST] testSrv=%p\n", (void*)testSrv);
 
             // ImGui_ImplDX11 は ImTextureID に SRV ポインタを渡す実装が標準
             ImGui::Image((ImTextureID)srv, drawSize);
 
-            //ImVec2 a = screenPos;
-            //ImVec2 b = ImVec2(screenPos.x + sprite.width, screenPos.y + sprite.height);
-            //ImGui::GetWindowDrawList()->AddRect(a, b, IM_COL32(0, 255, 255, 200), 0.0f, 0, 2.0f);
-            //printf("[CLIP TEST] rect a=(%f,%f) b=(%f,%f)\n", a.x, a.y, b.x, b.y);
+                //ImVec2 a = screenPos;
+                //ImVec2 b = ImVec2(screenPos.x + sprite.width, screenPos.y + sprite.height);
+                //ImGui::GetWindowDrawList()->AddRect(a, b, IM_COL32(0, 255, 255, 200), 0.0f, 0, 2.0f);
+                //printf("[CLIP TEST] rect a=(%f,%f) b=(%f,%f)\n", a.x, a.y, b.x, b.y);
 
-            //printf("[SRVCHK] front.tx=%p front.tx_id=%p sprite.tex=%p sprite.tx_id=%p\n",
-            //    (void*)m_SceneSprites.front().texture, (void*)m_SceneSprites.front().texture->tx_id,
-            //    (void*)sprite.texture, (void*)sprite.texture->tx_id);
+                //printf("[SRVCHK] front.tx=%p front.tx_id=%p sprite.tex=%p sprite.tx_id=%p\n",
+                //    (void*)m_SceneSprites.front().texture, (void*)m_SceneSprites.front().texture->tx_id,
+                //    (void*)sprite.texture, (void*)sprite.texture->tx_id);
 
 
         }
@@ -328,10 +334,21 @@ namespace n_windowscene
 
         m_SceneSprites.push_back(sprite);
 
+        RegisterSceneObjToHierarchy(sprite.texture, sprite.name); // ヒエラルキーに登録
+
         //printf("[window_scene/AddAssetToScene] pushed '%s' tex=%p size=(%d,%d) pos=(%f,%f)\n",
             //sprite.name.c_str(), (void*)sprite.texture, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
 
     }
+
+    // シーンオブジェクトをヒエラルキーに登録する処理をここに実装
+    void window_scene::RegisterSceneObjToHierarchy(Texture* tex, const std::string& assetObj_hier_name)
+    {
+		// デバッグ用ログ出力
+        if (!tex) { printf("[Window_scene/RegisterSceneObjToHierarchy/ERR] tex==nullptr\n"); return; }
+
+		//n_windowhierarchy::hierarchy_object& 
+	}
 
 }
 

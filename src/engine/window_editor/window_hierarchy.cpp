@@ -40,16 +40,10 @@ namespace n_windowhierarchy
 
         n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
-        ImTextureID texID = reinterpret_cast<ImTextureID>(n_render::Render_GetSceneSRV());
-        ImGui::Image(texID, m_LastSize);
-
-        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            auto mp = ImGui::GetMousePos();
-            n_render::Render_PickObject((int)mp.x, (int)mp.y);
-        }
-
-        ImGui::Image((void*)n_render::Render_GetSceneSRV(), avail);
+		// scene上に配置されたオブジェクトをここに表示する処理を実装
+        //GetObjFromScene();
 
         ImGui::End();
     }
+
 }

@@ -13,7 +13,7 @@ struct Texture
     std::string name;
 
     /// ImGui に渡すテクスチャハンドル（DirectX11 なら ID3D11ShaderResourceView* をキャスト）
-    ImTextureID tx_id;
+    ImTextureID tx_id = 0;
 
     /// 元画像の幅・高さ（必要に応じて参照用）
     int width = 16;

@@ -12,7 +12,7 @@
 #include <d3d11.h>
 
 #include <imgui.h>
-#include <imgui_internal.h> // 追加: ImGuiWindow型の定義
+#include <imgui_internal.h> // ImGuiWindow型の定義
 
 #include <directXMath.h>
 using namespace DirectX;
@@ -48,12 +48,26 @@ namespace n_render
 	// シーン描画用テクスチャを作成する
 	bool Render_CreateSceneTexture(int width, int height);
 
-	ID3D11ShaderResourceView* Render_GetSceneSRV(); // ビューポートのテクスチャを取得
-	// DirectX 11 のデバイスとコンテキストを取得
+	/* DirectX11 のCOMインターフェイスへのポインタ */
+
+	// ビューポートやレンダーターゲットの内容をシェーダーがサンプルできる形（Shader Resource View）で取得
+	// 現在の画面をテクスチャとして参照するためのSRVを返す
+	ID3D11ShaderResourceView* Render_GetSceneSRV();
+
+	/* DirectX11 のデバイスとコンテキストを取得 */
+
+	// Direct3D の デバイスオブジェクト
+	// GPUにリソース(テクスチャ/バッファ/シェーダーなどを)を作成・管理するためのインターフェイス
 	ID3D11Device*				Render_GetDevice();
+
+	// 描画コマンドやパイプライン状態の設定、リソースのバインドを行う コンテキスト（即時コンテキスト）
+	// 実際に描画命令をGPUに送るためのインターフェイス
 	ID3D11DeviceContext*		Render_GetDeviceContext();
-	ID3D11RenderTargetView* Render_GetRenderTargetView();
+
+	// レンダリング結果を書き込む レンダーターゲットのビュー
+	// 画面に描画するためのターゲットを表すインターフェイス
+	ID3D11RenderTargetView* Render_GetRenderTargetView();	
 
 }
 
-#endif // RENDER_HPP
+#endif 

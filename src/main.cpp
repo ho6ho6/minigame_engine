@@ -2,11 +2,11 @@
  * WinMain とメインループの呼び出し、各サブシステムの初期化と終了処理を行う        *
  **************************************************************************/
 
-#include "include/window.hpp"    // InitWindow(), IsRunning(), PollEvents(), ShutdownWindow()
-#include "include/input.hpp"     // InitInput(), ShutdownInput(), ProcessInput()
-#include "include/game.hpp"      // Game_Start(), Game_Update(), Game_Render(), Game_Shutdown()
-#include "include/time.hpp"      // Time::Start(), Time::Update(), Time::GetDeltaTime()
-#include "include/render.hpp"    // InitRenderer(), BeginFrame(), RenderFrame(), EndFrame(), ShutdownRenderer()
+#include "include/window.hpp"
+#include "include/input.hpp"
+#include "include/game.hpp"
+#include "include/time.hpp"
+#include "include/render.hpp"
 
 #include "include/window_editor/window_manager.hpp" // window_manager
 #include "include/assets/assets_manager/texture_manager.hpp" // texture_manager
@@ -45,6 +45,9 @@ int APIENTRY WinMain(
 
     const int width = 1920;
     const int height = 1000;
+
+
+	std::cout << "ゲームエンジンmainがここから始まります。" << "\n"<< std::filesystem::current_path() << std::endl;
 
     if (!n_window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine")) return -1;
 

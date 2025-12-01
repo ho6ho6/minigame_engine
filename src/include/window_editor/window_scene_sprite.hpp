@@ -21,4 +21,15 @@ struct SceneSprite
     bool selected = false; // ‘I‘ğó‘Ô
 };
 
+// hierarchy‚É“o˜^‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+struct SceneToHierarchyNode {
+    uint64_t id;           // unique id
+    std::string name;
+    Texture* texture;      // nullable
+    float x, y;            // world (content-left-top Šî€, logical px)
+    int width, height;     // px
+    int z_order;
+    bool selected;
+};
+
 #endif // !SCENE_SPRITE
