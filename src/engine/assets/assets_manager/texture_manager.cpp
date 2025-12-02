@@ -76,7 +76,7 @@ namespace n_texturemanager
     void texture_manager::LoadAllTextures() // 起動時に一度だけ
     {
 
-        //printf("[texture_manager] instance_texmag addr=%p file=%s\n", (void*)&instance_texmag, __FILE__);
+        //printf("[texture_manager/LoadAllTextures/DBG] instance_texmag addr=%p file=%s\n", (void*)&instance_texmag, __FILE__);
 
         namespace fs = std::filesystem;
 
@@ -174,8 +174,11 @@ namespace n_texturemanager
         // Texture 構造体を作成・初期化
         Texture tex;
         tex.name = filepath.filename().string();
-        tex.width = w;
-        tex.height = h;
+		
+        /*実際に使用されるアセットオブジェクトの大きさを決定*/
+        tex.width = 64;     // window_scene.cpp に置かれるオブジェクトのサイズx
+		tex.height = 64;    // window_scene.cpp に置かれるオブジェクトのサイズy
+
         tex.tx_id = (ImTextureID)srv;  // ImGui は void* 扱い
 
         // Debug

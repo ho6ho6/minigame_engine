@@ -58,7 +58,7 @@ void n_assetsmanager::assets_manager::assets_Show()
 					//printf("[AssetsWindow] Begin DragDrop Source \n");
 					
 					const char* d = name.c_str();
-					printf("Send payload name='%s' size=%d \n", d, (int)name.size() + 1);
+					//printf("Send payload name='%s' size=%d \n", d, (int)name.size() + 1);
 					/*for (int i = 0; i < (int)name.size() + 1 && i < 32; ++i) {
 						printf(" %02X \n", (unsigned char)d[i]);
 					}*/
