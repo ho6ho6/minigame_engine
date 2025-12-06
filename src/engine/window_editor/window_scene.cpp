@@ -46,8 +46,8 @@ ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOf
                                  local.y / io.DisplayFramebufferScale.y);
 
     //ViewOffset を論理ピクセルで管理して加算 = scene座標
-    ImVec2 scenePos = ImVec2(localLogical.x - viewOffset.x,
-                             localLogical.y - viewOffset.y);
+    ImVec2 scenePos = ImVec2(localLogical.x + viewOffset.x, // これで正しい
+                             localLogical.y + viewOffset.y);//
 
     return scenePos;
 }
@@ -157,8 +157,8 @@ namespace n_windowscene
         const ImVec2 winSize = ImGui::GetWindowSize();
         draw->PushClipRect(winPos, ImVec2(winPos.x + winSize.x, winPos.y + winSize.y), true);
 
-        float centerX = winPos.x + winSize.x * 0.5f + ViewOffset.x;
-        float centerY = winPos.y + winSize.y * 0.5f + ViewOffset.y;
+        float centerX = winPos.x + winSize.x * 0.5f - ViewOffset.x;
+        float centerY = winPos.y + winSize.y * 0.5f - ViewOffset.y;
         ImVec2 origin(centerX, centerY);
 
         const float gridStep = 20.0f;
@@ -237,7 +237,7 @@ namespace n_windowscene
 			float dragX = dragFreamebuffer.x / io.DisplayFramebufferScale.x;
 			float dragY = dragFreamebuffer.y / io.DisplayFramebufferScale.y;
 
-			ViewOffset.x -= dragX;
+            ViewOffset.x -= dragX;
 			ViewOffset.y -= dragY;
 
             ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right); // 次フレームは 0 から計測
@@ -339,8 +339,8 @@ namespace n_windowscene
 
 
             // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
-            ImVec2 screenPos = ImVec2(contentPos.x + (sprite.pos_x + ViewOffset.x),
-                                      contentPos.y + (sprite.pos_y + ViewOffset.y));
+            ImVec2 screenPos = ImVec2(contentPos.x + (sprite.pos_x - ViewOffset.x), 
+                                      contentPos.y + (sprite.pos_y - ViewOffset.y));
 
             ImGui::SetCursorScreenPos(screenPos);
 
@@ -451,24 +451,12 @@ namespace n_windowscene
         printf("[AddAssetToScene] name=%s texPx=(%d,%d) logical=(%d,%d) pos=(%f,%f)\n",
             asset_name_str.c_str(), tex->width, tex->height, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
 
-
         m_SceneSprites.push_back(sprite);
-
-        RegisterSceneObjToHierarchy(sprite.texture, sprite.name); // ヒエラルキーに登録
 
         //printf("[window_scene/AddAssetToScene] pushed '%s' tex=%p size=(%d,%d) pos=(%f,%f)\n",
             //sprite.name.c_str(), (void*)sprite.texture, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
 
     }
-
-    // シーンオブジェクトをヒエラルキーに登録する処理をここに実装
-    void window_scene::RegisterSceneObjToHierarchy(Texture* tex, const std::string& assetObj_hier_name)
-    {
-		// デバッグ用ログ出力
-        if (!tex) { printf("[Window_scene/RegisterSceneObjToHierarchy/ERR] tex==nullptr\n"); return; }
-
-		//n_windowhierarchy::hierarchy_object& 
-	}
 
 }
 
