@@ -56,19 +56,6 @@
 - window_hierarchyにwindow_sceneに配置されたAssetの情報を渡す。
 - window_gameにwindow_sceneに描画されている部分のみを抽出し、描画する。
 
-## デバック
-- 起動直後のフレームでテクスチャ/リソースのアップロード（UpdateSubresource / CopyTextureRegion）が GPU タイムライン上で発生しており、PCIe バス使用率が高い </br>
-
-### 予想
-- UpdateSubresource / Copy が GPU タイムラインにある → テクスチャやバッファの転送がフレーム中に実行されている </br>
-- PCIe 使用率が高い → CPU→GPU 転送（ホスト→VRAM）がボトルネックになっている </br>
-- GPU のレンダリング（Clear/Draw）は短いが、転送が重い → 転送がレンダリング開始を遅らせている可能性が高い </br>
-
-### 対策案
-- 非同期アップロードを導入する -> Upload Heap（ステージング）に書き込み → CopyCommandList で Copy → CopyQueue に Submit → フェンスで最小限同期 </br>
-- GPU 側でミップ生成に切り替える -> CPU でミップを作って転送するのをやめ、GPU の GenerateMips（または Compute）で生成して転送量を削減 </br>
-![minigame_engine](./img/minigame_engine_debug1.png)
-
 ## 更新履歴
 2025/08/21 サブウィンドウ関連の煩雑なモジュール群を全て一掃し、簡潔にまとめた</br>
 2025/08/29 ImGuiモジュールによるウィンドウ分割を確認できたので、サブウィンドウ処理の共通化を行った</br>
