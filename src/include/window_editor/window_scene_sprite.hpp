@@ -20,11 +20,12 @@ struct SceneSprite
     int width = 16;  // スプライトの幅
     int height = 16; // スプライトの高さ
     int z_order = 1;   // 描画順序（大きいほど前面に描画）
+	uint64_t id = 0;   // ユニークID
     bool selected = false; // 選択状態
 };
 
 // hierarchyに登録するための構造体
-struct SceneToHierarchyNode {
+struct SceneToHierarchyObj {
     uint64_t id;           // unique id
     std::string name;
     Texture* texture;      // nullable

@@ -2,11 +2,43 @@
 #include "include/render.hpp"	//フレームバッファ取得用
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
 
+#include <mutex>
+
+// objを保持するためのコンテナ
+static std::vector<SceneToHierarchyObj> g_SceneToHierarchyObjs;
+static std::mutex g_SceneToHierarchyMutex;
+
 namespace n_windowhierarchy
 {
+	// グローバルインスタンス
+	window_hierarchy instance_winHie;
+
+
+	// Sceneからオブジェクトを取得
+    void window_hierarchy::GetObjFromScene(const SceneToHierarchyObj& Obj)
+    {
+		// スレッドセーフに追加
+		std::lock_guard<std::mutex> lock(g_SceneToHierarchyMutex);
+		g_SceneToHierarchyObjs.push_back(Obj);
+    }
+
+	// Sceneからオブジェクト削除を取得
+    void window_hierarchy::DeleteObjFromScene(uint64_t id)
+    {
+        if (id == 0) return;
+		std::lock_guard<std::mutex> lock(g_SceneToHierarchyMutex);
+        g_SceneToHierarchyObjs.erase(
+            std::remove_if(g_SceneToHierarchyObjs.begin(), g_SceneToHierarchyObjs.end(),
+                [id](const SceneToHierarchyObj& obj) { return obj.id == id; }),
+            g_SceneToHierarchyObjs.end()
+        );
+    }
 
     void window_hierarchy::Render()
     {
+        
+        /*------------------------------------------*/
+
         /*windowの座標とサイズ*/
         ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Always);
 
@@ -40,8 +72,34 @@ namespace n_windowhierarchy
 
         n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
-        // scene上に配置されたオブジェクトをここに表示する処理を実装
-        //GetObjFromScene();
+        /*------------------------------------------*/
+
+		// 描画時にローカルコピーを作成しておく
+		std::vector<SceneToHierarchyObj> localObjs;
+        {
+			std::lock_guard<std::mutex> lock(g_SceneToHierarchyMutex);
+			localObjs = g_SceneToHierarchyObjs;
+        }
+
+        for (const auto& obj : localObjs)
+        {
+			ImGui::PushID((int64_t)obj.id);
+			bool selected = obj.selected;
+            if (ImGui::Selectable(obj.name.c_str(), &selected))
+            {
+				// 選択処理　ノードの追加はここで行う
+            }
+            if (ImGui::BeginPopupContextItem())
+            {
+                if (ImGui::MenuItem("Delete"))
+                {
+					// 削除処理　ノードの削除はここで行う
+                }
+				ImGui::EndPopup();
+            }
+			ImGui::PopID();
+
+        }
 
         ImGui::End();
     }

@@ -15,6 +15,8 @@ namespace n_windowscene
 	public:
 		void Render() override;
 		void AddAssetToScene(Texture* tex, const std::string& asset_name, ImVec2 guiLocalPos, ImVec2 guiWindowPos);
+		void DeleteAssetFromScene(uint64_t id);
+		uint64_t GenerateUniqueSpriteId();	// ユニークID生成
 
 	private:
 		ImVec2 m_LastSize = { 0, 0 };   // 最後に記憶したサイズ

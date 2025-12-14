@@ -29,6 +29,7 @@
     scene座標:シーン内のピクセル位置、ViewOffsetを含む。ズームや移動で変換する
 */
 static ImVec2 ViewOffset = ImVec2(0.0f, 0.0f);
+static uint64_t g_NextSpriteId = 1; // ユニークID生成用カウンタ
 
 /* 当たり判定/選択/ドラッグは、ScreenToSceneを使用*/
 ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOffset)
@@ -43,13 +44,18 @@ ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOf
 
     //ViewOffset を論理ピクセルで管理して加算 = scene座標
     ImVec2 scenePos = ImVec2(localLogical.x + viewOffset.x, // これで正しい
-        localLogical.y + viewOffset.y);//
+        localLogical.y + viewOffset.y);
 
     return scenePos;
 }
 
 namespace n_windowscene
 {
+
+    uint64_t window_scene::GenerateUniqueSpriteId()
+    {
+        return g_NextSpriteId++;
+	}
 
     void window_scene::Render()
     {
@@ -367,6 +373,7 @@ namespace n_windowscene
                     if (s.selected)
                     {
                         printf("[window_scene/Render] Deleting selected sprite '%s'\n", s.name.c_str());
+                        DeleteAssetFromScene(sprite.id);
                     }
                 }
 
@@ -388,6 +395,7 @@ namespace n_windowscene
 
             //printf("[window_scene/Render/DBG] sprite='%s' pos=(%f,%f) dragOffset=(%f,%f) selected=%d\n",
             //    sprite.name.c_str(), sprite.pos_x, sprite.pos_y, sprite.dragOffsetX, sprite.dragOffsetY, sprite.selected);
+
 
             // ImGui_ImplDX11はImTextureIDにSRV ポインタを渡す実装が標準
             ImGui::Image((ImTextureID)srv, drawSize);
@@ -443,25 +451,51 @@ namespace n_windowscene
         sprite.width = (int)std::round(tex_w);  // 論理ピクセル幅
         sprite.height = (int)std::round(tex_h); // 論理ピクセル高さ
         sprite.selected = false;    // 初期選択状態
+		sprite.z_order = sprite.z_order + 1; // 最前面に
+		sprite.id = GenerateUniqueSpriteId();
 
         printf("[AddAssetToScene] name=%s texPx=(%d,%d) logical=(%d,%d) pos=(%f,%f)\n",
             asset_name_str.c_str(), tex->width, tex->height, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
 
         m_SceneSprites.push_back(sprite);
 
-        //printf("[window_scene/AddAssetToScene] pushed '%s' tex=%p size=(%d,%d) pos=(%f,%f)\n",
-            //sprite.name.c_str(), (void*)sprite.texture, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
+		SceneToHierarchyObj Obj;
+		Obj.id = sprite.id; // 一意のIDとしてポインタを使用
+		Obj.name = asset_name_str;
+		Obj.texture = tex;
+		Obj.x = sprite.pos_x;
+		Obj.y = sprite.pos_y;
+		Obj.width = sprite.width;
+		Obj.height = sprite.height;
+		Obj.z_order = sprite.z_order;
+		Obj.selected = sprite.selected;
+
+        // ヒエラルキーウィンドウへ
+        n_windowhierarchy::instance_winHie.GetObjFromScene(Obj);
 
     }
 
-}
 
-namespace n_texturemanager
-{
-    Texture* texture_manager::GetTextureName(const std::string& name)
+    void window_scene::DeleteAssetFromScene(uint64_t id)
     {
-        auto it = m_Textures.find(name);    // nameで検索
-        if (it == m_Textures.end()) return nullptr; // 見つからなかった場合はnullptrを返す
-        return &it->second; // 見つかった場合はTextureへのポインタを返す
-    }
+        if (id == 0) return;
+        printf("[window_scene/DeletAsFrScene] DeleteObjFromScene id=%llu\n", (unsigned long long)id);
+
+		size_t beforeCount = m_SceneSprites.size();
+
+		// コンテナから削除 id一致で削除
+        m_SceneSprites.erase
+        (
+            std::remove_if(m_SceneSprites.begin(), m_SceneSprites.end(),
+                [id](const SceneSprite& s) { return reinterpret_cast<uint64_t>(&s) == id; }),
+            m_SceneSprites.end()
+		);
+
+		size_t afterCount = m_SceneSprites.size();
+        printf("[window_scene] Deleted %zu sprites (before=%zu after=%zu)\n", beforeCount - afterCount, beforeCount, afterCount);
+
+		// ヒエラルキーウィンドウへ
+		n_windowhierarchy::instance_winHie.DeleteObjFromScene(id);
+	}
+
 }

@@ -15,7 +15,8 @@ namespace n_windowhierarchy
 	{
 	public:
 		void Render() override;
-		void GetObjFromScene();
+		void GetObjFromScene(const SceneToHierarchyObj& Obj);	// Sceneからオブジェクトを取得
+		void DeleteObjFromScene(uint64_t id);	// Sceneからオブジェクト削除を取得
 
 	private:
 		ImVec2 m_LastSize = { 0,0 };
@@ -34,11 +35,8 @@ namespace n_windowhierarchy
 		SceneSprite* FindById(uint64_t id);	//IDでノード検索
 	};
 
-	static hierarchy_object& GetHierarchyObject()
-	{
-		static hierarchy_object instance;
-		return instance;
-	}
+	// グローバルインスタンス sceneに配置されたAssetsをhierarchyに反映させるために使用
+	extern window_hierarchy instance_winHie;
 }
 
 #endif // !WINDOW_HIERARCHY

@@ -1,4 +1,4 @@
-/*ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ‚ğs‚¤.png/.jpeg*/
+ï»¿/*ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿ã‚’è¡Œã†.png/.jpeg*/
 
 #ifndef TEXTURE_MANAGER
 #define TEXTURE_MANAGER
@@ -7,10 +7,27 @@
 #include <string>
 #include <unordered_map>
 #include <filesystem>
+#include <vector>
+#include <cstdint>
+#include <functional>
+
 #include "include/assets/texture.hpp"
 
 namespace n_texturemanager
 {
+	using RequestId = uint64_t;
+
+	enum class LoadState {Unknown, Queued, Loading, ReadyToFinalize, Completed, Failed, Cancelled};
+
+	struct LoadStatus
+	{
+		RequestId id = 0;
+		LoadState state = LoadState::Unknown;
+		float progress = 0.0f; // 0.0ã€œ1.0
+		std::string name;	// æœ€çµ‚çš„ã«èª­ã¿è¾¼ã¾ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£å
+		std::string errorMessage; // ã‚¨ãƒ©ãƒ¼ç™ºç”Ÿæ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+	};
+
 	class texture_manager
 	{
 	public:
@@ -18,27 +35,27 @@ namespace n_texturemanager
 		texture_manager(const std::filesystem::path& base_Dir) : m_baseDir(base_Dir) {}
 		~texture_manager();
 
-		// ‹N“®‚Éˆê“x‚¾‚¯
+		// èµ·å‹•æ™‚ã«ä¸€åº¦ã ã‘
 		void LoadAllTextures();
 
-		// ƒeƒNƒXƒ`ƒƒ–¼‚Åæ“¾ 1‚Â‚Ì‚İ
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£åã§å–å¾— 1ã¤ã®ã¿
 		Texture* GetTextureName(const std::string& name);
 
-		// ƒeƒNƒXƒ`ƒƒ–¼ˆê——‚ğæ“¾ ‚·‚×‚Ä
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£åä¸€è¦§ã‚’å–å¾— ã™ã¹ã¦
 		const std::unordered_map<std::string, Texture>& GetTextureNames() const;
 
-		// ƒeƒNƒXƒ`ƒƒƒL[ˆê——‚ğæ“¾
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚­ãƒ¼ä¸€è¦§ã‚’å–å¾—
 		std::vector<std::string> GetTextureKeys() const;
 
 	private:
-		// ƒeƒNƒXƒ`ƒƒ‚ğ1‚Â“Ç‚İ‚Ş
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’1ã¤èª­ã¿è¾¼ã‚€
 		void LoadTextureFromFile(const std::filesystem::path& filepath);
 
-		std::filesystem::path m_baseDir; //ƒeƒNƒjƒbƒNƒtƒ@ƒCƒ‹‚ğQÆ‚·‚é baseDir "Assets/textures/"
+		std::filesystem::path m_baseDir; //ãƒ†ã‚¯ãƒ‹ãƒƒã‚¯ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‚ç…§ã™ã‚‹ baseDir "Assets/textures/"
 		std::unordered_map<std::string, Texture> m_Textures;
 	};
 
-	// ƒOƒ[ƒoƒ‹ƒCƒ“ƒXƒ^ƒ“ƒX
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 	extern texture_manager instance_texmag;
 }
 

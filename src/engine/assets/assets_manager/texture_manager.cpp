@@ -197,4 +197,11 @@ namespace n_texturemanager
         return m_Textures;
     }
 
+    Texture* texture_manager::GetTextureName(const std::string& name)
+    {
+        auto it = m_Textures.find(name);    // name‚ÅŒŸõ
+        if (it == m_Textures.end()) return nullptr; // Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚Ínullptr‚ğ•Ô‚·
+        return &it->second; // Œ©‚Â‚©‚Á‚½ê‡‚ÍTexture‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·
+    }
+
 }
