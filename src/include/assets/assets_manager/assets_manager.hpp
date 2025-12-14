@@ -24,4 +24,3 @@ namespace n_assetsmanager
 
 }
 #endif // !ASSETS_MANAGER
-

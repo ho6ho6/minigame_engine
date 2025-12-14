@@ -5,7 +5,7 @@
 #include "include/input.hpp"
 #include <Windows.h>
 
-/*“ü—Í*/
+ /*“ü—Í*/
 
 
 namespace n_input

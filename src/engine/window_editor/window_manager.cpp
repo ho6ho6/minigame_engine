@@ -23,7 +23,7 @@ namespace n_windowmanager
 	{
 		windows_.emplace_back(std::make_unique<n_windowinput::window_input>());
 	}*/
-	
+
 	void window_manager::Register_Hierarchywindow()
 	{
 		windows_.emplace_back(std::make_unique<n_windowhierarchy::window_hierarchy>());

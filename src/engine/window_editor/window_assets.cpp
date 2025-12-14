@@ -6,8 +6,8 @@
 /*Assetsウィンドウの描画*/
 namespace n_windowassets
 {
-	void window_assets::Render()
-	{
+    void window_assets::Render()
+    {
         /*windowの座標とサイズ*/
         ImGui::SetNextWindowPos(ImVec2(920, 600), ImGuiCond_Always);
 
@@ -53,5 +53,5 @@ namespace n_windowassets
         ImGui::Image((void*)n_render::Render_GetSceneSRV(), avail);
 
         ImGui::End();
-	}
+    }
 }

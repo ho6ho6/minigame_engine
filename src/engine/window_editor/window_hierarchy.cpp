@@ -40,7 +40,7 @@ namespace n_windowhierarchy
 
         n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
-		// scene上に配置されたオブジェクトをここに表示する処理を実装
+        // scene上に配置されたオブジェクトをここに表示する処理を実装
         //GetObjFromScene();
 
         ImGui::End();

@@ -6,7 +6,7 @@
 #include "include/input.hpp"
 #include "include/render.hpp"
 
-namespace 
+namespace
 {
 	float rectX, rectY;
 	float speedX;
@@ -38,7 +38,7 @@ namespace n_game
 	// シーン上の各オブジェクトに対して「どう描画するか」を指示する
 	void Game_Render()
 	{
-	
+
 	}
 
 	void Game_Shutdown()

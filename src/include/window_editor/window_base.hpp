@@ -7,8 +7,8 @@ namespace n_windowbase
 {
 	class window_base
 	{
-		public:
-			virtual ~window_base() = default;
-			virtual void Render() = 0;
+	public:
+		virtual ~window_base() = default;
+		virtual void Render() = 0;
 	};
 }

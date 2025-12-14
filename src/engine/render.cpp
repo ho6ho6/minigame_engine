@@ -19,14 +19,14 @@
 using namespace Gdiplus;
 
 // DirectX 11 のデバイスとコンテキスト
-static ID3D11Device*                    g_device = nullptr;
-static ID3D11DeviceContext*            g_context = nullptr;
-static IDXGISwapChain*                 g_swapChain = nullptr;
+static ID3D11Device* g_device = nullptr;
+static ID3D11DeviceContext* g_context = nullptr;
+static IDXGISwapChain* g_swapChain = nullptr;
 
 // シーン描画用テクスチャ + RTV + SRV
-static ID3D11RenderTargetView*          g_rtv = nullptr;    
-static ID3D11DepthStencilView*          g_dsv = nullptr;
-static ID3D11ShaderResourceView*        g_srv = nullptr;
+static ID3D11RenderTargetView* g_rtv = nullptr;
+static ID3D11DepthStencilView* g_dsv = nullptr;
+static ID3D11ShaderResourceView* g_srv = nullptr;
 
 
 
@@ -46,8 +46,8 @@ namespace n_render
         // 例: スワップチェーン／デバイス生成
         DXGI_SWAP_CHAIN_DESC sd = {};
         sd.BufferCount = 1;
-		sd.BufferDesc.Width = width;     //マウスの座標が合わないのはここを変えていないから
-		sd.BufferDesc.Height = height;    //本来は1920x1280にしたいが、この数値だと多少のズレが発生する
+        sd.BufferDesc.Width = width;     //マウスの座標が合わないのはここを変えていないから
+        sd.BufferDesc.Height = height;    //本来は1920x1280にしたいが、この数値だと多少のズレが発生する
         sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         sd.BufferDesc.RefreshRate.Numerator = 60;
         sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -67,7 +67,7 @@ namespace n_render
             nullptr, 0,
             D3D11_SDK_VERSION,
             &sd,
-            /* out */ 
+            /* out */
             &g_swapChain,
             &g_device,
             &featureLevel,
@@ -177,7 +177,7 @@ namespace n_render
     {
         return -1;
     }
-    
+
     bool Render_CreateSceneTexture(int width, int height)
     {
         if (g_rtv) { g_rtv->Release(); g_rtv = nullptr; }
@@ -207,7 +207,7 @@ namespace n_render
 
         pTexture->Release();
         return true;
-	}
+    }
 
 
 

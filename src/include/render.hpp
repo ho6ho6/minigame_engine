@@ -42,7 +42,7 @@ namespace n_render
 	void Render_Resizeviewport(int win_w, int win_h, int fb_w, int fb_h);
 
 	// 画面 (x, y) からオブジェクトをピックし、ID を返す
-    // -1 を返したら「何も選択されていない」
+	// -1 を返したら「何も選択されていない」
 	int Render_PickObject(int x, int y);
 
 	// シーン描画用テクスチャを作成する
@@ -58,15 +58,15 @@ namespace n_render
 
 	// Direct3D の デバイスオブジェクト
 	// GPUにリソース(テクスチャ/バッファ/シェーダーなどを)を作成・管理するためのインターフェイス
-	ID3D11Device*				Render_GetDevice();
+	ID3D11Device* Render_GetDevice();
 
 	// 描画コマンドやパイプライン状態の設定、リソースのバインドを行う コンテキスト（即時コンテキスト）
 	// 実際に描画命令をGPUに送るためのインターフェイス
-	ID3D11DeviceContext*		Render_GetDeviceContext();
+	ID3D11DeviceContext* Render_GetDeviceContext();
 
 	// レンダリング結果を書き込む レンダーターゲットのビュー
 	// 画面に描画するためのターゲットを表すインターフェイス
-	ID3D11RenderTargetView* Render_GetRenderTargetView();	
+	ID3D11RenderTargetView* Render_GetRenderTargetView();
 
 }
 

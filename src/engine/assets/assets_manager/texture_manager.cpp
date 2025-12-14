@@ -11,7 +11,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-namespace n_texturemanager 
+namespace n_texturemanager
 {
 
     // exeファイルの場所から候補を探して返す
@@ -51,9 +51,9 @@ namespace n_texturemanager
     }
 
 
-	texture_manager instance_texmag(ResolveTexturesDir());
+    texture_manager instance_texmag(ResolveTexturesDir());
 
-	// テクスチャ名で取得
+    // テクスチャ名で取得
     std::vector<std::string> texture_manager::GetTextureKeys() const {
         std::vector<std::string> keys;
         keys.reserve(m_Textures.size());
@@ -71,7 +71,7 @@ namespace n_texturemanager
             }
         }
         m_Textures.clear();
-	}
+    }
 
     void texture_manager::LoadAllTextures() // 起動時に一度だけ
     {
@@ -87,13 +87,13 @@ namespace n_texturemanager
 
         // base 絶対パス化 -- 相対パス／カレントディレクトリ問題の検出用
         fs::path base = fs::absolute(m_baseDir);
-        std::cout << "[TextureManager] BaseDir= " << "\n" << base 
-                  << " cwd=" << fs::current_path() << "\n";
+        std::cout << "[TextureManager] BaseDir= " << "\n" << base
+            << " cwd=" << fs::current_path() << "\n";
 
         if (!fs::exists(base) || !fs::is_directory(base))
         {
             std::cerr << "[TextureManager] Texture directory not found: " << "\n" << base
-                      << "cwd = " << fs::current_path() << "\n";
+                << "cwd = " << fs::current_path() << "\n";
             return;
         }
 
@@ -174,10 +174,10 @@ namespace n_texturemanager
         // Texture 構造体を作成・初期化
         Texture tex;
         tex.name = filepath.filename().string();
-		
+
         /*実際に使用されるアセットオブジェクトの大きさを決定*/
         tex.width = 64;     // window_scene.cpp に置かれるオブジェクトのサイズx
-		tex.height = 64;    // window_scene.cpp に置かれるオブジェクトのサイズy
+        tex.height = 64;    // window_scene.cpp に置かれるオブジェクトのサイズy
 
         tex.tx_id = (ImTextureID)srv;  // ImGui は void* 扱い
 

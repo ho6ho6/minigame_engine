@@ -1,5 +1,5 @@
-/*******************************************************************************
- *engine::InitWindow, PollEvents, IsRunning, ShutdownWindow, SwapBuffers ÇÃíËã`*
+Ôªø/*******************************************************************************
+ *engine::InitWindow, PollEvents, IsRunning, ShutdownWindow, SwapBuffers       *
  *******************************************************************************/
 
 #include "include/window.hpp"
@@ -10,12 +10,6 @@
 #include "include/window_editor/window_manager.hpp"
 #include <Windows.h>
 
-
-/*ÉEÉBÉìÉhÉEê∂ê¨*/
-
-//static HWND g_hWnd = nullptr;
-//static HINSTANCE g_hInstance = nullptr;
-//static bool g_isRunning = false;
 static HWND g_hWnd = nullptr;
 static HINSTANCE g_hInstance = nullptr;
 static bool g_isRunning = false;
@@ -33,13 +27,13 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     {
     case WM_RBUTTONDOWN:
         printf("WndProc: WM_RBUTTONDOWN\n");
-		fflush(stdout);
+        fflush(stdout);
         break;
 
     case WM_RBUTTONUP:
         printf("WndProc: WM_RBUTTONUP\n");
         fflush(stdout);
-		break;
+        break;
 
 
     case WM_DESTROY:
@@ -48,11 +42,11 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
         return 0;
 
     case WM_SIZE:
-		int client_w = LOWORD(lParam);
-		int client_h = HIWORD(lParam);
-		int fb_w = client_w;
-		int fb_h = client_h;
-		n_render::Render_Resizeviewport(client_w, client_h, fb_w, fb_h);
+        int client_w = LOWORD(lParam);
+        int client_h = HIWORD(lParam);
+        int fb_w = client_w;
+        int fb_h = client_h;
+        n_render::Render_Resizeviewport(client_w, client_h, fb_w, fb_h);
         break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -91,7 +85,7 @@ namespace n_window
         ShowWindow(g_hWnd, nCmdShow);
         UpdateWindow(g_hWnd);
 
-		g_isRunning = true;
+        g_isRunning = true;
         return true;
     }
 

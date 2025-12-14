@@ -1,5 +1,3 @@
-/**/
-
 #include "include/time.hpp"
 
 namespace n_time {

@@ -9,7 +9,7 @@
 #include <array>
 #include <windows.h>
 
-/*“ü—Í‚ðŽó‚¯Žæ‚é*/
+ /*“ü—Í‚ðŽó‚¯Žæ‚é*/
 
 namespace n_input
 {

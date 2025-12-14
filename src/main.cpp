@@ -14,8 +14,8 @@
 #include "include/assets/assets_manager/assets_manager.hpp"
 #include "include/assets/util.hpp"
 
-/*ImGui は「既存の OS ウィンドウ」のクライアント領域内に GUI を即時モードで描画するライブラリ*/
-// Begin/End で開くウィンドウ
+ /*ImGui は「既存の OS ウィンドウ」のクライアント領域内に GUI を即時モードで描画するライブラリ*/
+ // Begin/End で開くウィンドウ
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
@@ -47,19 +47,19 @@ int APIENTRY WinMain(
     const int height = 1000;
 
 
-	std::cout << "ゲームエンジンmainがここから始まります。" << "\n"<< std::filesystem::current_path() << std::endl;
+    std::cout << "ゲームエンジンmainがここから始まります。" << "\n" << std::filesystem::current_path() << std::endl;
 
     if (!n_window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine")) return -1;
 
-	if (!n_game::Game_Start()) return -1;
+    if (!n_game::Game_Start()) return -1;
 
     if (!n_render::Render_Start(n_window::GetHWND(), width, height)) return -1;
-    
-	// ImGui 初期化
+
+    // ImGui 初期化
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-	ImGui::StyleColorsDark(); // ImGui のテーマをダークに設定
+    ImGui::StyleColorsDark(); // ImGui のテーマをダークに設定
 
     // Dock機能は使わない
     io.ConfigFlags &= ~ImGuiConfigFlags_DockingEnable;
@@ -93,7 +93,7 @@ int APIENTRY WinMain(
     /*-----------------------------ウィンドウの登録------------------------------*/
 
 
-	/*------------------------------Assetsの登録-------------------------------*/
+    /*------------------------------Assetsの登録-------------------------------*/
 
     // テクスチャを読み込む
     n_texturemanager::instance_texmag.LoadAllTextures();
@@ -107,15 +107,15 @@ int APIENTRY WinMain(
     {
         n_window::PollEvents();
 
-		// マウス座標を取得して ImGui に渡す
+        // マウス座標を取得して ImGui に渡す
         POINT p;
-		GetCursorPos(&p);
-		ScreenToClient(n_window::GetHWND(), &p);
+        GetCursorPos(&p);
+        ScreenToClient(n_window::GetHWND(), &p);
 
-		// ImGui にマウス位置を設定
-		ImVec2 fbScale = io.DisplayFramebufferScale;
-		io.MousePos = ImVec2((float)p.x / fbScale.x, (float)p.y / fbScale.y);
-        
+        // ImGui にマウス位置を設定
+        ImVec2 fbScale = io.DisplayFramebufferScale;
+        io.MousePos = ImVec2((float)p.x / fbScale.x, (float)p.y / fbScale.y);
+
         // 各サブシステム更新
         float deltaTime = n_time::Time::Update_Time();
         uint64_t frameTime = n_time::Time::GetFrameCount();
@@ -129,7 +129,7 @@ int APIENTRY WinMain(
         ImGui::NewFrame();
 
         //Assets テクスチャの描画
-		g_AssetsManager.assets_Show();
+        g_AssetsManager.assets_Show();
 
         static const float clear_col[4] = { 0.5f, 0.5f, 0.5f, 0.1f };
         n_render::Render_Frame(clear_col, deltaTime, frameTime);
@@ -140,7 +140,7 @@ int APIENTRY WinMain(
 
         // ImGui 描画確定
         ImGui::Render();
-        
+
         auto ctx = n_render::Render_GetDeviceContext();
         auto g_rtv = n_render::Render_GetRenderTargetView();
 
@@ -148,7 +148,7 @@ int APIENTRY WinMain(
         ctx->ClearRenderTargetView(g_rtv, clear_col);
 
         //game::Game_Render(); // game.cpp
-        
+
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
         // 最後に DirectX の Present
@@ -159,14 +159,14 @@ int APIENTRY WinMain(
 
 
     // 5. 終了処理
-	ImGui_ImplDX11_Shutdown();        // ImGuiのDirectX11レンダリングを終了
-	ImGui_ImplWin32_Shutdown();       // ImGuiのWin32プラットフォームを終了
-	ImGui::DestroyContext();            // ImGuiコンテキストを破棄
+    ImGui_ImplDX11_Shutdown();        // ImGuiのDirectX11レンダリングを終了
+    ImGui_ImplWin32_Shutdown();       // ImGuiのWin32プラットフォームを終了
+    ImGui::DestroyContext();            // ImGuiコンテキストを破棄
 
     n_input::Input_Shutdown();             // input.cpp
     n_render::Render_Shutdown();        // render.cpp
-	n_game::Game_Shutdown();            // game.cpp
-	n_window::ShutdownWindow();        // window.cpp
+    n_game::Game_Shutdown();            // game.cpp
+    n_window::ShutdownWindow();        // window.cpp
 
     return 0;
 }

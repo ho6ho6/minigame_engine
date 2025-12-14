@@ -10,18 +10,18 @@ void OnAssetClicked(const std::string& name);
 
 void n_assetsmanager::assets_manager::assets_Show()
 {
-    ImGui::Begin("Assets");
+	ImGui::Begin("Assets");
 
-    //  インスタンス m_TextureManager から呼び出す
-    const auto& textures = m_TextureManager.GetTextureNames();
+	//  インスタンス m_TextureManager から呼び出す
+	const auto& textures = m_TextureManager.GetTextureNames();
 
-	
-    //ImGui::Text("LoadedCount = %zu", textures.size());   // 読み込んだテクスチャ数
+
+	//ImGui::Text("LoadedCount = %zu", textures.size());   // 読み込んだテクスチャ数
 	//ImGui::Separator();                             // 区切り線
 
-    // テクスチャ数の出力デバック用
-    //std::cout << "[AssetsWindow] Texture count = "
-    //    << textures.size() << std::endl;
+	// テクスチャ数の出力デバック用
+	//std::cout << "[AssetsWindow] Texture count = "
+	//    << textures.size() << std::endl;
 
 
 	const ImVec2 thumbSize(64, 64); // サムネイルの表示サイズ
@@ -47,16 +47,16 @@ void n_assetsmanager::assets_manager::assets_Show()
 				printf("[AssetsWindow] Clicked on texture \n");
 				OnAssetClicked(name);
 			}
-			
+
 			// ドラッグ＆ドロップのソース設定
 			if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
 			{
 				//printf("[Assetes_manager] テクスチャ選択 PAYLOAD");
 
-				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) 
-				{	
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+				{
 					//printf("[AssetsWindow] Begin DragDrop Source \n");
-					
+
 					const char* d = name.c_str();
 					//printf("Send payload name='%s' size=%d \n", d, (int)name.size() + 1);
 					/*for (int i = 0; i < (int)name.size() + 1 && i < 32; ++i) {
@@ -89,7 +89,7 @@ void n_assetsmanager::assets_manager::assets_Show()
 
 	ImGui::Columns(1); // 列設定を解除
 
-    ImGui::End();
+	ImGui::End();
 }
 
 
