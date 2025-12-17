@@ -28,7 +28,7 @@ void n_assetsmanager::assets_manager::assets_Show()
 	const float padding = 32.0f;     // サムネイル間の余白
 	const float cellSize = thumbSize.x + padding; // セルのサイズ（サムネイル + 余白）
 	float panelWidth = ImGui::GetContentRegionAvail().x; // 利用可能なパネル幅
-	int columns = std::max(1, (int)(panelWidth / cellSize)); // 列数を計算
+	int columns = std::max<float>(1, (int)(panelWidth / cellSize)); // 列数を計算
 	ImGui::Columns(columns, nullptr, false); // 列を設定
 
 	int index = 0;

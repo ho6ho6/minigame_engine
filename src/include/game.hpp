@@ -1,26 +1,27 @@
-/************************************************************
- *ゲーム全体の状態管理・シーン生成・ステートマシンなどを宣言*
- ************************************************************/
-
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "include/input.hpp"
+#include "include/render.hpp"
+#include "include/game_component.hpp"
 
-#pragma once
+#include <algorithm>
+#include <iostream>
+#include <optional>
+#include <limits>
 
 namespace n_game
 {
-	//ゲーム全体の初期化。リソース読み込みや変数初期化
-	bool Game_Start();
+	class game
+	{
+		public:
+		// メインループから呼び出されるコマンド処理
+		void ProcessTriggers(const Vec3& playerPosition);
 
-	//毎フレーム呼ばれる更新関数。引数　deltaTime
-	void Game_Update(float deltaTime);
-
-	//毎フレーム呼ばれる描画関数
-	void Game_Render();
-
-	//ゲーム終了時に呼ばれる。リソース解放や変数のクリーンアップ
-	void Game_Shutdown();
+		private:
+		// もしオンラインにも対応する時、PlayerIDで個別に演出を可能に出来る
+		void HandleFinish(int64_t playerId, int64_t finishId, const n_component::FinishComponent& f);
+	};
 }
 
 #endif // GAME_HPP

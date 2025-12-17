@@ -24,6 +24,10 @@
 #include <iostream>
 #include <filesystem>
 
+#ifdef PIX_CAPTURE_WAIT
+Sleep(1000);
+#endif
+
 /*
   WinMain の引数:
     HINSTANCE   hInstance     : このアプリケーションのインスタンスハンドル
@@ -32,7 +36,45 @@
     int         nCmdShow      : ウィンドウの初期表示方法
 */
 
-n_assetsmanager::assets_manager g_AssetsManager(n_texturemanager::instance_texmag); // グローバルなアセットマネージャ
+n_assetsmanager::assets_manager g_AssetsManager(n_texturemanager::instance_texmag()); // グローバルなアセットマネージャ
+
+
+// exeファイルの場所から候補を探して返す
+static std::filesystem::path ResolveTexturesDir()
+{
+    namespace fs = std::filesystem;
+
+    // exeファイルの場所を取得
+    char exePath[MAX_PATH];
+    DWORD len = GetModuleFileNameA(NULL, exePath, MAX_PATH);
+    if (len == 0 || len == MAX_PATH)
+    {
+        std::cerr << "[TextureManager] GetModuleFileNameA failed\n";
+        return {};
+    }
+    fs::path exeDir = fs::path(exePath).remove_filename();
+
+    // 候補リスト
+    std::vector<fs::path> candidates = {
+        exeDir / "Assets" / "textures", // exe直下
+        exeDir.parent_path() / "Assets" / "textures", // 1階層上
+        fs::current_path() / "Assets" / "textures" // カレントディレクトリ
+    };
+
+    for (auto& c : candidates)
+    {
+        if (fs::exists(c) && fs::is_directory(c))   return c;
+    }
+
+    // 見つからなかった
+    std::cerr << "[TextureManager] Texture directory not found in candidates\n";
+    for (auto& c : candidates)
+    {
+        std::cerr << "  Candidate: " << c << "\n";
+    }
+    return {};
+}
+
 
 int APIENTRY WinMain(
     HINSTANCE hInstance,
@@ -46,12 +88,13 @@ int APIENTRY WinMain(
     const int width = 1920;
     const int height = 1000;
 
+	//Sleep(10000); // デバッガ接続用待機 (10秒)
 
     std::cout << "ゲームエンジンmainがここから始まります。" << "\n" << std::filesystem::current_path() << std::endl;
 
     if (!n_window::InitWindow(hInstance, nCmdShow, width, height, L"minigame_engine")) return -1;
 
-    if (!n_game::Game_Start()) return -1;
+    //if (!n_game::Game_Start()) return -1;
 
     if (!n_render::Render_Start(n_window::GetHWND(), width, height)) return -1;
 
@@ -74,7 +117,8 @@ int APIENTRY WinMain(
 
     //game::Game_Start();
 
-
+	// テクスチャマネージャ初期化
+	n_texturemanager::instance_texmag().Initialize(ResolveTexturesDir());
 
 
     /*----------------------------------初期化----------------------------------*/
@@ -95,11 +139,10 @@ int APIENTRY WinMain(
 
     /*------------------------------Assetsの登録-------------------------------*/
 
-    // テクスチャを読み込む
-    n_texturemanager::instance_texmag.LoadAllTextures();
+	// テクスチャを読み込む (同期ロード)
+    n_texturemanager::instance_texmag().LoadAllTextures();
 
     /*------------------------------Assetsの登録-------------------------------*/
-
 
     /*----------------------------------メイン----------------------------------*/
 
@@ -162,10 +205,10 @@ int APIENTRY WinMain(
     ImGui_ImplDX11_Shutdown();        // ImGuiのDirectX11レンダリングを終了
     ImGui_ImplWin32_Shutdown();       // ImGuiのWin32プラットフォームを終了
     ImGui::DestroyContext();            // ImGuiコンテキストを破棄
-
+	n_texturemanager::instance_texmag().Shutdown(); // テクスチャマネージャ終了
     n_input::Input_Shutdown();             // input.cpp
     n_render::Render_Shutdown();        // render.cpp
-    n_game::Game_Shutdown();            // game.cpp
+    //n_game::Game_Shutdown();            // game.cpp
     n_window::ShutdownWindow();        // window.cpp
 
     return 0;

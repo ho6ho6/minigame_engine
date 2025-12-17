@@ -29,10 +29,12 @@ struct SceneToHierarchyObj {
     uint64_t id;           // unique id
     std::string name;
     Texture* texture;      // nullable
-    float x, y;            // world (content-left-top Šî€, logical px)
-    int width, height;     // px
-    int z_order;
-    bool selected;
+    float x = 0.0f;
+    float y = 0.0f;            // world (content-left-top Šî€, logical px)
+    int width = 0;
+    int height = 0;     // px
+    int z_order = 0;
+    bool selected = false;
 };
 
 #endif // !SCENE_SPRITE

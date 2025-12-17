@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <algorithm>
 /* --注1--
     ImGui の API ではウィンドウ局所座標と絶対座標の概念があり、
     GetCursorScreenPos() や SetCursorScreenPos() は絶対座標、GetCursorPos() や SetCursorPos() はウィンドウ局所座標を扱うが
@@ -30,6 +31,7 @@
 */
 static ImVec2 ViewOffset = ImVec2(0.0f, 0.0f);
 static uint64_t g_NextSpriteId = 1; // ユニークID生成用カウンタ
+std::unordered_map<int64_t, SceneSprite> sprites;
 
 /* 当たり判定/選択/ドラッグは、ScreenToSceneを使用*/
 ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOffset)
@@ -57,8 +59,20 @@ namespace n_windowscene
         return g_NextSpriteId++;
 	}
 
+    window_scene& instance_winSce()
+    {
+        static window_scene inst;
+        return inst;
+    }
+
     void window_scene::Render()
     {
+
+        //for (const auto& s : m_SceneSprites) {
+        //    printf("[Render Debug] id=%u name=%s pos=(%f,%f) size=(%d,%d) texPx=(%d,%d)\n",
+        //        s.id, s.name.c_str(), s.pos_x, s.pos_y, s.width, s.height,
+        //        s.texture ? s.texture->width : 0, s.texture ? s.texture->height : 0);
+        //}
 
         //printf("[window_scene/Render/DBG] instance_texmag addr=%p file=%s\n", (void*)&n_texturemanager::instance_texmag, __FILE__);
 
@@ -106,49 +120,49 @@ namespace n_windowscene
 
         //### デバック
 
-        // SRV (D3D11) からテクスチャサイズを取得
-        int texW = 0, texH = 0;
-        {
-            ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(n_render::Render_GetSceneSRV());
-            if (srv) {
-                ID3D11Resource* res = nullptr;
-                srv->GetResource(&res);
-                if (res) {
-                    ID3D11Texture2D* tex = nullptr;
-                    if (SUCCEEDED(res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&tex)) && tex) {
-                        D3D11_TEXTURE2D_DESC desc;
-                        tex->GetDesc(&desc);
-                        texW = desc.Width;
-                        texH = desc.Height;
-                        tex->Release();
-                    }
-                    res->Release();
-                }
-            }
-        }
+        //// SRV (D3D11) からテクスチャサイズを取得
+        //int texW = 0, texH = 0;
+        //{
+        //    ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(n_render::Render_GetSceneSRV());
+        //    if (srv) {
+        //        ID3D11Resource* res = nullptr;
+        //        srv->GetResource(&res);
+        //        if (res) {
+        //            ID3D11Texture2D* tex = nullptr;
+        //            if (SUCCEEDED(res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&tex)) && tex) {
+        //                D3D11_TEXTURE2D_DESC desc;
+        //                tex->GetDesc(&desc);
+        //                texW = desc.Width;
+        //                texH = desc.Height;
+        //                tex->Release();
+        //            }
+        //            res->Release();
+        //        }
+        //    }
+        //}
 
-        // 視覚デバッグ：ヒット領域の枠とマウス位置
-        ImVec2 rect_a = contentPos;
-        ImVec2 rect_b = ImVec2(contentPos.x + contentSize.x, contentPos.y + contentSize.y);
-        draw->AddRect(rect_a, rect_b, IM_COL32(255, 0, 0, 200), 0.0f, 0, 2.0f); // 赤枠：ヒット領域
+        //// 視覚デバッグ：ヒット領域の枠とマウス位置
+        //ImVec2 rect_a = contentPos;
+        //ImVec2 rect_b = ImVec2(contentPos.x + contentSize.x, contentPos.y + contentSize.y);
+        //draw->AddRect(rect_a, rect_b, IM_COL32(255, 0, 0, 200), 0.0f, 0, 2.0f); // 赤枠：ヒット領域
 
-        draw->AddCircleFilled(mouseScreen, 4.0f, IM_COL32(255, 255, 0, 200)); // 黄色：実マウス
+        //draw->AddCircleFilled(mouseScreen, 4.0f, IM_COL32(255, 255, 0, 200)); // 黄色：実マウス
 
-        // マウスのローカル座標（ヒット領域左上を原点）
-        ImVec2 localTex = ImVec2(mouseScreen.x - contentPos.x, mouseScreen.y - contentPos.y);
+        //// マウスのローカル座標（ヒット領域左上を原点）
+        //ImVec2 localTex = ImVec2(mouseScreen.x - contentPos.x, mouseScreen.y - contentPos.y);
 
-        // テクスチャ上のピクセル座標に変換（重要：desc.Width/Height を使う）
-        float mappedTexX = 0.0f, mappedTexY = 0.0f;
-        if (contentSize.x > 0.0f && contentSize.y > 0.0f && texW > 0 && texH > 0) {
-            mappedTexX = (localTex.x / io.DisplayFramebufferScale.x) * (float)texW / contentSize.x;
-            mappedTexY = (localTex.y / io.DisplayFramebufferScale.y) * (float)texH / contentSize.y;
-        }
+        //// テクスチャ上のピクセル座標に変換（重要：desc.Width/Height を使う）
+        //float mappedTexX = 0.0f, mappedTexY = 0.0f;
+        //if (contentSize.x > 0.0f && contentSize.y > 0.0f && texW > 0 && texH > 0) {
+        //    mappedTexX = (localTex.x / io.DisplayFramebufferScale.x) * (float)texW / contentSize.x;
+        //    mappedTexY = (localTex.y / io.DisplayFramebufferScale.y) * (float)texH / contentSize.y;
+        //}
 
-        // 再び ImGui 上に戻して、マッピング位置を描画（緑十字）
-        ImVec2 mappedOnImage = ImVec2(contentPos.x + (mappedTexX / (float)texW) * contentSize.x,
-            contentPos.y + (mappedTexY / (float)texH) * contentSize.y);
-        draw->AddLine(ImVec2(mappedOnImage.x - 8, mappedOnImage.y), ImVec2(mappedOnImage.x + 8, mappedOnImage.y), IM_COL32(0, 255, 0, 200), 2.0f);
-        draw->AddLine(ImVec2(mappedOnImage.x, mappedOnImage.y - 8), ImVec2(mappedOnImage.x, mappedOnImage.y + 8), IM_COL32(0, 255, 0, 200), 2.0f);
+        //// 再び ImGui 上に戻して、マッピング位置を描画（緑十字）
+        //ImVec2 mappedOnImage = ImVec2(contentPos.x + (mappedTexX / (float)texW) * contentSize.x,
+        //    contentPos.y + (mappedTexY / (float)texH) * contentSize.y);
+        //draw->AddLine(ImVec2(mappedOnImage.x - 8, mappedOnImage.y), ImVec2(mappedOnImage.x + 8, mappedOnImage.y), IM_COL32(0, 255, 0, 200), 2.0f);
+        //draw->AddLine(ImVec2(mappedOnImage.x, mappedOnImage.y - 8), ImVec2(mappedOnImage.x, mappedOnImage.y + 8), IM_COL32(0, 255, 0, 200), 2.0f);
 
         //###
 
@@ -303,7 +317,7 @@ namespace n_windowscene
 
             //printf("[window_scene] Processing dropped asset: %s\n", asset_name.c_str());
 
-            Texture* tex = n_texturemanager::instance_texmag.GetTextureName(asset_name);
+            Texture* tex = n_texturemanager::instance_texmag().GetTextureByName(asset_name);
             if (tex)
             {
                 AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos);    // sceneに追加
@@ -319,7 +333,7 @@ namespace n_windowscene
 
             // 列挙（GetTextureNames() が pair<string, ...> を返すことを仮定）
             printf("[window_scene] Registered texture keys:\n");
-            for (const auto& kv : n_texturemanager::instance_texmag.GetTextureNames()) {
+            for (const auto& kv : n_texturemanager::instance_texmag().GetTextureNames()) {
                 printf("  '%s'\n", kv.first.c_str());
             }
 
@@ -333,11 +347,11 @@ namespace n_windowscene
         {
             if (!sprite.texture) continue;
 
-            ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(sprite.texture->tx_id);
-            if (!srv) {
-                printf("[window_scene/Render/ERR] sprite '%s' has null srv\n", sprite.name.c_str());
-                continue;
-            }
+            //ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(sprite.texture->tx_id);
+            //if (!srv) {
+            //    printf("[window_scene/Render/ERR] sprite '%s' has null srv\n", sprite.name.c_str());
+            //    continue;
+            //}
 
 
             // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
@@ -398,7 +412,7 @@ namespace n_windowscene
 
 
             // ImGui_ImplDX11はImTextureIDにSRV ポインタを渡す実装が標準
-            ImGui::Image((ImTextureID)srv, drawSize);
+            ImGui::Image(sprite.texture->tx_id, drawSize);
         }
 
         m_PendingDrop.clear();
@@ -422,22 +436,30 @@ namespace n_windowscene
         ImGuiIO& io = ImGui::GetIO();
 
         // GUI論理座標をシーン座標に変換
-        ImVec2 scale = io.DisplayFramebufferScale;
+        ImVec2 fbscale = io.DisplayFramebufferScale;
 
         // GUI　内の絶対座標
         ImVec2 guiAbsPos = ImVec2(guiWindowPos.x + guiLocalPos.x, guiWindowPos.y + guiLocalPos.y);
 
         // scene座標(=論理ピクセル)
-        //float sceneX = guiAbsPos.x * scale.x;
-        //float sceneY = guiAbsPos.y * scale.y;
         float sceneX = guiLocalPos.x;
         float sceneY = guiLocalPos.y;
 
-        // テクスチャのピクセルサイズを論理ピクセルに変換
-        int tex_w = (float)(tex->width > 0 ? tex->width : 16) / io.DisplayFramebufferScale.x;
-        int tex_h = (float)(tex->height > 0 ? tex->height : 16) / io.DisplayFramebufferScale.y;
-
-        // 中心配置:scene座標は 左上原点なので、テクスチャの半分を引く
+        // 実ピクセル -> 論理ピクセルに変換
+        float logicalW = (float)(tex->width > 0 ? tex->width : 16) / fbscale.x;
+        float logicalH = (float)(tex->height > 0 ? tex->height : 16) / fbscale.y;
+        
+        // 最大表示サイズ
+        const float maxDisplay = 64.0f; // 例: 64x64 を上限にする
+        float scale = 1.0f;
+        if (logicalW > maxDisplay || logicalH > maxDisplay)
+        {
+            scale = std::min<float>(maxDisplay / logicalW, maxDisplay / logicalH);
+        }
+        int tex_w = (int)std::round(logicalW * scale);
+        int tex_h = (int)std::round(logicalH * scale);
+        
+        // 中心配置: scene 座標は左上原点なので、テクスチャの半分を引く
         float placeX = sceneX - tex_w * 0.5f;
         float placeY = sceneY - tex_h * 0.5f;
 
@@ -471,7 +493,7 @@ namespace n_windowscene
 		Obj.selected = sprite.selected;
 
         // ヒエラルキーウィンドウへ
-        n_windowhierarchy::instance_winHie.GetObjFromScene(Obj);
+        n_windowhierarchy::instance_winHie().GetObjFromScene(Obj);
 
     }
 
@@ -495,7 +517,17 @@ namespace n_windowscene
         printf("[window_scene] Deleted %zu sprites (before=%zu after=%zu)\n", beforeCount - afterCount, beforeCount, afterCount);
 
 		// ヒエラルキーウィンドウへ
-		n_windowhierarchy::instance_winHie.DeleteObjFromScene(id);
+		n_windowhierarchy::instance_winHie().DeleteObjFromScene(id);
 	}
 
+    bool window_scene::GetSpritePosition(int64_t id, std::array<float, 3>& outPos) const
+    {
+        auto it = sprites.find(id);
+        if (it == sprites.end()) return false;
+        const SceneSprite& s = it->second;
+        outPos[0] = s.pos_x;
+        outPos[1] = s.pos_y;
+        outPos[2] = 0.0f;	//spriteのzはZオーダーのため、0を代入
+        return true;
+    };
 }
