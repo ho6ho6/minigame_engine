@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <array>
+#include <optional>
 
 namespace n_windowscene
 {
@@ -18,8 +19,7 @@ namespace n_windowscene
 		void AddAssetToScene(Texture* tex, const std::string& asset_name, ImVec2 guiLocalPos, ImVec2 guiWindowPos);
 		void DeleteAssetFromScene(uint64_t id);
 		uint64_t GenerateUniqueSpriteId();	// ユニークID生成
-		bool GetSpritePosition(int64_t id, std::array<float, 3>& outPos) const;
-
+		bool GetSpritePosition(int64_t id, std::array<float, 2>& outPos) const;
 
 	private:
 		ImVec2 m_LastSize = { 0, 0 };   // 最後に記憶したサイズ

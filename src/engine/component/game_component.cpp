@@ -1,6 +1,6 @@
 #include "include/input.hpp"
 #include "include/render.hpp"
-#include "include/game_component.hpp"
+#include "include/component/game_component.hpp"
 #include "include/window_editor/window_scene.hpp"
 #include "include/window_editor/window_editor.hpp"
 #include "include/window_editor/window_hierarchy.hpp"
@@ -17,15 +17,15 @@ namespace n_gamecomponent
 	gameFunctions::gameFunctions()
 	{
 		// Transform のデフォルト
-		Transform.position = { 0.0f, 0.0f, 0.0f };
-		Transform.rotation = { 0.0f, 0.0f, 0.0f };
-		Transform.scale = { 1.0f, 1.0f, 1.0f };
+		Transform.position = { 0.0f, 0.0f};
+		Transform.rotation = { 0.0f, 0.0f};
+		Transform.scale = { 1.0f, 1.0f};
 
 		// Move のデフォルト
 		Move.speed = 5.0f;
 		Move.acceleration = 10.0f;
 		Move.jump = 1.0f;
-		Move.direction = { 1.0f, 0.0f, 0.0f };
+		Move.direction = { 1.0f, 0.0f};
 		Move.jumpKey = ImGuiKey_Space;
 
 		// Light のデフォルト
@@ -34,16 +34,15 @@ namespace n_gamecomponent
 		Light.range = 10.0f;
 
 		// Gravity のデフォルト
-		Gravity.gravity = -9.81f;
+		Rigidbody.gravity = -9.81f;
+		Rigidbody.isGround = false;
 
 		// Start のデフォルト
-		Start.position = { 0.0f, 1.0f, 0.0f };		// ここも同様に
 		Start.spawnRadius = 0.5f;
 		Start.priority = 0;
 		Start.active = false;
 
 		// Finish のデフォルト
-		Finish.position = { 10.0f, 0.0f, 0.0f };	// この座標はオブジェクトの論理座標を取得する
 		Finish.radius = 1.0f;
 		Finish.oneShot = true;
 		Finish.active = false;
@@ -133,12 +132,13 @@ namespace n_gamecomponent
 			});
 	};
 
-	void gameFunctions::AddComponentGravity(int64_t id)
+	void gameFunctions::AddComponentRigidbody(int64_t id)
 	{
-		n_component::GravityComponent g;
-		g.gravity = Gravity.gravity;
+		n_component::RigidbodyComponent g;
+		g.gravity = Rigidbody.gravity;
+		g.isGround = Rigidbody.isGround;
 		EnqueueGameCommand([this, id, g]() {
-			CreateGravityComponent(id, g);
+			CreateRigidbodyComponent(id, g);
 			});
 	};
 
@@ -146,7 +146,6 @@ namespace n_gamecomponent
 	{
 		n_component::StartComponent s;
 		s.active = Start.active;
-		s.position = Start.position;
 		s.priority = Start.priority;
 		s.spawnRadius = Start.spawnRadius;
 		EnqueueGameCommand([this, id, s]() {
@@ -160,7 +159,6 @@ namespace n_gamecomponent
 		n_component::FinishComponent f;
 		f.active = Finish.active;
 		f.oneShot = Finish.oneShot;
-		f.position = Finish.position;
 		f.radius = Finish.radius;
 		//f.tag = Finish.tag;
 		EnqueueGameCommand([this, id, f]() {
@@ -175,7 +173,7 @@ namespace n_gamecomponent
 			transformComponents.erase(id);
 			moveComponents.erase(id);
 			lightComponents.erase(id);
-			gravityComponents.erase(id);
+			rigidbodyComponents.erase(id);
 			startComponents.erase(id);
 			finishComponents.erase(id);
 			isplayerComponents.erase(id);
@@ -193,6 +191,16 @@ namespace n_gamecomponent
 
 		EnqueueGameCommand([this, EntityId, i]() {
 			CreateIsPlayerComponent(EntityId, i);
+			});
+	};
+
+	void gameFunctions::AddComponentSprite(int64_t id)
+	{
+		n_component::SpriteComponent sp;
+		sp.spriteId = Sprite.spriteId;
+		sp.visible = Sprite.visible;
+		EnqueueGameCommand([this, id, sp]() {
+			CreateSpriteComponent(id, sp);
 			});
 	};
 	/*--------------------------コンポーネント--------------------------*/
@@ -217,9 +225,9 @@ namespace n_gamecomponent
 		lightComponents[id] = l;
 	}
 
-	void gameFunctions::CreateGravityComponent(int64_t id, const n_component::GravityComponent& g)
+	void gameFunctions::CreateRigidbodyComponent(int64_t id, const n_component::RigidbodyComponent& g)
 	{
-		gravityComponents[id] = g;
+		rigidbodyComponents[id] = g;
 	}
 
 	void gameFunctions::CreateStartComponent(int64_t id, const n_component::StartComponent& s)
@@ -237,10 +245,10 @@ namespace n_gamecomponent
 		isplayerComponents[id] = i;
 	}
 
+	void gameFunctions::CreateSpriteComponent(int64_t id, const n_component::SpriteComponent& sp)
+	{
+		spriteComponents[id] = sp;
+	}
+
 	/*-----------------------------------------*/
-
-
-	/*---------コンポーネントの詳細---------------*/
-
-	/*---------コンポーネントの詳細---------------*/
 }

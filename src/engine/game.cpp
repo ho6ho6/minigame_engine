@@ -1,9 +1,9 @@
 #include "include/game.hpp"
-#include "include/game_component.hpp"
 #include "include/input.hpp"
 #include "include/render.hpp"
 #include "include/window_editor/window_scene.hpp"
 #include "include/window_editor/window_hierarchy.hpp"
+#include "include/component/component_api.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -11,22 +11,118 @@
 #include <limits>
 #undef max
 
+struct MoveComponent {
+	float speed;
+	Vec3 direction;
+	float acceleration;
+	float jump;
+	int jumpKey; // デフォルト Space のキーコード（環境に合わせて変更
+};
+
+struct RigidbodyComponent
+{
+	float gravity;
+	bool isGround;
+};
+
+
+// 状態保持（エッジ検出用）
+static std::unordered_map<int64_t, bool> s_wasJumpPressed;
+
 namespace n_game
 {
+	game& instance_game()
+	{
+		static game inst;
+		return inst;
+	}
+
+
+	void game::Render(int64_t entityId, std::optional<int> spriteIdOpt)
+	{
+		auto mcOpt = n_compoapi::GetMoveComponent(entityId);
+		if (!mcOpt) return;
+		auto mc = *mcOpt;
+
+		if (mc.jumpKey < 0) {
+			s_wasJumpPressed.erase(entityId);
+			return;
+		}
+
+		// キー状態取得とエッジ検出
+		SHORT state = GetAsyncKeyState(mc.jumpKey);
+		bool isDown = (state & 0x8000) != 0;
+		bool wasDown = false;
+		auto it = s_wasJumpPressed.find(entityId);
+		if (it != s_wasJumpPressed.end()) wasDown = it->second;
+
+		// 押下開始（エッジ）でジャンプを発生させる
+		if (isDown && !wasDown) {
+			// 地上判定を確認してからジャンプ
+			auto rbOpt = n_compoapi::GetRigidbodyComponent(entityId);
+			bool grounded = false;
+			if (rbOpt) grounded = rbOpt->isGround;
+
+			if (grounded) {
+				n_input::UpdateInputAndJumpForAll();
+				// デバッグログ
+				printf("[game::Render] entity=%lld jump triggered (jump=%f)\n", (long long)entityId, mc.jump);
+			}
+		}
+
+		// spriteId があればエフェクトやデバッグ表示に使う
+		if (spriteIdOpt) {
+			int spriteId = *spriteIdOpt;
+			// 例: ジャンプ時にエフェクトをスプライト位置に出す、またはデバッグ枠を描くためのフラグを立てる
+			// n_render_registry::RequestEffectAtSprite(spriteId, EffectType::Jump); // 仮API
+		}
+
+		// 必要なら MoveComponent の状態を更新して戻す（例: lastJumpTime）
+		// mc.lastJumpTime = n_time::Time::Now();
+		// n_compoapi::SetMoveComponent(entityId, mc);
+
+		// 押下状態を保存
+		s_wasJumpPressed[entityId] = isDown;
+
+	}
+
+
 	/*--数値計算--*/
 	
 	// シンプルな距離判定
-	static float DistanceSq(const Vec3& a, const Vec3& b)
+	static float DistanceSq(const Vec2& a, const Vec2& b)
 	{
 		float dx = a[0] - b[0];
 		float dy = a[1] - b[1];
-		float dz = a[2] - b[2];
 
-		return dx * dx + dy * dy + dz * dz;
+		return dx * dx + dy * dy;
 	}
 
+	// Ground 判定：PhysicsComponent の grounded フラグを参照する実装例
+
+	/*このIsGroundedとApplyJumpImpulse*/
+	bool game::IsGrounded(int64_t entityId) {
+		auto rbOpt = n_compoapi::GetRigidbodyComponent(entityId);
+		if (!rbOpt) return false;
+		return rbOpt->isGround;
+	}
+
+	void game::ApplyJumpImpulse(int64_t entityId, float strength) {
+		auto rbOpt = n_compoapi::GetRigidbodyComponent(entityId);
+		if (!rbOpt) {
+			printf("ApplyJumpImpulse: no Rigidbody for %lld\n", (long long)entityId);
+			return;
+		}
+		auto rb = *rbOpt;
+		rb.gravity += strength; // 既存の落下速度と合成
+		rb.isGround = false;
+		n_compoapi::SetRigidbodyComponent(entityId, rb);
+		printf("ApplyJumpImpulse_Impulse: entity=%lld strength=%f\n", (long long)entityId, strength);
+	}
+
+
 	// playerPosition は現在のプレイヤー座標
-	void game::ProcessTriggers(const Vec3& playerPosition)
+	void game::ProcessTriggers(const Vec2& playerPosition)
 	{
 		for (auto& kv : n_gamecomponent::instance_gameFunctions().finishComponents) {
 			int64_t finishId = kv.first;
@@ -34,10 +130,29 @@ namespace n_game
 			if (!f.active) continue;
 
 			// window_scene のオブジェクト座標を優先
-			Vec3 finishPos;
+			Vec2 finishPos;
 			bool hasScenePos = n_windowscene::instance_winSce().GetSpritePosition(finishId, finishPos);
 
-			if (!hasScenePos) finishPos = f.position;
+			if (!hasScenePos) {
+				// エンティティに Transform/Translate コンポーネントがあればそれを使う
+				bool usedTransform = false;
+
+				// 例: TransformComponent を優先して取得
+				if (n_compoapi::HasTransformComponent(finishId)) {
+					auto optT = n_compoapi::GetTransformComponent(finishId);
+					if (optT) {
+						const auto& tc = *optT;
+						finishPos = tc.position; // Transform のワールド位置を想定
+						usedTransform = true;
+					}
+				}
+
+				if (!usedTransform)
+				{
+					printf("[game]positionが見つからないから、AddTransformComponentするとか何とか\n");
+				}
+
+			}
 
 			float r2 = f.radius * f.radius;
 			// 判定は playerPosition と finishPos を比較
@@ -54,7 +169,7 @@ namespace n_game
 					const n_component::IsPlayerComponent& flag = pkv.second;
 
 					// スプライト位置を取得できなければスキップ
-					Vec3 entPos;
+					Vec2 entPos;
 					if (!n_windowscene::instance_winSce().GetSpritePosition(entityId, entPos)) continue;
 
 					float d2 = DistanceSq(entPos, finishPos);

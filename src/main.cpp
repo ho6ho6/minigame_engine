@@ -11,8 +11,11 @@
 #include "include/window_editor/window_manager.hpp" // window_manager
 #include "include/assets/assets_manager/texture_manager.hpp" // texture_manager
 #include "include/window_editor/window_assets.hpp"
+#include "include/window_editor/window_hierarchy.hpp"
 #include "include/assets/assets_manager/assets_manager.hpp"
 #include "include/assets/util.hpp"
+
+#include "include/component/component_api.hpp"
 
  /*ImGui は「既存の OS ウィンドウ」のクライアント領域内に GUI を即時モードで描画するライブラリ*/
  // Begin/End で開くウィンドウ
@@ -24,9 +27,9 @@
 #include <iostream>
 #include <filesystem>
 
-#ifdef PIX_CAPTURE_WAIT
-Sleep(1000);
-#endif
+//#ifdef PIX_CAPTURE_WAIT
+//Sleep(1000);
+//#endif
 
 /*
   WinMain の引数:
@@ -113,12 +116,10 @@ int APIENTRY WinMain(
 
     n_time::Time::Start_Time();
 
-    //input::Input_Start();
-
-    //game::Game_Start();
-
 	// テクスチャマネージャ初期化
 	n_texturemanager::instance_texmag().Initialize(ResolveTexturesDir());
+
+    n_windowhierarchy::instance_winHie().InitHierarchyScanner();
 
 
     /*----------------------------------初期化----------------------------------*/
@@ -162,8 +163,6 @@ int APIENTRY WinMain(
         // 各サブシステム更新
         float deltaTime = n_time::Time::Update_Time();
         uint64_t frameTime = n_time::Time::GetFrameCount();
-        //input::Input_Update();
-        //game::Game_Update(deltaTime);
 
 
         // ImGui フレーム開始
@@ -177,7 +176,6 @@ int APIENTRY WinMain(
         static const float clear_col[4] = { 0.5f, 0.5f, 0.5f, 0.1f };
         n_render::Render_Frame(clear_col, deltaTime, frameTime);
 
-        //ImGui::End();
 
         wm.RenderAll();
 
@@ -190,7 +188,17 @@ int APIENTRY WinMain(
         ctx->OMSetRenderTargets(1, &g_rtv, nullptr);
         ctx->ClearRenderTargetView(g_rtv, clear_col);
 
-        //game::Game_Render(); // game.cpp
+        auto entities = n_compoapi::GetAllEntities();
+        for (int64_t eid : entities) {
+            // spriteId を取得（レンダー登録マップを参照）
+            auto spriteOpt = n_windowhierarchy::instance_winHie().GetSpriteIdForEntity(eid);
+            if (spriteOpt) {
+                n_game::instance_game().Render(eid, *spriteOpt);
+            }
+            else {
+                n_game::instance_game().Render(eid, std::nullopt);
+            }
+        }
 
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -205,10 +213,9 @@ int APIENTRY WinMain(
     ImGui_ImplDX11_Shutdown();        // ImGuiのDirectX11レンダリングを終了
     ImGui_ImplWin32_Shutdown();       // ImGuiのWin32プラットフォームを終了
     ImGui::DestroyContext();            // ImGuiコンテキストを破棄
+    n_windowhierarchy::instance_winHie().ShutdownHierarchyScanner();
 	n_texturemanager::instance_texmag().Shutdown(); // テクスチャマネージャ終了
-    n_input::Input_Shutdown();             // input.cpp
     n_render::Render_Shutdown();        // render.cpp
-    //n_game::Game_Shutdown();            // game.cpp
     n_window::ShutdownWindow();        // window.cpp
 
     return 0;

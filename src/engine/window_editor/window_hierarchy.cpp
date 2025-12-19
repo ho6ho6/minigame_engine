@@ -2,7 +2,10 @@
 #include "include/window_editor/window_editor.hpp"
 #include "include/render.hpp"	//フレームバッファ取得用
 #include "include/game.hpp"
-#include "include/game_component.hpp"
+#include "include/component/component_api.hpp"
+#include "include/component/component_keycapture.hpp"
+#include "include/component/component_config.hpp"
+#include "include/component/component_manager.hpp"
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
 
 #include <mutex>
@@ -10,6 +13,12 @@
 // objを保持するためのコンテナ
 static std::vector<SceneToHierarchyObj> g_SceneToHierarchyObjs;
 static std::mutex g_SceneToHierarchyMutex;
+static std::mutex g_mutex;
+static std::vector<int64_t> g_cachedSpriteIds;
+static std::vector<EntitySpritePair> g_cachedPairs;
+static bool g_cacheValid = false;
+static std::unordered_map<int64_t, int64_t> g_entityToSprite;
+static std::mutex g_registryMutex;
 
 namespace n_windowhierarchy
 {
@@ -41,6 +50,81 @@ namespace n_windowhierarchy
         );
     }
 
+
+    void window_hierarchy::RegisterSprite(int64_t entityId, int64_t spriteId) {
+        std::lock_guard<std::mutex> lk(g_registryMutex);
+        g_entityToSprite[entityId] = spriteId;
+    }
+
+    void window_hierarchy::UnregisterSprite(int64_t entityId) {
+        std::lock_guard<std::mutex> lk(g_registryMutex);
+        g_entityToSprite.erase(entityId);
+    }
+
+    std::optional<int64_t> window_hierarchy::GetSpriteIdForEntity(int64_t entityId) {
+        std::lock_guard<std::mutex> lk(g_registryMutex);
+        auto it = g_entityToSprite.find(entityId);
+        if (it == g_entityToSprite.end()) return std::nullopt;
+        return it->second;
+    }
+
+
+    static void RebuildCache()
+    {
+        std::lock_guard<std::mutex> lk(g_mutex);
+        g_cachedSpriteIds.clear();
+        g_cachedPairs.clear();
+
+        // 全エンティティ走査（n_compoapi::GetAllEntities() はそのまま使う）
+        for (int64_t eid : n_compoapi::GetAllEntities()) {
+            // eid が 0 を返す設計ならスキップ（通常は不要）
+            if (eid == 0) continue;
+
+            // ここでエンティティから Sprite コンポーネントを取得する
+            // GetSpriteComponent は optional を返す想定
+            auto spriteOpt = n_compoapi::GetSpriteComponent(eid);
+            if (!spriteOpt) continue; // スプライトを持たないエンティティはスキップ
+
+            // optional を展開してフィールドを取り出す
+            auto sprite = *spriteOpt;
+            int64_t spriteId = sprite.spriteId; // 実際のフィールド名に合わせる
+
+            // ヒエラルキー上で「配置されている」かを判定するならここでチェック
+            // 例: if (!sprite.visible) continue;
+
+            g_cachedSpriteIds.push_back(spriteId);
+            g_cachedPairs.emplace_back(eid, spriteId);
+        }
+
+        g_cacheValid = true;
+    }
+
+    std::vector<EntitySpritePair> window_hierarchy::GetAllVisibleEntitySpritePairs() {
+        if (!g_cacheValid) RebuildCache();
+        std::lock_guard<std::mutex> lk(g_mutex);
+        return g_cachedPairs;
+    }
+
+    void NotifyHierarchyChanged() {
+        std::lock_guard<std::mutex> lk(g_mutex);
+        g_cacheValid = false; // 次回取得時に再構築
+    }
+
+    void window_hierarchy::InitHierarchyScanner() {
+        std::lock_guard<std::mutex> lk(g_mutex);
+        g_cacheValid = false;
+    }
+
+    void window_hierarchy::ShutdownHierarchyScanner() {
+        std::lock_guard<std::mutex> lk(g_mutex);
+        g_cachedSpriteIds.clear();
+        g_cachedPairs.clear();
+        g_cacheValid = false;
+    }
+
+
+
+
     void window_hierarchy::Render()
     {
         
@@ -55,7 +139,7 @@ namespace n_windowhierarchy
         ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_NoResize);
 
         // window サイズを固定
-        ImGui::SetWindowSize(ImVec2(920, 400));
+        ImGui::SetWindowSize(ImVec2(450, 400));
 
         ImVec2 avail = ImGui::GetContentRegionAvail();
 
@@ -92,62 +176,130 @@ namespace n_windowhierarchy
         {
 			ImGui::PushID((int64_t)obj.id);
 			bool selected = obj.selected;
+
             if (ImGui::Selectable(obj.name.c_str(), &selected))
             {
-				// 選択処理　ノードの追加はここで行う
+                // オブジェクトが選択されたときの処理
+                // obj.selected = selected;
             }
-
 
             if (ImGui::BeginPopupContextItem())
             {
                 /*もう少し可読性は上げる*/
 
                 // contextCommands の登録はコンストラクタで行う想定
-                if (ImGui::MenuItem("Add Transform")) {
-                    // 直接呼ぶ（引数は id のみ）
-                    n_gamecomponent::instance_gameFunctions().AddComponentTransform(obj.id);
-
-                } else if (ImGui::MenuItem("Add Move"))
+                // 直接呼ぶ（引数は id のみ）
+                if (!n_compoapi::HasTransformComponent(obj.id))
                 {
-                    n_gamecomponent::instance_gameFunctions().AddComponentMove(obj.id);
-
-                } else if (ImGui::MenuItem("Add Light"))
-                {
-
-                    n_gamecomponent::instance_gameFunctions().AddComponentLight(obj.id);
-
-                } else if (ImGui::MenuItem("Add Gravity"))
-                {
-
-                    n_gamecomponent::instance_gameFunctions().AddComponentGravity(obj.id);
-
-                } else if (ImGui::MenuItem("Object Delete"))
-                {
-
-                    n_gamecomponent::instance_gameFunctions().AddComponentDelete(obj.id);
-
-				} else if (ImGui::MenuItem("Add Start"))
-                {
-
-                    n_gamecomponent::instance_gameFunctions().AddComponentStart(obj.id);
-
-                } else if (ImGui::MenuItem("Add Finish"))
-                {
-
-                    n_gamecomponent::instance_gameFunctions().AddComponentFinish(obj.id);
+                    if (ImGui::MenuItem("Add Transform"))       n_compoapi::AddTransformComponent(obj.id);
                 }
-                else if (ImGui::MenuItem("Add isPlayer"))
+                else
                 {
-                    n_gamecomponent::instance_gameFunctions().AddComponentIsPlayer(obj.id);
+                    if (ImGui::MenuItem("Remove Transform"))    n_compoapi::RemoveTransformComponent(obj.id);
                 }
-                /*Add Component*/
+                
+                if (!n_compoapi::HasMoveComponent(obj.id))
+                {
+                    if (ImGui::MenuItem("Add Move"))            n_compoapi::AddMoveComponent(obj.id); // Moveが付与されていない
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Remove Move"))         n_compoapi::RemoveMoveComponent(obj.id); // Moveが付与されている
+                }
+
+                if (!n_compoapi::HasLightComponent(obj.id))
+                {
+                    if (ImGui::MenuItem("Add Light"))           n_compoapi::AddLightComponent(obj.id);
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Remove Light"))        n_compoapi::RemoveLightComponent(obj.id);
+                }
+
+                if (!n_compoapi::HasRigidbodyComponent(obj.id))
+                {
+                    if (ImGui::MenuItem("Add Rigidbody"))       n_compoapi::AddRigidbodyComponent(obj.id);
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Remove Rigidbody"))    n_compoapi::RemoveRigidbodyComponent(obj.id);
+                }
+
+                if (!n_compoapi::HasStartComponent(obj.id))
+                {
+                    if (ImGui::MenuItem("Add Start"))           n_compoapi::AddStartComponent(obj.id);
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Remove Start"))        n_compoapi::RemoveStartComponent(obj.id);
+                }
+
+                if (!n_compoapi::HasFinishComponent(obj.id))
+                {
+                    if (ImGui::MenuItem("Add Finish"))          n_compoapi::AddFinishComponent(obj.id);
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Remove Finish"))       n_compoapi::RemoveFinishComponent(obj.id);
+                }
+
+                if (!n_compoapi::HasIsPlayerComponent(obj.id))
+                {
+                    if (ImGui::MenuItem("Add IsPlayer"))        n_compoapi::AddIsPlayerComponent(obj.id);
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Remove IsPlayer"))     n_compoapi::RemoveIsPlayerComponent(obj.id);
+                }
 
 				ImGui::EndPopup();
             }
+
 			ImGui::PopID();
         }
 
         ImGui::End();
+
+
+        ImGui::SetNextWindowPos(ImVec2(450, 600), ImGuiCond_Always);
+        
+        ImGui::Begin("Hierarchy Inspector"); // もしくは同じウィンドウ内で区切る
+        // window サイズを固定
+        ImGui::SetWindowSize(ImVec2(470, 400));
+
+        if (g_selectedEntity >= 0) {
+
+            // コンポーネント用の Inspector を直接呼ぶ
+            ImGui::Text("----Transform----");
+            RenderTransformInspector(g_selectedEntity);
+
+            ImGui::Text("----Move----");
+            RenderMoveInspector(g_selectedEntity);
+
+            ImGui::Text("----Rigidbody----");
+            RenderRigidbodyInspector(g_selectedEntity);
+
+            ImGui::Text("----IsPlayer----");
+            RenderIsPlayerInspector(g_selectedEntity);
+
+            ImGui::Text("----Start----");
+            RenderStartInspector(g_selectedEntity);
+
+            ImGui::Text("----Finish----");
+            RenderFinishInspector(g_selectedEntity);
+
+            ImGui::Text("----Light----");
+            RenderLightInspector(g_selectedEntity);
+            // キーキャプチャモーダルは毎フレームどこかで必ず呼ぶ（UI ループ内）
+            RenderKeyCaptureModal();
+        }
+        else
+        {
+            ImGui::Text("No selection");
+        }
+
+        ImGui::End();
+
     }
 
 }

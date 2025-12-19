@@ -52,8 +52,7 @@ add_executable(minigame_engine
     src/main.cpp
     src/external/stb_image_impl.cpp
     ${ENGINE_SOURCES}
-    ${IMGUI_SOURCES}        
-)
+    ${IMGUI_SOURCES} "src/engine/component/component_api.cpp" "src/engine/component/component_config.cpp" "src/engine/component/component_keycapture.cpp")
 
 
 # debug—p‚Ì’è‹`

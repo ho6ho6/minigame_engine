@@ -26,13 +26,9 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     switch (msg)
     {
     case WM_RBUTTONDOWN:
-        printf("WndProc: WM_RBUTTONDOWN\n");
-        fflush(stdout);
         break;
 
     case WM_RBUTTONUP:
-        printf("WndProc: WM_RBUTTONUP\n");
-        fflush(stdout);
         break;
 
 
