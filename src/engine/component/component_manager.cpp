@@ -19,10 +19,10 @@ namespace n_compomanager {
     ComponentManager g_componentManager;
 
     // 翻訳単位間で使用されるテンプレートの明示的なインスタンス化
-    template void ComponentManager::AddComponent<n_component::MoveComponent>(EntityId, const n_component::MoveComponent&);
-    template void ComponentManager::RemoveComponent<n_component::MoveComponent>(EntityId);
-    template std::optional<n_component::MoveComponent> ComponentManager::GetComponent<n_component::MoveComponent>(EntityId) const;
-    template void ComponentManager::SetComponent<n_component::MoveComponent>(EntityId, const n_component::MoveComponent&);
+    //template void ComponentManager::AddComponent<n_component::MoveComponent>(EntityId, const n_component::MoveComponent&);
+    //template void ComponentManager::RemoveComponent<n_component::MoveComponent>(EntityId);
+    //template std::optional<n_component::MoveComponent> ComponentManager::GetComponent<n_component::MoveComponent>(EntityId) const;
+    //template void ComponentManager::SetComponent<n_component::MoveComponent>(EntityId, const n_component::MoveComponent&);
 
     // 他のコンポーネントタイプも同様にインスタンス化する
 

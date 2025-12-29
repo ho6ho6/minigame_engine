@@ -1,6 +1,8 @@
-#include "include/component/component_api.hpp"
+#include "include/game.h"
+#include "include/component/component_api.h"
 #include "include/component/component_manager.hpp"
-#include "include/component/game_component.hpp"
+#include "include/window_editor/window_scene.h"
+#include "include/component/game_component.h"
 #include <optional>
 
 EntityId g_selectedEntity = -1;
@@ -30,6 +32,9 @@ EntityId g_lightConfigEntity = -1;
 
 std::unordered_set<EntityId> g_entitySet;
 std::mutex g_entitySetMutex;
+std::unordered_set<EntityId> g_dirtyTransforms;
+
+
 
 /*n_compomanager::EntityId は Int64_t型のID */
 
@@ -51,15 +56,67 @@ namespace n_compoapi
 
     void SetTransformComponent(EntityId eid, const n_component::TransformComponent& t)
     {
-        // キャッシュ更新（即時UI反映）
-        n_compomanager::g_componentManager.SetComponent<n_component::TransformComponent>(eid, t);
-        // ゲーム側に反映する必要があるなら非同期コマンドを投げる
-        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, t]()
-            {
-                // ゲームスレッド: 別個の場合は実行時シーンに適用
-            });
+        //fprintf(stderr, "[SetTransformComponent] ENTRY eid=%lld thread_hash=%zu saved_hash=%zu addr=%p equal=%d\n",
+        //    (long long)eid,
+        //    (size_t)std::hash<std::thread::id>{}(std::this_thread::get_id()),
+        //    (size_t)std::hash<std::thread::id>{}(g_gameThreadId),
+        //    (void*)&g_gameThreadId,
+        //    (int)(std::this_thread::get_id() == g_gameThreadId));
+        //fflush(stderr);
+        // ゲームスレッド前提。誤って別スレッドから呼ばれたらログを出して早期 return
+        if (!IsGameThread()) {
+            n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, t]() {
+                SetTransformComponentImpl(eid, t);
+                });
+            fprintf(stderr, "[SetTransformComponent] forwarded to game thread (fallback) eid=%lld\n", (long long)eid);
+            fflush(stderr);
+            return;
+        }
+        SetTransformComponentImpl(eid, t);
     }
-        
+
+    // SetTransformComponentのヘルプ関数
+    void SetTransformComponentImpl(EntityId eid, const n_component::TransformComponent& t)
+    {
+        bool changed = true;
+        if (auto oldOpt = n_compoapi::GetTransformComponent(eid))
+        {
+            const auto& old = *oldOpt;
+            if (old.position[0] == t.position[0] && old.position[1] == t.position[1]
+                && old.rotation == t.rotation && old.scale == t.scale)
+            {
+                changed = false;
+            }
+        }
+
+        // ゲームスレッドでストレージを書き換える（ここに移動）
+        n_compomanager::g_componentManager.SetComponent<n_component::TransformComponent>(eid, t);
+
+        if (!changed) return;
+
+        // スプライト同期処理（ゲームスレッド上で安全に行う）
+        auto spOpt = n_compoapi::GetSpriteComponent(eid);
+        if (spOpt) {
+            const float px = t.position[0];
+            const float py = t.position[1];
+            std::array<float, 2> pos = { px, py };
+
+            Vec2 cur;
+            bool hasPos = n_windowscene::instance_winSce().GetSpritePosition(eid, cur);
+
+            const float EPS = 1e-5f;
+            // Vec2 のアクセスは .x/.y を使う実装に合わせてください
+            bool needSync = !hasPos || (fabsf(cur[0] - px) > EPS || fabsf(cur[1] - py) > EPS);
+
+            if (needSync) {
+                SceneSprite s;
+                s.id = spOpt->spriteId;
+                s.selected = spOpt->visible;
+                n_compoapi::RegisterSpriteAndSyncTransform(eid, s, pos);
+            }
+        }
+    }
+
     void AddTransformComponent(EntityId eid)
     {
         // 既に持っていれば何もしない（ログを残す）
@@ -85,7 +142,7 @@ namespace n_compoapi
         n_compomanager::g_componentManager.RemoveComponent<n_component::TransformComponent>(eid);
         n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid]()
             {
-            // 必要に応じてランタイムを追加
+                // 必要に応じてランタイムを追加
             });
     }
 
@@ -95,6 +152,8 @@ namespace n_compoapi
         g_transformConfigEntity = eid;
         g_transformConfigOpen = true;
     }
+
+
 
     // Move
     bool HasMoveComponent(EntityId eid)  noexcept
@@ -114,7 +173,7 @@ namespace n_compoapi
         // ゲーム側に反映する必要があるなら非同期コマンドを投げる
         n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, m]()
             {
-            // ゲームスレッド: 別個の場合は実行時シーンに適用
+                // ゲームスレッド: 別個の場合は実行時シーンに適用
             });
     }
 
@@ -147,7 +206,7 @@ namespace n_compoapi
         n_compomanager::g_componentManager.RemoveComponent<n_component::MoveComponent>(eid);
         n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid]()
             {
-            // 要に応じてランタイムを追加
+                // 要に応じてランタイムを追加
             });
     }
 
@@ -157,6 +216,8 @@ namespace n_compoapi
         g_moveConfigEntity = eid;
         g_moveConfigOpen = true;
     }
+
+
 
     // IsPlayer
     bool HasIsPlayerComponent(EntityId eid)
@@ -190,7 +251,7 @@ namespace n_compoapi
         }
         n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, def]() {
             // ランタイム側の追加処理（必要なら）
-        });
+            });
         OpenIsPlayerConfigFor(eid);
     }
 
@@ -209,6 +270,8 @@ namespace n_compoapi
         g_isplayerConfigEntity = eid;
         g_isplayerConfigOpen = true;
     }
+
+
 
     // Rigidbody
     bool HasRigidbodyComponent(EntityId eid)
@@ -263,7 +326,9 @@ namespace n_compoapi
         g_rigidbodyConfigOpen = true;
     }
 
-    // Start/Finish
+
+
+    // Start
     bool HasStartComponent(EntityId eid)
     {
         return n_compomanager::g_componentManager.HasComponent<n_component::StartComponent>(eid);
@@ -281,7 +346,7 @@ namespace n_compoapi
         // ゲーム側に反映する必要があるなら非同期コマンドを投げる
         n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, s]()
             {
-            // ゲームスレッド: 別個の場合は実行時シーンに適用
+                // ゲームスレッド: 別個の場合は実行時シーンに適用
             });
     }
 
@@ -317,6 +382,8 @@ namespace n_compoapi
     }
 
 
+
+    // Finish
     bool HasFinishComponent(EntityId eid)
     {
         return n_compomanager::g_componentManager.HasComponent<n_component::FinishComponent>(eid);
@@ -334,7 +401,7 @@ namespace n_compoapi
         // ゲーム側に反映する必要があるなら非同期コマンドを投げる
         n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, f]()
             {
-            // ゲームスレッド: 別個の場合は実行時シーンに適用
+                // ゲームスレッド: 別個の場合は実行時シーンに適用
             });
     }
 
@@ -368,6 +435,8 @@ namespace n_compoapi
         g_finishConfigEntity = eid;
         g_finishConfigOpen = true;
     }
+
+
 
     // Light
     bool HasLightComponent(EntityId eid)
@@ -422,6 +491,78 @@ namespace n_compoapi
         g_lightConfigOpen = true;
     }
 
+    /* Spriteの処理は少ないため、ヘッダにある */
+
+
+    // Spriteの初期配置とTransform
+    void RegisterSpriteAndSyncTransform(EntityId eid, const SceneSprite& sprite, const std::array<float, 2>& pos)
+    {
+        //fprintf(stderr, "[RegisterSpriteAndSyncTransform] ENTRY eid=%lld spriteId=%lld pos=(%f,%f) thread=%zu\n",
+        //    (long long)eid, (long long)sprite.id, pos[0], pos[1],
+        //    (size_t)std::hash<std::thread::id>{}(std::this_thread::get_id()));
+        //fflush(stderr);
+
+        // Register は必ず呼ぶ
+        n_windowscene::instance_winSce().RegisterSprite(eid, sprite);
+
+        // 位置は呼び出し側から受け取るので GetTransformComponent に依存しない
+        bool ok = n_windowscene::instance_winSce().SetSpritePosition(eid, pos);
+        if (!ok) {
+            // retry with sprite.id if API expects that
+            ok = n_windowscene::instance_winSce().SetSpritePosition(sprite.id, pos);
+        }
+        if (!ok) {
+            n_game::instance_game().MarkTransformDirty(eid);
+            printf("[RegisterSpriteAndSyncTransform] fallback: marked dirty eid=%lld\n", (long long)eid);
+        }
+        // printf("[RegisterSpriteAndSyncTransform] eid=%lld pos=(%f,%f) ok=%d\n", (long long)eid, pos[0], pos[1], ok);
+        return;
+    }
+
+    bool HasSpriteComponent(EntityId eid)
+    {
+        return n_compomanager::g_componentManager.HasComponent<n_component::SpriteComponent>(eid);
+    }
+
+
+    std::optional<n_component::SpriteComponent> GetSpriteComponent(EntityId eid) {
+        return n_compomanager::g_componentManager.GetComponent<n_component::SpriteComponent>(eid);
+    }
+
+
+    void InitializeGameThreadId()
+    {
+        bool expected = false;
+        // 既に初期化済みなら上書きしない
+        if (!g_gameThreadIdInitialized.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
+            fprintf(stderr, "[InitializeGameThreadId] WARNING: already initialized saved_hash=%zu addr=%p\n",
+                (size_t)std::hash<std::thread::id>{}(g_gameThreadId), (void*)&g_gameThreadId);
+            fflush(stderr);
+            return;
+        }
+        g_gameThreadId = std::this_thread::get_id();
+        fprintf(stderr, "[InitializeGameThreadId] saved hash=%zu addr=%p\n",
+            (size_t)std::hash<std::thread::id>{}(g_gameThreadId), (void*)&g_gameThreadId);
+        fflush(stderr);
+    }
+
+
+    bool IsGameThread()
+    {
+        //fprintf(stderr, "[DBG] g_gameThreadId current hash=%zu addr=%p\n",
+        //    (size_t)std::hash<std::thread::id>{}(g_gameThreadId), (void*)&g_gameThreadId);
+        //fflush(stderr);
+        if (!g_gameThreadIdInitialized.load(std::memory_order_acquire)) {
+            return false; // 初期化前は false を返す（ログで検出しやすくする）
+        }
+        return std::this_thread::get_id() == g_gameThreadId;
+    }
+
+
+    void EnsureEntityRegistered(EntityId eid) {
+        std::lock_guard<std::mutex> lk(g_entitySetMutex);
+        g_entitySet.insert(eid);
+    }
 
     // 全てのオブジェクトを取得
     std::vector<EntityId> GetAllEntities()
@@ -429,5 +570,4 @@ namespace n_compoapi
         std::lock_guard<std::mutex> lk(g_entitySetMutex);
         return std::vector<EntityId>(g_entitySet.begin(), g_entitySet.end());
     }
-
 }

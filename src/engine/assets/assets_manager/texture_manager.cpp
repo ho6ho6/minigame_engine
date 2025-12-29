@@ -1,7 +1,7 @@
 ﻿/*テクスチャを読み込むために*/
 
 #include "include/assets/assets_manager/texture_manager.hpp"
-#include "include/render.hpp" // DirectX11のデバイス取得用
+#include "include/render.h" // DirectX11のデバイス取得用
 #include <stb_image.h>
 #include <d3d11.h>
 #include <iostream>
@@ -163,8 +163,8 @@ namespace n_texturemanager {
         tex.width = w;
         tex.height = h;
 
-        printf("[TextureManager]Loaded image %s: w=%d h=%d tex.width=%d tex.height=%d\n",
-            filepath.string().c_str(), w, h, tex.width, tex.height);
+        //printf("[TextureManager]Loaded image %s: w=%d h=%d tex.width=%d tex.height=%d\n",
+        //    filepath.string().c_str(), w, h, tex.width, tex.height);
 
         bool ok = CreateGpuTextureFromMemory(data, w, h, tex);
         stbi_image_free(data);

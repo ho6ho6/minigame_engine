@@ -59,7 +59,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20"
 				}
 			],
 			"defines" : 
@@ -99,7 +99,7 @@
 				[
 					1
 				],
-				"standard" : "17"
+				"standard" : "20"
 			},
 			"sourceIndexes" : 
 			[
@@ -131,10 +131,7 @@
 				25,
 				26,
 				27,
-				28,
-				29,
-				30,
-				31
+				28
 			]
 		}
 	],
@@ -224,10 +221,7 @@
 				25,
 				26,
 				27,
-				28,
-				29,
-				30,
-				31
+				28
 			]
 		}
 	],
@@ -261,24 +255,6 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "src/engine/assets/assets_manager/texture_manager.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "src/engine/assets/material.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "src/engine/assets/mesh.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "src/engine/assets/prefab.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

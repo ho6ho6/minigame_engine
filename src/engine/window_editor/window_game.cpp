@@ -1,6 +1,6 @@
 /*シーンウィンドウ*/
-#include "include/window_editor/window_game.hpp"
-#include "include/render.hpp"	//フレームバッファ取得用
+#include "include/window_editor/window_game.h"
+#include "include/render.h"	//フレームバッファ取得用
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
 
 namespace n_windowgame

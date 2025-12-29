@@ -3,9 +3,8 @@
 
 #pragma once
 #include <imgui.h>
-#include "window_base.hpp"
+#include "window_base.h"
 // パスを修正: assets_manager ディレクトリが include 配下にある場合
-#include "include/assets/assets_manager/texture_manager.hpp"
 
 namespace n_windowassets
 {

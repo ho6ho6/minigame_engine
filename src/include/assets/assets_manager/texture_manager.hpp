@@ -15,7 +15,7 @@
 #include <mutex>
 #include <atomic>
 
-#include "include/assets/texture.hpp"
+#include "include/assets/texture.h"
 
 namespace n_texturemanager
 {

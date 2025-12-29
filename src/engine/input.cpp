@@ -1,10 +1,7 @@
-/********************************************
- *input::Update, IsKeyDown, マウス処理の定義*
- ********************************************/
-
-#include "include/input.hpp"
-#include "include/game.hpp"
-#include "include/component/component_api.hpp"
+#include "include/input.h"
+#include "include/game.h"
+#include "include/component/component_api.h"
+#include "include/component/componentDefaults.h"
 #include <Windows.h>
 #include <unordered_map>
 #include <include/component/component_manager.hpp>
@@ -13,75 +10,78 @@ static std::unordered_map<int64_t, bool> s_wasJumpPressed;
  /*入力*/
 namespace n_input
 {
-    void UpdateInputAndJumpForAll() {
-        for (int64_t entityId : n_compoapi::GetAllEntities()) {
-            auto mcOpt = n_compoapi::GetMoveComponent(entityId);
-            if (!mcOpt) continue;
-            auto mc = *mcOpt; // コピー
-
-            if (mc.jumpKey < 0) {
-                s_wasJumpPressed.erase(entityId);
-                continue;
-            }
-
-            SHORT state = GetAsyncKeyState(mc.jumpKey);
-            bool isDown = (state & 0x8000) != 0;
-            bool wasDown = s_wasJumpPressed[entityId];
-
-            if (isDown && !wasDown) {
-                if (n_game::instance_game().IsGrounded(entityId)) {
-                    // 高さ方式を採るなら:
-                    n_game::instance_game().ApplyJumpImpulse(entityId, mc.jump);
-
-                    // もし MoveComponent 側に何か状態を残す必要があれば更新する
-                    // 例: mc.lastJumpTime = currentTime;
-                    // n_compoapi::SetMoveComponent(entityId, mc);
-                }
-            }
-            s_wasJumpPressed[entityId] = isDown;
-        }
-    }
-
-    void PhysicsStep(float dt)
+    void PollPlayerInputAndEnqueue(int64_t eid)
     {
-        // dt が極端に大きい/小さいと不安定になるので必要なら clamp する
-        if (dt <= 0.0f) return;
-        const float maxDt = 0.05f;
-        if (dt > maxDt) dt = maxDt;
+        // プレイヤーかどうか
+        if (!n_compomanager::g_componentManager.HasComponent<n_component::IsPlayerComponent>(eid)) return;
+        
+        // MoveComponentを取得
+        auto mvOpt = n_compoapi::GetMoveComponent(eid);
+        if (!mvOpt) return;
+        n_component::MoveComponent mc = *mvOpt;
 
-        for (int64_t entityId : n_compoapi::GetAllEntities()) {
-            auto rbOpt = n_compoapi::GetRigidbodyComponent(entityId);
-            if (!rbOpt) continue;
-            auto rb = *rbOpt; // コピーして編集
+        // ImGui 入力状態を参照
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.WantCaptureKeyboard) return;
 
-            // 1) 速度に重力を適用（gravity は負の値を想定）
-            rb.gravity += rb.gravity * dt;
+        Vec2 dir{ 0.0f, 0.0f };
 
-            // 2) Transform を取得して位置を速度で更新
-            auto tOpt = n_compoapi::GetTransformComponent(entityId);
-            if (!tOpt) {
-                // Transform が無ければ Rigidbody の変更だけ保存して次へ
-                n_compoapi::SetRigidbodyComponent(entityId, rb);
-                continue;
-            }
+        // 方向Keyの受付
+        if (mc.directionLeftKey != ImGuiKey_None && ImGui::IsKeyDown(mc.directionLeftKey)) dir[0] -= 1.0f;
+        if (mc.directionRightKey != ImGuiKey_None && ImGui::IsKeyDown(mc.directionRightKey)) dir[0] += 1.0f;
+        if (mc.directionUpKey != ImGuiKey_None && ImGui::IsKeyDown(mc.directionUpKey)) dir[1] -= 1.0f;
+        if (mc.directionDownKey != ImGuiKey_None && ImGui::IsKeyDown(mc.directionDownKey)) dir[1] += 1.0f;
 
-            auto t = *tOpt; // コピー
-            t.position[1] += rb.gravity * dt; // Y 成分を更新
-
-            // 3) 簡易床判定（y <= 0 を床とする）
-            if (t.position[1] <= 0.0f) {
-                t.position[1] = 0.0f;
-                rb.gravity = 0.0f;
-                rb.isGround = true;
-            }
-            else {
-                rb.isGround = false;
-            }
-
-            // 4) 変更を永続化
-            n_compoapi::SetTransformComponent(entityId, t);
-            n_compoapi::SetRigidbodyComponent(entityId, rb);
+        // 正規化
+        float len2 = dir[0] * dir[0] + dir[1] * dir[1];
+        if (len2 > 1e-8f) 
+        { 
+            float inv = 1.0f / std::sqrt(len2);
+            mc.direction[0] = dir[0] * inv;
+            mc.direction[1] = dir[1] * inv;
         }
+        else 
+        { 
+            mc.direction[0] = 0.0f;
+            mc.direction[1] = 0.0f;
+        }
+
+        // Key押下フレームの検出
+        // ジャンプ（押下フレーム）
+        bool jumpPressed = (mc.jumpKey != ImGuiKey_None) && ImGui::IsKeyPressed(mc.jumpKey, false);
+        if (jumpPressed)
+        { 
+            mc.jump = 1.0f; // 値の意味は MoveSystem 側で解釈（例：初速倍率) 
+        }
+
+        // 変化判定：前回の MoveComponent と差分があるときだけ送る
+        const float EPS = 1e-4f; //仮の値　今後どう変わるかは挙動を見てゲームに適した値に変更する
+        bool dirChanged = (std::fabs(mc.direction[0] - mvOpt->direction[0]) > EPS ||
+                           std::fabs(mc.direction[1] - mvOpt->direction[1]) > EPS);
+        bool jumpChanged = (jumpPressed && mvOpt->jump == 0.0f);
+
+        // 変化なし
+        if (!dirChanged && !jumpChanged) return;
+
+        // 変化があればゲームスレッドへ反映
+        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid, mc]() {
+            // ゲームスレッドで最新の MoveComponent を取得上書き
+            if (auto curOpt = n_compoapi::GetMoveComponent(eid)) {
+                auto cur = *curOpt;
+                cur.direction[0] = mc.direction[0];
+                cur.direction[1] = mc.direction[1];
+                // jump は要求フラグなので上書き
+                if (mc.jump > 0.0f) cur.jump = mc.jump;
+                n_compoapi::SetMoveComponent(eid, cur);
+            }
+            else
+            {
+                // 万が一 MoveComponent が消えてたら付けなおす
+                n_compoapi::SetMoveComponent(eid, mc);
+            }
+        });
+
     }
+
 
 } // namespace Input

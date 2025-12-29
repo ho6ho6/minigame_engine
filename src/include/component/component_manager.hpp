@@ -5,7 +5,7 @@
 #include <bitset>
 #include <mutex>
 #include <optional>
-#include "include/component/componentDefaults.hpp" // n_component::MoveComponent, TransformComponent, etc.
+#include "include/component/componentDefaults.h" // n_component::MoveComponent, TransformComponent, etc.
 #include <type_traits>
 
 namespace n_compomanager
@@ -26,11 +26,18 @@ namespace n_compomanager
         Start = 4,
         Finish = 5,
         IsPlayer = 6,
-        Sprite = 7
+        Sprite = 7,
         // ここに追加していく
     };
 
-    template<typename T> struct ComponentTypeId;
+    // 先頭付近に追加（既に type_traits を include しているのでそのまま使えます）
+    template<typename T>
+    using remove_cvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
+
+    // 主テンプレート 特殊化がない時->エラーを出す
+    template<typename T>
+    struct ComponentTypeId;
 
     template<> struct ComponentTypeId<n_component::TransformComponent> { static constexpr ComponentId value = ComponentId::Transform; };
     template<> struct ComponentTypeId<n_component::MoveComponent>      { static constexpr ComponentId value = ComponentId::Move; };
@@ -47,9 +54,20 @@ namespace n_compomanager
         // コンポーネントがアタッチされているか
         bool HasComponent(EntityId eid, ComponentId cid) const;
         template<typename T>
-        bool HasComponent(EntityId eid) const {
-            return HasComponent(eid, ComponentTypeId<T>::value);
+            requires requires {
+                { ComponentTypeId<std::remove_cvref_t<T>>::value };
         }
+        bool HasComponent(EntityId eid) const {
+            using U = remove_cvref_t<T>;
+            static_assert(
+                requires { ComponentTypeId<U>::value; },
+            "ComponentTypeId<T> is not registered. Use n_component::XXXComponent."
+                );
+            return HasComponent(eid, ComponentTypeId<U>::value);
+        }
+        //bool HasComponent(EntityId eid) const {
+        //    return HasComponent(eid, ComponentTypeId<T>::value);
+        //}
 
         // 追加と削除
         template<typename T>
@@ -164,24 +182,29 @@ namespace n_compomanager
     // --- テンプレート本体実装（Add/Remove/Get/Set） ---
     template<typename T>
     inline void ComponentManager::AddComponent(EntityId eid, const T& comp) {
+        using U = remove_cvref_t<T>;
         std::lock_guard<std::mutex> lk(storageMutex_);
-        getMapForType<T>()[eid] = comp;
+        getMapForType<U>()[eid] = comp;
         std::lock_guard<std::mutex> lk2(masksMutex_);
-        masks_[eid].set(static_cast<size_t>(ComponentTypeId<T>::value));
+        using Under = std::underlying_type_t<ComponentId>;
+        masks_[eid].set(static_cast<size_t>(static_cast<Under>(ComponentTypeId<U>::value)));
     }
 
     template<typename T>
     inline void ComponentManager::RemoveComponent(EntityId eid) {
+        using U = remove_cvref_t<T>;
         std::lock_guard<std::mutex> lk(storageMutex_);
-        getMapForType<T>().erase(eid);
+        getMapForType<U>().erase(eid);
         std::lock_guard<std::mutex> lk2(masksMutex_);
-        masks_[eid].reset(static_cast<size_t>(ComponentTypeId<T>::value));
+        using Under = std::underlying_type_t<ComponentId>;
+        masks_[eid].reset(static_cast<size_t>(static_cast<Under>(ComponentTypeId<U>::value)));
     }
 
     template<typename T>
     inline std::optional<T> ComponentManager::GetComponent(EntityId eid) const {
+        using U = remove_cvref_t<T>;
         std::lock_guard<std::mutex> lk(storageMutex_);
-        const auto& m = getMapForType<T>();
+        const auto& m = getMapForType<U>();
         auto it = m.find(eid);
         if (it == m.end()) return std::nullopt;
         return it->second;
@@ -189,9 +212,11 @@ namespace n_compomanager
 
     template<typename T>
     inline void ComponentManager::SetComponent(EntityId eid, const T& comp) {
+        using U = remove_cvref_t<T>;
         std::lock_guard<std::mutex> lk(storageMutex_);
-        getMapForType<T>()[eid] = comp;
+        getMapForType<U>()[eid] = comp;
         std::lock_guard<std::mutex> lk2(masksMutex_);
-        masks_[eid].set(static_cast<size_t>(ComponentTypeId<T>::value));
+        using Under = std::underlying_type_t<ComponentId>;
+        masks_[eid].set(static_cast<size_t>(static_cast<Under>(ComponentTypeId<U>::value)));
     }
 }

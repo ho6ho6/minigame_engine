@@ -1,4 +1,5 @@
-#include "include/component/component_keycapture.hpp"
+ï»¿#include "include/component/component_keycapture.h"
+#include "include/component/component_config.hpp"
 #include <imgui.h>
 #include <unordered_map>
 #include <mutex>
@@ -7,7 +8,7 @@
 
 const char* GetKeyName(int key)
 {
-    // ‚Ü‚¸‚æ‚­g‚¤ VK ‚ğƒn[ƒhƒR[ƒh‚Åˆ—
+    // ã¾ãšã‚ˆãä½¿ã† VK ã‚’ãƒãƒ¼ãƒ‰ã‚³ãƒ¼ãƒ‰ã§å‡¦ç†
     switch (key) {
     case VK_SPACE:   return "Space";
     case VK_LEFT:    return "Left";
@@ -20,10 +21,10 @@ const char* GetKeyName(int key)
     case VK_SHIFT:   return "Shift";
     case VK_CONTROL: return "Ctrl";
     case VK_MENU:    return "Alt";
-        // •K—v‚È‚ç VK_F1..VK_F12, VK_NUMPAD0.. “™‚ğ’Ç‰Á
+        // å¿…è¦ãªã‚‰ VK_F1..VK_F12, VK_NUMPAD0.. ç­‰ã‚’è¿½åŠ 
     }
 
-    // ‰p‘å•¶š A..Z ‚Í‚»‚Ì‚Ü‚Ü•\¦
+    // è‹±å¤§æ–‡å­— A..Z ã¯ãã®ã¾ã¾è¡¨ç¤º
     if (key >= 'A' && key <= 'Z') {
         thread_local char buf[2];
         buf[0] = static_cast<char>(key);
@@ -31,7 +32,7 @@ const char* GetKeyName(int key)
         return buf;
     }
 
-    // ”š 0..9iASCIIj
+    // æ•°å­— 0..9ï¼ˆASCIIï¼‰
     if (key >= '0' && key <= '9') {
         thread_local char buf[2];
         buf[0] = static_cast<char>(key);
@@ -39,11 +40,11 @@ const char* GetKeyName(int key)
         return buf;
     }
 
-    // ‚»‚êˆÈŠO‚Íƒ}ƒbƒv‚Å•âŠ®i•K—v‚É‰‚¶‚ÄŠg’£j
+    // ãã‚Œä»¥å¤–ã¯ãƒãƒƒãƒ—ã§è£œå®Œï¼ˆå¿…è¦ã«å¿œã˜ã¦æ‹¡å¼µï¼‰
     static const std::unordered_map<int, const char*> extra = {
         { VK_OEM_1, ";" }, { VK_OEM_PLUS, "+" }, { VK_OEM_COMMA, "," },
         { VK_OEM_MINUS, "-" }, { VK_OEM_PERIOD, "." }, { VK_OEM_2, "/" },
-        // ’Ç‰Á: VK_OEM_3, VK_OEM_4..VK_OEM_8 ‚È‚Ç
+        // è¿½åŠ : VK_OEM_3, VK_OEM_4..VK_OEM_8 ãªã©
     };
     auto it = extra.find(key);
     if (it != extra.end()) return it->second;
@@ -51,31 +52,23 @@ const char* GetKeyName(int key)
     return "Unknown";
 }
 
-// ƒLƒƒƒvƒ`ƒƒó‘Ô
-struct KeyCaptureState
-{
-    bool open = false;
-    int64_t entityId = -1;
-    std::string purpose;
-    std::function<void(int)> callback;
-    // ƒIƒvƒVƒ‡ƒ“: ƒ^ƒCƒ€ƒAƒEƒg‚âƒLƒƒƒ“ƒZƒ‹—pƒtƒ‰ƒO
-};
 
-static int DetectVKKeyPressed() {
-    for (int vk = 1; vk <= 0xFE; ++vk) {
-        SHORT state = GetAsyncKeyState(vk);
-        if (state & 0x8000) { // ‚ˆÊƒrƒbƒg‚ª—§‚Á‚Ä‚¢‚ê‚Î‰Ÿ‰º’†
-            return vk;
-        }
-    }
-    return 0;
+
+static ImGuiKey DetectImGuiKeyPressed() {
+    ImGuiIO& io = ImGui::GetIO(); // ImGuiKey_NamedKey_BEGIN ã€œ ImGuiKey_COUNT ã®ç¯„å›²ã‚’èµ°æŸ» 
+    for (int k = (int)ImGuiKey_NamedKey_BEGIN; k < (int)ImGuiKey_COUNT; ++k) 
+    { 
+        ImGuiKey key = (ImGuiKey)k; 
+        if (ImGui::IsKeyDown(key)) return key;
+    } 
+    return ImGuiKey_None;
 }
 
 static KeyCaptureState g_keyCapture;
 static std::mutex g_keyCaptureMutex;
 
-// Start capture: İ’è‚µ‚Äƒ‚[ƒ_ƒ‹‚ğŠJ‚­
-void StartKeyCaptureFor(int64_t entityId, const char* purpose, std::function<void(int)> callback)
+// Start capture: è¨­å®šã—ã¦ãƒ¢ãƒ¼ãƒ€ãƒ«ã‚’é–‹ã
+void StartKeyCaptureFor(int64_t entityId, const char* purpose, std::function<void(ImGuiKey)> callback)
 {
     {
         std::lock_guard<std::mutex> lk(g_keyCaptureMutex);
@@ -83,22 +76,13 @@ void StartKeyCaptureFor(int64_t entityId, const char* purpose, std::function<voi
         g_keyCapture.entityId = entityId;
         g_keyCapture.purpose = purpose ? purpose : "";
         g_keyCapture.callback = std::move(callback);
-    } // ‚±‚±‚Åƒ~ƒ…[ƒeƒbƒNƒX‚Í‰ğ•ú
+    } // ã“ã“ã§ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã¯è§£æ”¾
 
-    // ImGui ŒÄ‚Ño‚µ‚ÍƒƒbƒNŠO‚Ås‚¤
+    // ImGui å‘¼ã³å‡ºã—ã¯ãƒ­ãƒƒã‚¯å¤–ã§è¡Œã†
     ImGui::OpenPopup("Key Capture");
 }
 
-// ImGuiKey ‚ğ•Ô‚·iŒ©‚Â‚©‚ç‚È‚¯‚ê‚Î ImGuiKey_Nonej
-//int DetectImGuiKeyPressed() {
-//    for (int k = 0; k < ImGuiKey_COUNT; ++k) {
-//        ImGuiKey key = static_cast<ImGuiKey>(k);
-//        if (ImGui::IsKeyPressed(key, false)) return k;
-//    }
-//    return ImGuiKey_None;
-//}
-
-// UI ƒXƒŒƒbƒh‚Å–ˆƒtƒŒ[ƒ€ŒÄ‚ÔBƒL[“ü—ÍŒŸo‚ÆƒR[ƒ‹ƒoƒbƒNŒÄ‚Ño‚µ‚ğs‚¤B
+// UI ã‚¹ãƒ¬ãƒƒãƒ‰ã§æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã¶ã€‚ã‚­ãƒ¼å…¥åŠ›æ¤œå‡ºã¨ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯å‘¼ã³å‡ºã—ã‚’è¡Œã†ã€‚
 void RenderKeyCaptureModal()
 {
     {
@@ -111,28 +95,28 @@ void RenderKeyCaptureModal()
         ImGui::Separator();
         ImGui::Text("Press Esc to cancel.");
 
-        int detected = DetectVKKeyPressed(); // ‚Ü‚½‚Í ImGui ŒŸo”Å
+        ImGuiKey detected = DetectImGuiKeyPressed(); // ã¾ãŸã¯ ImGui æ¤œå‡ºç‰ˆ
 
-        const char* cur = detected ? GetKeyName(detected) : "None";
+        const char* cur = (detected != ImGuiKey_None) ? GetImGuiKeyNameSafe(detected) : "None";
         ImGui::Text("Current: %s (0x%02X)", cur, detected);
 
         if (detected != 0)
         {
-            std::function<void(int)> cb;
+            std::function<void(ImGuiKey)> cb;
             {
                 std::lock_guard<std::mutex> lk(g_keyCaptureMutex);
-                cb = std::move(g_keyCapture.callback); // ƒR[ƒ‹ƒoƒbƒN‚ğæ‚èo‚·
+                cb = std::move(g_keyCapture.callback); // ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’å–ã‚Šå‡ºã™
                 g_keyCapture.open = false;
                 g_keyCapture.entityId = -1;
                 g_keyCapture.purpose.clear();
-            } // ƒ~ƒ…[ƒeƒbƒNƒX‰ğ•ú
+            } // ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹è§£æ”¾
 
-            ImGui::CloseCurrentPopup(); // ImGui ŒÄ‚Ño‚µ‚ÍƒƒbƒNŠO
-            if (cb) cb(detected);       // ƒR[ƒ‹ƒoƒbƒN‚ÍƒƒbƒNŠO‚ÅŒÄ‚Ô
+            ImGui::CloseCurrentPopup(); // ImGui å‘¼ã³å‡ºã—ã¯ãƒ­ãƒƒã‚¯å¤–
+            if (cb) cb(detected);       // ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã¯ãƒ­ãƒƒã‚¯å¤–ã§å‘¼ã¶
         }
 
         if (ImGui::Button("Cancel")) {
-            std::function<void(int)> cb;
+            std::function<void(ImGuiKey)> cb;
             {
                 std::lock_guard<std::mutex> lk(g_keyCaptureMutex);
                 g_keyCapture.open = false;
@@ -141,7 +125,7 @@ void RenderKeyCaptureModal()
                 g_keyCapture.purpose.clear();
             }
             ImGui::CloseCurrentPopup();
-            // ’ÊíƒLƒƒƒ“ƒZƒ‹‚ÍƒR[ƒ‹ƒoƒbƒN‚ğŒÄ‚Î‚È‚¢‚ªA•K—v‚È‚ç‚±‚±‚ÅŒÄ‚ÔiƒƒbƒNŠOj
+            // é€šå¸¸ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚ã¯ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’å‘¼ã°ãªã„ãŒã€å¿…è¦ãªã‚‰ã“ã“ã§å‘¼ã¶ï¼ˆãƒ­ãƒƒã‚¯å¤–ï¼‰
         }
 
         ImGui::EndPopup();

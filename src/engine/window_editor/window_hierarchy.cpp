@@ -1,9 +1,12 @@
-#include "include/window_editor/window_hierarchy.hpp"
-#include "include/window_editor/window_editor.hpp"
-#include "include/render.hpp"	//フレームバッファ取得用
-#include "include/game.hpp"
-#include "include/component/component_api.hpp"
-#include "include/component/component_keycapture.hpp"
+#include "include/window_editor/window_hierarchy.h"
+#include "include/window_editor/window_editor.h"
+#include "include/window_editor/window_scene.h"
+#include "include/assets/assets_manager/assets_manager.h"
+#include "include/component/componentDefaults.h"
+#include "include/render.h"	//フレームバッファ取得用
+#include "include/game.h"
+#include "include/component/component_api.h"
+#include "include/component/component_keycapture.h"
 #include "include/component/component_config.hpp"
 #include "include/component/component_manager.hpp"
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
@@ -30,6 +33,8 @@ namespace n_windowhierarchy
         return inst;
     }
 
+
+
 	// Sceneからオブジェクトを取得
     void window_hierarchy::GetObjFromScene(const SceneToHierarchyObj& Obj)
     {
@@ -51,6 +56,7 @@ namespace n_windowhierarchy
     }
 
 
+
     void window_hierarchy::RegisterSprite(int64_t entityId, int64_t spriteId) {
         std::lock_guard<std::mutex> lk(g_registryMutex);
         g_entityToSprite[entityId] = spriteId;
@@ -68,6 +74,22 @@ namespace n_windowhierarchy
         return it->second;
     }
 
+
+
+
+    void window_hierarchy::OnHierarchyAdd(int64_t entityId, const n_component::SpriteComponent& sc)
+    {
+        SceneSprite s;
+        s.id = sc.spriteId;
+        s.pos_x = 0.0f;
+        s.pos_y = 0.0f;
+        s.selected = sc.visible;
+        n_windowscene::instance_winSce().RegisterSprite(entityId, s);
+        printf("[ui] OnHierarchyAdd entity=%lld spriteAsset=%lld\n", (long long)entityId, (long long)sc.spriteId);
+
+        // 本登録はゲームスレッドへ（sc をコピーキャプチャ）
+        n_gamecomponent::instance_gameFunctions().AddComponentSprite(entityId, sc);
+    }
 
     static void RebuildCache()
     {
@@ -122,7 +144,18 @@ namespace n_windowhierarchy
         g_cacheValid = false;
     }
 
+    void LoadInspectorForEntity(EntityId eid)
+    {
+        if (eid < 0)
+        {
+            // Inspectorをクリア
+            g_selectedEntity = -1;
+            return;
+        }
 
+        auto t = n_compoapi::GetTransformComponent(eid);
+        auto m = n_compoapi::GetMoveComponent(eid);
+    }
 
 
     void window_hierarchy::Render()
@@ -172,15 +205,44 @@ namespace n_windowhierarchy
 			localObjs = g_SceneToHierarchyObjs;
         }
 
+        // まず「一度だけ登録」処理を行う（元データを書き換える必要がある）
+        {
+            std::lock_guard<std::mutex> lock(g_SceneToHierarchyMutex);
+            for (auto& objRef : g_SceneToHierarchyObjs) {
+                if (!objRef.registered) {
+                    // 既にゲーム側や registry に登録されていないか二重チェック
+                    if (!n_compoapi::HasSpriteComponent(objRef.id) &&
+                        !window_hierarchy::GetSpriteIdForEntity(objRef.id).has_value()) {
+                        n_component::SpriteComponent sc;
+                        sc.spriteId = objRef.id;      // 必要なら別の asset id を設定
+                        sc.visible = objRef.selected;
+                        OnHierarchyAdd(objRef.id, sc); // 一度だけ呼ぶ
+                    }
+                    objRef.registered = true; // フラグを立てる（以降呼ばない）
+                }
+            }
+            // 更新した g_SceneToHierarchyObjs を localObjs に反映しておく（描画で使うため）
+            localObjs = g_SceneToHierarchyObjs;
+        }
+
+
         for (const auto& obj : localObjs)
         {
 			ImGui::PushID((int64_t)obj.id);
-			bool selected = obj.selected;
+            bool isSelected = (g_selectedEntity == obj.id);
 
-            if (ImGui::Selectable(obj.name.c_str(), &selected))
+            if (ImGui::Selectable(obj.name.c_str(), isSelected))
             {
-                // オブジェクトが選択されたときの処理
-                // obj.selected = selected;
+                // クリックで選択を切り替える（単一選択）
+                if (g_selectedEntity != obj.id) {
+                    g_selectedEntity = obj.id;
+                    // Inspector を即時更新する処理をここで呼ぶ（関数化しておくと良い）
+                    LoadInspectorForEntity(obj.id);
+                }
+                else {
+                    g_selectedEntity = -1;
+                    LoadInspectorForEntity(-1); // または ClearInspector()
+                }
             }
 
             if (ImGui::BeginPopupContextItem())

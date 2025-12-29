@@ -4,10 +4,14 @@
 #pragma once
 #include <cstdint>
 #include <optional>
-#include "include/component/componentDefaults.hpp"
+#include "include/component/componentDefaults.h"
 #include "include/component/component_manager.hpp"
+#include "include/window_editor/window_scene_sprite.h"
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
+#include <thread>
+#include <mutex>
 /*n_compomanager::EntityId は Int64_t型のID */
 
 using EntityId = n_compomanager::EntityId;
@@ -17,34 +21,81 @@ extern EntityId g_selectedEntity;
 extern bool g_moveConfigOpen;
 extern EntityId g_moveConfigEntity;
 
+static std::mutex g_moveMutex;
+static std::unordered_map<EntityId, n_component::MoveComponent> g_moveStore;
+static std::unordered_map<EntityId, n_component::MoveComponent> g_prevMoveStore; // 補間用
+static std::unordered_set<EntityId> g_dirtyMove;
+
 // transform
 extern bool g_transformConfigOpen;
 extern EntityId g_transformConfigEntity;
+// グローバル／静的（ヘッダ側）
+static std::mutex g_transformMutex;
+static std::unordered_map<EntityId, n_component::TransformComponent> g_transformStore;
+static std::unordered_map<EntityId, n_component::TransformComponent> g_prevTransformStore; // 補間用
+static std::mutex g_dirtyMutex;
+extern std::unordered_set<EntityId> g_dirtyTransforms;
 
 // isplayer
 extern bool g_isplayerConfigOpen;
 extern EntityId g_isplayerConfigEntity;
 
+static std::mutex g_isplayerMutex;
+static std::unordered_map<EntityId, n_component::IsPlayerComponent> g_isplayerStore;
+static std::unordered_map<EntityId, n_component::IsPlayerComponent> g_prevIsPlayerStore; // 補間用
+static std::unordered_set<EntityId> g_dirtyIsPlayer;
+
 // rigidbody
 extern bool g_rigidbodyConfigOpen;
 extern EntityId g_rigidbodyConfigEntity;
+
+static std::mutex g_rigidbodyMutex;
+static std::unordered_map<EntityId, n_component::RigidbodyComponent> g_rigidbodyStore;
+static std::unordered_map<EntityId, n_component::RigidbodyComponent> g_prevRigidbodyStore; // 補間用
+static std::unordered_set<EntityId> g_dirtyRigidbody;
 
 // start
 extern bool g_startConfigOpen;
 extern EntityId g_startConfigEntity;
 
+static std::mutex g_startMutex;
+static std::unordered_map<EntityId, n_component::StartComponent> g_startStore;
+static std::unordered_map<EntityId, n_component::StartComponent> g_prevStartStore; // 補間用
+static std::unordered_set<EntityId> g_dirtyStart;
+
 // finish
 extern bool g_finishConfigOpen;
 extern EntityId g_finishConfigEntity;
+
+static std::mutex g_finishMutex;
+static std::unordered_map<EntityId, n_component::FinishComponent> g_finishStore;
+static std::unordered_map<EntityId, n_component::FinishComponent> g_prevFinishStore; // 補間用
+static std::unordered_set<EntityId> g_dirtyFinish;
 
 // light
 extern bool g_lightConfigOpen;
 extern EntityId g_lightConfigEntity;
 
+static std::mutex g_lightMutex;
+static std::unordered_map<EntityId, n_component::LightComponent> g_lightStore;
+static std::unordered_map<EntityId, n_component::LightComponent> g_prevlightStore; // 補間用
+static std::unordered_set<EntityId> g_dirtyLight;
+
+// sprite
+extern bool g_spriteConfigOpen;
+extern EntityId g_spriteConfigEntity;
+
 // 選択判定
 extern std::unordered_set<EntityId> g_entitySet;
 extern std::mutex g_entitySetMutex;
 
+// Transformの同期
+extern std::mutex g_dirtyMutex;
+extern std::unordered_set<EntityId> g_dirtyTransforms;
+
+// gamethreadIDに保存
+static std::thread::id g_gameThreadId;
+static std::atomic<bool> g_gameThreadIdInitialized{ false };
 
 namespace n_compoapi
 {
@@ -55,6 +106,9 @@ namespace n_compoapi
     bool HasTransformComponent(EntityId eid) noexcept;
     std::optional<n_component::TransformComponent> GetTransformComponent(EntityId eid);
     void SetTransformComponent(EntityId eid, const n_component::TransformComponent& t);
+    //  SetTransformComponentのヘルプ関数
+    void SetTransformComponentImpl(EntityId eid, const n_component::TransformComponent& t);
+
     void AddTransformComponent(EntityId eid);
     void RemoveTransformComponent(EntityId eid);
     void OpenTransformConfigFor(EntityId eid);
@@ -83,7 +137,7 @@ namespace n_compoapi
     void RemoveRigidbodyComponent(EntityId eid); // typo fixed
     void OpenRigidbodyConfigFor(EntityId eid);
 
-    // Start / Finish (タグ系)
+    // Start (タグ系)
     bool HasStartComponent(EntityId eid);
     std::optional<n_component::StartComponent> GetStartComponent(EntityId eid);
     void SetStartComponent(EntityId eid, const n_component::StartComponent& s);
@@ -91,6 +145,7 @@ namespace n_compoapi
     void RemoveStartComponent(EntityId eid);
     void OpenStartConfigFor(EntityId eid);
 
+    // Finish
     bool HasFinishComponent(EntityId eid);
     std::optional<n_component::FinishComponent> GetFinishComponent(EntityId eid);
     void SetFinishComponent(EntityId eid, const n_component::FinishComponent& f);
@@ -106,19 +161,29 @@ namespace n_compoapi
     void RemoveLightComponent(EntityId eid);
     void OpenLightConfigFor(EntityId eid);
 
+
+    // Sprite コンポーネント
+    bool HasSpriteComponent(EntityId eid);
+    std::optional<n_component::SpriteComponent> GetSpriteComponent(EntityId eid);
+
+
+    // sceneに配置されたSpriteの座標をTransformに反映させる
+    void RegisterSpriteAndSyncTransform(EntityId eid, const SceneSprite& sprite, const std::array<float, 2>& pos);
+
     // その他
     std::vector<EntityId> GetAllEntities();
 
     // 既にヘッダで安全に呼べる簡易ラッパー（例）
-    inline std::optional<n_component::SpriteComponent> GetSpriteComponent(EntityId eid) {
-        return n_compomanager::g_componentManager.GetComponent<n_component::SpriteComponent>(eid);
-    }
+    bool HasSpriteComponent(EntityId eid);
+    
+    std::optional<n_component::SpriteComponent> GetSpriteComponent(EntityId eid);
+
+    void InitializeGameThreadId();
+
+    bool IsGameThread();
 
     // どの AddXComponent でも共通に呼べるヘルパ
-    inline void EnsureEntityRegistered(EntityId eid) {
-        std::lock_guard<std::mutex> lk(g_entitySetMutex);
-        g_entitySet.insert(eid);
-    }
+    void EnsureEntityRegistered(EntityId eid);
 }
 
 #endif // !COMPO_API

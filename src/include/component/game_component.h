@@ -1,8 +1,8 @@
 #ifndef GAME_COMPO
 #define GAME_COMPO
 
-#include "include/window_editor/window_scene_sprite.hpp"
-#include "include/component/componentDefaults.hpp"
+#include "include/window_editor/window_scene_sprite.h"
+#include "include/component/componentDefaults.h"
 
 #include <array>
 #include <unordered_map>
@@ -32,7 +32,7 @@ namespace n_gamecomponent
 		void AddComponentFinish(int64_t id);
 		void AddComponentDelete(int64_t id);
 		void AddComponentIsPlayer(int64_t playerId);
-		void AddComponentSprite(int64_t id);
+		void AddComponentSprite(int64_t id, const n_component::SpriteComponent& sp);
 
 		// ÉwÉãÉpÅ[
 		void EnqueueGameCommand(GameCommand cmd);

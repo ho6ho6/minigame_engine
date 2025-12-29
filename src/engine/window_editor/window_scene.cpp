@@ -1,10 +1,12 @@
 ﻿/*シーンウィンドウ*/
-#include "include/window_editor/window_scene.hpp"
-#include "include/window_editor/window_scene_sprite.hpp"
-#include "include/render.hpp"	//フレームバッファ取得用
-#include "include/assets/texture.hpp"
+#include "include/window_editor/window_scene.h"
+#include "include/window_editor/window_scene_sprite.h"
+#include "include/render.h"	//フレームバッファ取得用
+#include "include/assets/texture.h"
 #include "include/assets/assets_manager/texture_manager.hpp"
-#include "include/window_editor/window_hierarchy.hpp"
+#include "include/window_editor/window_hierarchy.h"
+#include "include/component/component_api.h"
+#include "include/component/game_component.h"
 #include "imgui.h"  //ImGui本体
 #include <stdio.h>
 #include <string>
@@ -33,9 +35,10 @@
 static ImVec2 ViewOffset = ImVec2(0.0f, 0.0f);
 static uint64_t g_NextSpriteId = 1; // ユニークID生成用カウンタ
 std::unordered_map<int64_t, SceneSprite> sprites;
+std::mutex spriteMutex;
 
 /* 当たり判定/選択/ドラッグは、ScreenToSceneを使用*/
-ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOffset)
+ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& ViewOffset, const ImVec2& contentSize)
 {
     ImGuiIO& io = ImGui::GetIO();
     // content 内のローカル座標(screen->content左上基準)
@@ -43,13 +46,11 @@ ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOf
 
     // scene 論理ピクセル座標に変換  FramebufferScale を考慮
     ImVec2 localLogical = ImVec2(local.x / io.DisplayFramebufferScale.x,
-        local.y / io.DisplayFramebufferScale.y);
+                                 local.y / io.DisplayFramebufferScale.y);
 
-    //ViewOffset を論理ピクセルで管理して加算 = scene座標
-    ImVec2 scenePos = ImVec2(localLogical.x + viewOffset.x, // これで正しい
-        localLogical.y + viewOffset.y);
-
-    return scenePos;
+    // 左上原点のワールド座標（ViewOffset は左上基準のパン）
+    ImVec2 world = ImVec2(localLogical.x + ViewOffset.x, localLogical.y + ViewOffset.y);
+    return world;
 }
 
 namespace n_windowscene
@@ -117,10 +118,10 @@ namespace n_windowscene
         ImVec2 mouseScreen = ImGui::GetMousePos();
         ImDrawList* draw = ImGui::GetWindowDrawList();
 
-        ImVec2 mouseScene = ScreenToScene(mouseScreen, contentPos, ViewOffset);    // シーン座標に変換
+        ImVec2 mouseScene = ScreenToScene(mouseScreen, contentPos, ViewOffset, contentSize);    // シーン座標に変換
 
         //### デバック
-
+        
         // SRV (D3D11) からテクスチャサイズを取得
         int texW = 0, texH = 0;
         {
@@ -164,7 +165,7 @@ namespace n_windowscene
             contentPos.y + (mappedTexY / (float)texH) * contentSize.y);
         draw->AddLine(ImVec2(mappedOnImage.x - 8, mappedOnImage.y), ImVec2(mappedOnImage.x + 8, mappedOnImage.y), IM_COL32(0, 255, 0, 200), 2.0f);
         draw->AddLine(ImVec2(mappedOnImage.x, mappedOnImage.y - 8), ImVec2(mappedOnImage.x, mappedOnImage.y + 8), IM_COL32(0, 255, 0, 200), 2.0f);
-
+        
         //###
 
 
@@ -261,15 +262,17 @@ namespace n_windowscene
         }
 
         //mouseScreen = ImGui::GetMousePos(); // 再取得
-        mouseScene = ScreenToScene(mouseScreen, contentPos, ViewOffset);    // シーン座標に変換
+        mouseScene = ScreenToScene(mouseScreen, contentPos, ViewOffset, contentSize);    // シーン座標に変換
 
         // ヒット領域内か -> クリックがUIのその領域内で発生したかどうかの判定に使用 スクリーン座標で判定
+
         bool mouseInContent = (mouseScreen.x >= contentPos.x) && (mouseScreen.x <= contentPos.x + contentSize.x) &&
             (mouseScreen.y >= contentPos.y) && (mouseScreen.y <= contentPos.y + contentSize.y);
 
         // --- クリックで選択 ---
         int clickedIndex = -1;
-        if (mouseInContent && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDown(ImGuiMouseButton_Right))
+        if (mouseInContent && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDown(ImGuiMouseButton_Right)
+            && ImGui::IsWindowHovered() && ImGui::IsWindowFocused())
         {
             for (int i = (int)m_SceneSprites.size() - 1; i >= 0; --i)
             {
@@ -299,12 +302,24 @@ namespace n_windowscene
         // ドラッグ移動は選択済みのみに
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
         {
-            ImVec2 curMouseScene = ScreenToScene(mouseScreen, contentPos, ViewOffset);
+            ImVec2 curMouseScene = ScreenToScene(mouseScreen, contentPos, ViewOffset, contentSize);
             for (auto& s : m_SceneSprites)
             {
                 if (!s.selected) continue;
-                s.pos_x = curMouseScene.x - s.dragOffsetX;
-                s.pos_y = curMouseScene.y - s.dragOffsetY;
+                float newX = curMouseScene.x - s.dragOffsetX;
+                float newY = curMouseScene.y - s.dragOffsetY;
+
+                // Transform 更新
+                auto tOpt = n_compoapi::GetTransformComponent(s.id);
+                if (tOpt)
+                {
+                    auto t = *tOpt;
+                    t.position[0] = newX;
+                    t.position[1] = newY;
+                    n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid = s.id, t]() {
+                        n_compoapi::SetTransformComponent(eid, t);
+                    });
+                }
             }
         }
 
@@ -321,7 +336,7 @@ namespace n_windowscene
             Texture* tex = n_texturemanager::instance_texmag().GetTextureByName(asset_name);
             if (tex)
             {
-                AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos);    // sceneに追加
+                AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos, contentSize);    // sceneに追加
             }
             else
             {
@@ -330,13 +345,13 @@ namespace n_windowscene
 
 
             // 受け取った名前
-            printf("[window_scene] Dropped raw name: '%s' (len=%zu)\n", asset_name.c_str(), asset_name.size());
+            // printf("[window_scene] Dropped raw name: '%s' (len=%zu)\n", asset_name.c_str(), asset_name.size());
 
             // 列挙（GetTextureNames() が pair<string, ...> を返すことを仮定）
-            printf("[window_scene] Registered texture keys:\n");
-            for (const auto& kv : n_texturemanager::instance_texmag().GetTextureNames()) {
-                printf("  '%s'\n", kv.first.c_str());
-            }
+            //printf("[window_scene] Registered texture keys:\n");
+            //for (const auto& kv : n_texturemanager::instance_texmag().GetTextureNames()) {
+            //    printf("  '%s'\n", kv.first.c_str());
+            //}
 
         }
 
@@ -355,21 +370,28 @@ namespace n_windowscene
             //}
 
 
-            // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
-            ImVec2 screenPos = ImVec2(contentPos.x + (sprite.pos_x - ViewOffset.x),
-                contentPos.y + (sprite.pos_y - ViewOffset.y));
+            // Transform Component から座標を取得
+            auto tOpt = n_compoapi::GetTransformComponent(sprite.id);
+            if (tOpt)
+            {
+                sprite.pos_x = tOpt->position[0];
+                sprite.pos_y = tOpt->position[1];
+                //printf("[window_scene] Transformからposition取得成功 \n");
+            }
 
+            // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
+            ImVec2 screenPos = ImVec2(contentPos.x + (sprite.pos_x - ViewOffset.x) * io.DisplayFramebufferScale.x,
+                                      contentPos.y + (sprite.pos_y - ViewOffset.y) * io.DisplayFramebufferScale.y);
             ImGui::SetCursorScreenPos(screenPos);
 
 
             ImVec2 drawSize = ImVec2((float)sprite.width, (float)sprite.height);
 
-
             // 左クリックで選択され && ドラッグ中
             if (sprite.selected && ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
             {
                 // 再計算して現在のマウスのscene座標を取得
-                ImVec2 curMouseScene = ScreenToScene(ImGui::GetMousePos(), contentPos, ViewOffset);
+                ImVec2 curMouseScene = ScreenToScene(ImGui::GetMousePos(), contentPos, ViewOffset, contentSize);
                 sprite.pos_x = curMouseScene.x - sprite.dragOffsetX;    // ドラッグオフセットを考慮
                 sprite.pos_y = curMouseScene.y - sprite.dragOffsetY;
             }
@@ -423,7 +445,7 @@ namespace n_windowscene
 
 
 
-    void window_scene::AddAssetToScene(Texture* tex, const std::string& asset_name_str, ImVec2 guiLocalPos, ImVec2 guiWindowPos)
+    void window_scene::AddAssetToScene(Texture* tex, const std::string& asset_name_str, ImVec2 guiLocalPos, ImVec2 guiWindowPos, const ImVec2& ContentSize)
     {
 
         //printf("[AddAssetToScene] tex_ptr=%p tx_id=%p width=%d height=%d asset='%s' guiLocal=(%f,%f) guiWin=(%f,%f)\n",
@@ -443,8 +465,8 @@ namespace n_windowscene
         ImVec2 guiAbsPos = ImVec2(guiWindowPos.x + guiLocalPos.x, guiWindowPos.y + guiLocalPos.y);
 
         // scene座標(=論理ピクセル)
-        float sceneX = guiLocalPos.x;
-        float sceneY = guiLocalPos.y;
+        float sceneX = guiLocalPos.x + ViewOffset.x;
+        float sceneY = guiLocalPos.y + ViewOffset.y;
 
         // 実ピクセル -> 論理ピクセルに変換
         float logicalW = (float)(tex->width > 0 ? tex->width : 16) / fbscale.x;
@@ -477,8 +499,8 @@ namespace n_windowscene
 		sprite.z_order = sprite.z_order + 1; // 最前面に
 		sprite.id = GenerateUniqueSpriteId();
 
-        printf("[AddAssetToScene] name=%s texPx=(%d,%d) logical=(%d,%d) pos=(%f,%f)\n",
-            asset_name_str.c_str(), tex->width, tex->height, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
+        //printf("[AddAssetToScene] name=%s texPx=(%d,%d) logical=(%d,%d) pos=(%f,%f)\n",
+        //    asset_name_str.c_str(), tex->width, tex->height, sprite.width, sprite.height, sprite.pos_x, sprite.pos_y);
 
         m_SceneSprites.push_back(sprite);
 
@@ -521,13 +543,33 @@ namespace n_windowscene
 		n_windowhierarchy::instance_winHie().DeleteObjFromScene(id);
 	}
 
-    bool window_scene::GetSpritePosition(int64_t id, std::array<float, 2>& outPos) const
+    bool window_scene::GetSpritePosition(int64_t eid, std::array<float, 2>& outPos) const
     {
-        auto it = sprites.find(id);
+        auto it = sprites.find(eid);
         if (it == sprites.end()) return false;
         const SceneSprite& s = it->second;
         outPos[0] = s.pos_x;
         outPos[1] = s.pos_y;
         return true;
     };
+
+    bool window_scene::SetSpritePosition(int64_t eid, const std::array<float, 2>& SetPos)
+    {
+        std::lock_guard<std::mutex> lk(spriteMutex);
+        auto it = sprites.find(eid);
+        if (it == sprites.end()) {
+            printf("[winScene/SetSpritePos] SetSpritePosition: sprite not found for eid=%lld\n", (long long)eid);
+            return false;
+        }
+        it->second.pos_x = SetPos[0];
+        it->second.pos_y = SetPos[1];
+        return true;
+    }
+
+    void window_scene::RegisterSprite(int64_t id, const SceneSprite& sprite)
+    {
+        std::lock_guard<std::mutex> lk(spriteMutex);
+        sprites[id] = sprite;
+        // 位置は Transform に従うので pos_x/pos_y は使わない
+    }
 }

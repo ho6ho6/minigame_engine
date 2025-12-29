@@ -2,7 +2,7 @@
  *      –ˆƒtƒŒ[ƒ€‚Ì•`‰æˆ—‚¾‚¯s‚¤        *
  ****************************************/
 
-#include "include/render.hpp"
+#include "include/render.h"
 
 #include <gdiplus.h>
 #include <string>
@@ -115,7 +115,7 @@ namespace n_render
 
     }
 
-    void Render_Frame(const float clearColor[4], float dt, uint64_t frameTime)
+    void Render_Frame(const float clearColor[4])
     {
 
 

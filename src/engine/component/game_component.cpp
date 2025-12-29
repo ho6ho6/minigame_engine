@@ -1,9 +1,11 @@
-#include "include/input.hpp"
-#include "include/render.hpp"
-#include "include/component/game_component.hpp"
-#include "include/window_editor/window_scene.hpp"
-#include "include/window_editor/window_editor.hpp"
-#include "include/window_editor/window_hierarchy.hpp"
+#include "include/input.h"
+#include "include/render.h"
+#include "include/component/game_component.h"
+#include "include/component/component_manager.hpp"
+#include "include/component/component_api.h"
+#include "include/window_editor/window_scene.h"
+#include "include/window_editor/window_editor.h"
+#include "include/window_editor/window_hierarchy.h"
 
 #include <algorithm>
 #include <iostream>
@@ -27,6 +29,10 @@ namespace n_gamecomponent
 		Move.jump = 1.0f;
 		Move.direction = { 1.0f, 0.0f};
 		Move.jumpKey = ImGuiKey_Space;
+		Move.directionUpKey = ImGuiKey_W;
+		Move.directionRightKey = ImGuiKey_A;
+		Move.directionDownKey = ImGuiKey_S;
+		Move.directionLeftKey = ImGuiKey_D;
 
 		// Light のデフォルト
 		Light.color = { 1.0f, 1.0f, 1.0f };
@@ -34,8 +40,13 @@ namespace n_gamecomponent
 		Light.range = 10.0f;
 
 		// Gravity のデフォルト
-		Rigidbody.gravity = -9.81f;
+		Rigidbody.Vel[0] = 0.0f;
+		Rigidbody.Vel[1] = 0.0f;
+		Rigidbody.gravity[0] = 0.0f;
+		Rigidbody.gravity[1] = -9.81f;
 		Rigidbody.isGround = false;
+		Rigidbody.isJump = false;
+		Rigidbody.jumpElapsed = 0.0f;
 
 		// Start のデフォルト
 		Start.spawnRadius = 0.5f;
@@ -112,7 +123,13 @@ namespace n_gamecomponent
 		n_component::MoveComponent m;
 		m.direction = Move.direction;
 		m.acceleration = Move.acceleration;
-		m.jump = Move.jump;
+
+		m.jumpKey = Move.jumpKey;
+		m.directionUpKey = Move.directionUpKey;
+		m.directionRightKey = Move.directionRightKey;
+		m.directionDownKey = Move.directionDownKey;
+		m.directionLeftKey = Move.directionLeftKey;
+
 		m.speed = Move.speed;
 
 		EnqueueGameCommand([this, id, m]() {
@@ -135,8 +152,12 @@ namespace n_gamecomponent
 	void gameFunctions::AddComponentRigidbody(int64_t id)
 	{
 		n_component::RigidbodyComponent g;
+		g.Vel[0] = Rigidbody.Vel[0];
+		g.Vel[1] = Rigidbody.Vel[1];
 		g.gravity = Rigidbody.gravity;
 		g.isGround = Rigidbody.isGround;
+		g.isJump = Rigidbody.isJump;
+		g.jumpElapsed = Rigidbody.jumpElapsed;
 		EnqueueGameCommand([this, id, g]() {
 			CreateRigidbodyComponent(id, g);
 			});
@@ -194,20 +215,36 @@ namespace n_gamecomponent
 			});
 	};
 
-	void gameFunctions::AddComponentSprite(int64_t id)
+	void gameFunctions::AddComponentSprite(int64_t id, const n_component::SpriteComponent& sp)
 	{
-		n_component::SpriteComponent sp;
-		sp.spriteId = Sprite.spriteId;
-		sp.visible = Sprite.visible;
-		EnqueueGameCommand([this, id, sp]() {
-			CreateSpriteComponent(id, sp);
-			});
+		SceneSprite s;
+		s.id = sp.spriteId;
+		s.selected = sp.visible;
+
+		// this をコピーキャプチャし、sp は値コピーしてラムダに渡す
+		EnqueueGameCommand([this, id, sp,s]() {
+			fprintf(stderr, "[EnqueuedLambda] start eid=%lld thread=%zu\n",
+				(long long)id, (size_t)std::hash<std::thread::id>{}(std::this_thread::get_id()));
+			fflush(stderr);
+			this->CreateSpriteComponent(id, sp);
+
+			if (auto tOpt = n_compoapi::GetTransformComponent(id))
+			{
+				Vec2 pos = { tOpt->position[0], tOpt->position[1] };
+				n_compoapi::RegisterSpriteAndSyncTransform(id, s, pos);
+			}
+
+		});
+		fprintf(stderr, "[QueueExec] running lambda thread=%zu\n", (size_t)std::hash<std::thread::id>{}(std::this_thread::get_id()));
+		fflush(stderr);
 	};
 	/*--------------------------コンポーネント--------------------------*/
 
 
 	/*----------------------実際のコンポーネント生成----------------------*/
 
+
+	// これらはデータを保持するだけ
 	void gameFunctions::CreateTransformComponent(int64_t id, const n_component::TransformComponent& t)
 	{
 		// 存在チェックやマージ方針をここで決める
@@ -245,9 +282,23 @@ namespace n_gamecomponent
 		isplayerComponents[id] = i;
 	}
 
-	void gameFunctions::CreateSpriteComponent(int64_t id, const n_component::SpriteComponent& sp)
+
+	// 描画に関係するコンポーネントだけ登録処理を持たせる Lightもこのような処理になる可能性がある
+	void gameFunctions::CreateSpriteComponent(int64_t id, const n_component::SpriteComponent& sc)
 	{
-		spriteComponents[id] = sp;
+		if (n_compomanager::g_componentManager.HasComponent<n_component::SpriteComponent>(id)) {
+			printf("[game] CreateSpriteComponent skipped: already exists id=%lld\n", (long long)id);
+			return;
+		}
+		n_compomanager::g_componentManager.SetComponent<n_component::SpriteComponent>(id, sc);
+		SceneSprite s;
+		s.id = sc.spriteId;
+		s.pos_x = 0;
+		s.pos_y = 0;
+		s.selected = sc.visible;
+		n_windowscene::instance_winSce().RegisterSprite(id, s);
+		fprintf(stderr, "[CreateSpriteComponent] eid=%lld spriteId=%lld\n", (long long)id, (long long)sc.spriteId);
+		fflush(stderr);
 	}
 
 	/*-----------------------------------------*/

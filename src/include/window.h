@@ -2,8 +2,8 @@
  *  Win32　ウィンドウ生成・イベント処理・バッファ管理の宣言*
  ***********************************************************/
 
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
+#ifndef WINDOW_H
+#define WINDOW_H
 
 #pragma once
 #include <Windows.h>

@@ -1,106 +1,176 @@
 #include "include/component/component_config.hpp"
-#include "include/component/component_keycapture.hpp"
-#include "include/component/component_api.hpp"   // Has/Get/Set/Add/Remove ラッパー
+#include "include/component/component_keycapture.h"
+#include "include/component/game_component.h"
+#include "include/component/component_api.h"   // Has/Get/Set/Add/Remove ラッパー
+#include "include/window_editor/window_scene.h"
 #include <imgui.h>
 #include <Windows.h>
 
+// UI　コンポーネントの見た目はここで変わる
 void RenderTransformInspector(int64_t entityId)
 {
-    // GetMoveComponent の結果で分岐
     auto opt = n_compoapi::GetTransformComponent(entityId);
-    if (!opt)
-    {
+    if (!opt) {
         ImGui::Text("The Transform component is not attached");
-        if (ImGui::Button("Add Transform")) n_compoapi::AddTransformComponent(entityId);
+        if (ImGui::Button("Add Transform")) {
+            n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([entityId]() {
+                n_compoapi::AddTransformComponent(entityId);
+                });
+        }
         return;
     }
 
-    auto mc = *opt;
+    auto t = *opt;
     bool changed = false;
-    float pos[2] = {mc.position[0], mc.position[1]};
-    float rote[2] = {mc.rotation[0], mc.rotation[1]};
-    float scale[2] = {mc.scale[0] , mc.scale[1]};
+    float pos[2]     = { t.position[0], t.position[1] };
+    float rote[2]    = { t.rotation[0], t.rotation[1] };
+    float scale[2]   = { t.scale[0], t.scale[1] };
 
-    if (ImGui::DragFloat2("Transform", pos, 1.0f))
-    {
-        mc.position[0] = pos[0];
-        mc.position[1] = pos[1];
+    if (ImGui::DragFloat2("Transform", pos, 1.0f)) {
+        t.position[0] = pos[0];
+        t.position[1] = pos[1];
         changed = true;
     }
     if (ImGui::DragFloat2("Rotation", rote, 1.0f)) {
-        mc.rotation[0] = rote[0];
-        mc.rotation[1] = rote[1];
+        t.rotation[0] = rote[0];
+        t.rotation[1] = rote[1];
         changed = true;
     }
-    if (ImGui::DragFloat2("Scale", scale, 1.0f))
+    if (ImGui::DragFloat2("Scale", scale, 1.0f)) {
+        t.scale[0] = scale[0];
+        t.scale[1] = scale[1];
+        changed = true;
+    }
+
+    if (changed)
     {
-        mc.scale[0] = scale[0];
-        mc.scale[1] = scale[1];
-        changed = true;
-    }
-    if (changed) {
-        n_compoapi::SetTransformComponent(entityId, mc);
+        // ゲームスレッドへ投げる（UI スレッドから直接書き込まない）
+
+        //fprintf(stderr, "[UI] Enqueue before entity=%lld thread=%zu\n",
+        //    (long long)entityId, (size_t)std::hash<std::thread::id>{}(std::this_thread::get_id()));
+        //fflush(stderr);
+
+        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([entityId, t]() {
+            n_compoapi::SetTransformComponent(entityId, t);
+            });
     }
 
     if (ImGui::Button("Remove Transform")) {
-        n_compoapi::RemoveTransformComponent(entityId);
+        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([entityId]() {
+            n_compoapi::RemoveTransformComponent(entityId);
+            });
     }
 }
 
 void RenderMoveInspector(int64_t entityId)
 {   
-    // GetMoveComponent の結果で分岐
     auto opt = n_compoapi::GetMoveComponent(entityId);
-    if (!opt)
-    {
+    if (!opt) {
         ImGui::Text("The Move component is not attached");
-        if (ImGui::Button("Add Move")) n_compoapi::AddMoveComponent(entityId);
+        if (ImGui::Button("Add Move")) {
+            n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([entityId]() {
+                n_compoapi::AddMoveComponent(entityId);
+                });
+        }
         return;
     }
 
     auto mc = *opt;
     bool changed = false;
-    float dir[2] = { mc.direction[0], mc.direction[1]};
+    float dir[2] = { mc.direction[0], mc.direction[1] };
 
-    if (ImGui::DragFloat("Speed", &mc.speed, 0.1f)) changed = true;
-    if (ImGui::DragFloat2("Direction", dir, 0.1f))
-    {
-        mc.direction[0] = dir[0];
-        mc.direction[1] = dir[1];
-        changed = true;
-    }
-    if (ImGui::DragFloat("Acceleration", &mc.acceleration, 0.1f)) changed = true;
-    if (ImGui::DragFloat("Jump Strength", &mc.jump, 0.1f)) changed = true;
+    if (ImGui::DragFloat("Speed", &mc.speed, 100.0f)) changed = true;
+    //if (ImGui::DragFloat2("Direction", dir, 1.0f)) {
+    //    mc.direction[0] = dir[0];
+    //    mc.direction[1] = dir[1];
+    //    changed = true;
+    //}
+    if (ImGui::DragFloat("Acceleration", &mc.acceleration, 100.0f)) changed = true;
+    if (ImGui::DragFloat("Jump Strength", &mc.jump, 100.0f)) changed = true;
 
-    // mc.jumpKey は VK コードを保持する想定（未設定は -1）
-    const char* keyName = (mc.jumpKey >= 0) ? GetKeyName(mc.jumpKey) : "None";
-    ImGui::Text("Jump Key: %s", keyName);
-    ImGui::SameLine();
-
-    if (ImGui::Button("Capture Key")) {
-        // StartKeyCaptureFor は Win32 実装で VK をコールバックに渡す想定
-        StartKeyCaptureFor(entityId, "jump", [entityId](int vk) {
-            auto opt2 = n_compoapi::GetMoveComponent(entityId);
-            if (opt2) {
-                auto m2 = *opt2;
-                m2.jumpKey = vk; // VK をそのまま保存
-                n_compoapi::SetMoveComponent(entityId, m2);
-            }
-            });
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Clear")) {
-        mc.jumpKey = -1;
-        changed = true;
-    }
 
     if (changed) {
-        n_compoapi::SetMoveComponent(entityId, mc);
+        // コンポーネントストレージに書き戻す（ゲームスレッド経由）
+        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([entityId, mc]() {
+            n_compoapi::SetMoveComponent(entityId, mc);
+            });
+
+        // **注意**: ここで直接 Transform を Set すると初期値が連続で更新されて動かせなくなる
     }
 
+    /* Keyの変更は即時反映 */
+    // 起こることは無いと思うが、即時反映を行うことでKey割り当ての競合を防ぐ
+
+
+    // JumpKey
+    ShowKeyBind("Jump Key",
+        [&mc]() -> ImGuiKey {return mc.jumpKey; },
+        [entityId](ImGuiKey imKey) {
+                if (auto opt2 = n_compoapi::GetMoveComponent(entityId))
+                {
+                    auto m2 = *opt2;
+                    m2.jumpKey = imKey;
+                    n_compoapi::SetMoveComponent(entityId, m2);
+                }
+            },
+        entityId);
+
+    // UpKey
+    ShowKeyBind("UP Key",
+        [&mc]() -> ImGuiKey {return mc.directionUpKey; },
+        [entityId](ImGuiKey imKey) {
+            if (auto opt2 = n_compoapi::GetMoveComponent(entityId))
+            {
+                auto m2 = *opt2;
+                m2.directionUpKey = imKey;
+                n_compoapi::SetMoveComponent(entityId, m2);
+            }
+        },
+    entityId);
+
+    // RightKey
+    ShowKeyBind("Right Key",
+        [&mc]() -> ImGuiKey {return mc.directionRightKey; },
+        [entityId](ImGuiKey imKey) {
+            if (auto opt2 = n_compoapi::GetMoveComponent(entityId))
+            {
+                auto m2 = *opt2;
+                m2.directionRightKey = imKey;
+                n_compoapi::SetMoveComponent(entityId, m2);
+            }
+        },
+        entityId);
+
+    // Down Key
+    ShowKeyBind("Down Key",
+        [&mc]() -> ImGuiKey {return mc.directionDownKey; },
+        [entityId](ImGuiKey imKey) {
+            if (auto opt2 = n_compoapi::GetMoveComponent(entityId))
+            {
+                auto m2 = *opt2;
+                m2.directionDownKey = imKey;
+                n_compoapi::SetMoveComponent(entityId, m2);
+            }
+        },
+        entityId);
+
+    //Left Key
+    ShowKeyBind("Left Key",
+        [&mc]() -> ImGuiKey {return mc.directionLeftKey; },
+        [entityId](ImGuiKey imKey) {
+            if (auto opt2 = n_compoapi::GetMoveComponent(entityId))
+            {
+                auto m2 = *opt2;
+                m2.directionLeftKey = imKey;
+                n_compoapi::SetMoveComponent(entityId, m2);
+            }
+        },
+        entityId);
+
     if (ImGui::Button("Remove Move")) {
-        n_compoapi::RemoveMoveComponent(entityId);
+        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([entityId]() {
+            n_compoapi::RemoveMoveComponent(entityId);
+            });
     }
 }
 
@@ -150,8 +220,17 @@ void RenderRigidbodyInspector(int64_t entityId)
     auto mc = *opt;
     bool changed = false;
 
-    if (ImGui::DragFloat("Gravity", &mc.gravity, 0.1f)) changed = true;
+    float Gravity[2] = {mc.gravity[0], mc.gravity[1]};
+
+    if (ImGui::DragFloat2("Gravity", Gravity, 100.0f))
+    {
+        mc.gravity[0] = Gravity[0];
+        mc.gravity[1] = Gravity[1];
+        changed = true;
+    }
+    //if (ImGui::DragFloat("JumpElapsed", &mc.jumpElapsed, 1.0f)) changed = true;
     if (ImGui::Checkbox("IsGround", &mc.isGround)) changed = true;
+    if (ImGui::Checkbox("IsJump", &mc.isJump)) changed = true;
 
     if (changed) {
         n_compoapi::SetRigidbodyComponent(entityId, mc);
@@ -177,7 +256,7 @@ void RenderStartInspector(int64_t entityId)
 
     if (ImGui::DragFloat("Start_Range", &mc.spawnRadius, 0.1f)) changed = true;
     if (ImGui::DragInt("Start_SpawnPriority", &mc.priority, 1)) changed = true;
-    if (ImGui::Checkbox("Start_sActive", &mc.active)) changed = true;
+    if (ImGui::Checkbox("Start_IsActive", &mc.active)) changed = true;
 
     if (changed)
     {
@@ -241,5 +320,40 @@ void RenderIsPlayerInspector(int64_t entityId)
 
     if (ImGui::Button("Remove IsPlayer")) {
         n_compoapi::RemoveIsPlayerComponent(entityId);
+    }
+}
+
+const char* GetImGuiKeyNameSafe(ImGuiKey imKey)
+{
+    if (imKey == ImGuiKey_None) return "None";
+    auto it = g_ImGuiKeyNames.find(imKey);
+    if (it != g_ImGuiKeyNames.end()) return it->second;
+    static char buf[32];
+    snprintf(buf, sizeof(buf), "Key(%d)", (int)imKey); return buf;
+}
+
+void ShowKeyBind(const char* label, std::function<ImGuiKey()> getCurrent, std::function<void(ImGuiKey)> setOnGameThread, int64_t entityId)
+{
+    ImGuiKey curKey = getCurrent();
+    const char* name = GetImGuiKeyNameSafe(curKey);
+    ImGui::Text("%s: %s", label, name);
+    ImGui::SameLine();
+
+    if (ImGui::Button((std::string(label) + "change").c_str()))
+    {
+        // StartKeyCaptureForは ImGuiKey を返すCallbackを受け取る
+        StartKeyCaptureFor(entityId, label, [setOnGameThread](ImGuiKey imKey) {
+            // UI スレッド -> ゲームスレッドへ
+            n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([setOnGameThread, imKey]() {
+                setOnGameThread(imKey);
+                });
+            });
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button((std::string(label) + "Clear").c_str())) {
+        n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([setOnGameThread]() {
+            setOnGameThread(ImGuiKey_None);
+            });
     }
 }

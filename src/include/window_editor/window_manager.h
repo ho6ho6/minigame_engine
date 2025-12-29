@@ -6,7 +6,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "window_base.hpp"
+#include "window_base.h"
 
 namespace n_windowmanager
 {

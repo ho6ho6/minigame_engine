@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(minigame_engine LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -52,7 +52,7 @@ add_executable(minigame_engine
     src/main.cpp
     src/external/stb_image_impl.cpp
     ${ENGINE_SOURCES}
-    ${IMGUI_SOURCES} "src/engine/component/component_api.cpp" "src/engine/component/component_config.cpp" "src/engine/component/component_keycapture.cpp")
+    ${IMGUI_SOURCES} "src/engine/component/component_api.cpp" "src/engine/component/component_config.cpp" "src/engine/component/component_keycapture.cpp" "src/engine/assets/scene.cpp")
 
 
 # debug—p‚Ì’è‹`

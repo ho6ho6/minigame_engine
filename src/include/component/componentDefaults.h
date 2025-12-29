@@ -1,10 +1,8 @@
-#ifndef COMPO_DEFAULTS
-#define COMPO_DEFAULTS
-
 #pragma once
 
 #include <array>
 #include <cstdint>
+#include "imgui.h"
 
 // 小さな型エイリアスはヘッダで可。必要なら名前空間に入れる。
 using Vec2 = std::array<float, 2>;
@@ -28,17 +26,25 @@ namespace n_component {
     // Move
     struct MoveDefaults {
         float speed = 1.0f;
-        Vec2 direction{ 0.0f, 0.0f};
+        Vec2 direction{ 1.0f, 1.0f};
         float acceleration = 0.0f;
-        float jump = 0.0f;
-        int jumpKey = 32; // デフォルト Space のキーコード（環境に合わせて変更）
+        float jump = 1.0f;
+        ImGuiKey jumpKey = ImGuiKey_Space;
+        ImGuiKey directionUpKey = ImGuiKey_W;
+        ImGuiKey directionRightKey = ImGuiKey_D;
+        ImGuiKey directionLeftKey = ImGuiKey_A;
+        ImGuiKey directionDownKey = ImGuiKey_S;
     };
     struct MoveComponent {
         float speed = 1.0f;
-        Vec2 direction{ 0.0f, 0.0f};
+        Vec2 direction{ 1.0f, 1.0f};
         float acceleration = 0.0f;
-        float jump = 0.0f;
-        int jumpKey = 32; // 初期値を必ず与える
+        float jump = 1.0f;
+        ImGuiKey jumpKey = ImGuiKey_Space;
+        ImGuiKey directionUpKey = ImGuiKey_W;
+        ImGuiKey directionRightKey = ImGuiKey_D;
+        ImGuiKey directionLeftKey = ImGuiKey_A;
+        ImGuiKey directionDownKey = ImGuiKey_S;
     };
 
     // Light
@@ -55,11 +61,17 @@ namespace n_component {
 
     // Gravity
     struct RigidbodyDefaults {
-        float gravity = -1.0f;
+        Vec2 Vel = {0.0f, 0.0f};
+        Vec2 gravity = { 0.0f, -9.8f };
+        float jumpElapsed = 0.0f;   // 経過時間
+        bool isJump = false;
         bool isGround = false;
     };
     struct RigidbodyComponent {
-        float gravity = -1.0f;
+        Vec2 Vel = { 0.0f, 0.0f };
+        Vec2 gravity = { 0.0f, -9.8f };
+        float jumpElapsed = 0.0f;
+        bool isJump = false;
         bool isGround = false;
     };
 
@@ -110,8 +122,7 @@ namespace n_component {
     struct SpriteComponent {
         int64_t spriteId = -1;
         bool visible = true;
-        // 必要なら layer, uv など
+        // 必要なら layer, uv 
     };
 
-} // namespace components
-#endif // !COMPO_DEFAULTS
+}

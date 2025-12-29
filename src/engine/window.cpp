@@ -2,12 +2,12 @@
  *engine::InitWindow, PollEvents, IsRunning, ShutdownWindow, SwapBuffers       *
  *******************************************************************************/
 
-#include "include/window.hpp"
+#include "include/window.h"
 #include <imgui.h>
 #include "../../third_party/imgui/backends/imgui_impl_win32.h"
 #include <imgui_impl_dx11.h>
-#include "include/render.hpp"
-#include "include/window_editor/window_manager.hpp"
+#include "include/render.h"
+#include "include/window_editor/window_manager.h"
 #include <Windows.h>
 
 static HWND g_hWnd = nullptr;

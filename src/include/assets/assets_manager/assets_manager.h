@@ -5,7 +5,7 @@
 
 #pragma once
 #include "include/assets/assets_manager/texture_manager.hpp"
-#include "include/assets/texture.hpp"
+#include "include/assets/texture.h"
 
 
 /*Assetsウィンドウに表示される画像のサムネだけ表示*/

@@ -3,17 +3,18 @@
 
 #pragma once
 #include <imgui.h>
-#include "window_base.hpp"
+#include "window_base.h"
 #include <string>
 #include <vector>
-#include "window_scene_sprite.hpp"
+#include "window_scene_sprite.h"
+#include "include/component/componentDefaults.h"
 #include <functional>
 #include <atomic>
 #include <optional>
 
 using Command = std::function<void(int64_t objectID)>;
 using EntitySpritePair = std::pair<int64_t, int64_t>;
-
+static std::optional<int64_t> selectedEntityId;
 
 
 namespace n_windowhierarchy
@@ -37,6 +38,8 @@ namespace n_windowhierarchy
 		void UnregisterSprite(int64_t entityId);
 
 		std::optional<int64_t> GetSpriteIdForEntity(int64_t entityId);
+
+		void OnHierarchyAdd(int64_t entityId, const n_component::SpriteComponent& sc);
 
 	private:
 		ImVec2 m_LastSize = { 0,0 };

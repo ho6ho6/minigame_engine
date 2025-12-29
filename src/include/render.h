@@ -2,8 +2,8 @@
 *シーンデータを受け取り、描画コマンドを発行するインタフェース		 *
 **************************************************************/
 
-#ifndef RENDER_HPP
-#define RENDER_HPP
+#ifndef RENDER_H
+#define RENDER_H
 
 
 #pragma once
@@ -30,7 +30,7 @@ namespace n_render
 	void Render_Shutdown();                                    // GDI+ 終了処理
 
 	//   clearColor: {r, g, b, a}
-	void Render_Frame(const float clearColor[4], float dt, uint64_t frameCount);
+	void Render_Frame(const float clearColor[4]);
 
 	// 描画コマンド確定（Present は行わない）
 	void Render_EndFrame();
