@@ -20,13 +20,16 @@ namespace n_windowhierarchy
     {
         wm_ = wm;
     }
-
+    
+	// エンティティIDからスプライトIDを取得
     std::optional<EntityId> window_hierarchy::GetSpriteIdForEntity(EntityId eid) const
     {
 		return n_hierarchy::sync::GetSpriteForEntity(eid);
     }
 
 }
+
+
 
 
 

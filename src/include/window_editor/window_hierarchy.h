@@ -28,6 +28,65 @@ namespace n_windowhierarchy
 }
 
 
+
+/*
+
+    Hierarchy 責務分離メモ
+    1. UI（n_hierarchy::ui）
+
+    役割
+    ImGui を使った描画・ユーザー操作を担当
+    hierarchyModel からオブジェクトリストを取得して表示
+    選択・クリックイベントを検出して Sync に通知
+    描画以外のロジックや状態は持たない
+
+    やること
+    DrawHierarchy(hierarchyModel&)
+    ImGui::Selectable で選択を検知
+    クリックされた EntityId を sync::OnEntitySelected() に送信
+
+    やらないこと
+    EntityId の決定
+    選択状態の保持
+    Scene や Component の直接操作
+
+    2. Sync（n_hierarchy::sync）
+
+    役割
+    UI と Scene / Model の橋渡し
+    ユーザー操作や Scene からのイベントを受け取り、正しい場所に通知
+    Scene の唯一の選択状態 (selectedEntity_) を更新する
+
+    やること
+    OnEntitySelected(EntityId eid) → Scene に通知 (SetSelectedEntity)
+    OnSceneObjectAdded/Removed(SceneToHierarchyObj) → hierarchyModel に通知
+    EntityId を Scene / Model 間で伝搬する
+
+    やらないこと
+    選択状態を自分で保持しない
+    ImGui 描画
+
+    3. Model（n_hierarchy::hierarchyModel）
+
+    役割
+    表示用データの保持
+    Scene から通知された状態をキャッシュして UI に提供
+    スレッドセーフなオブジェクトリスト管理
+
+    やること
+    オブジェクト追加・削除 (AddObject/RemoveObject)
+    キャッシュされた EntityId / SpriteId の保持
+    選択フラグの保持（あくまで UI 描画用）
+
+    やらないこと
+    EntityId の生成
+    Scene 上の本当の選択状態を決定
+    Scene / Component に直接変更を加える
+
+*/
+
+
+
 #endif // !WINDOW_HIERARCHY_H
 
 /*
