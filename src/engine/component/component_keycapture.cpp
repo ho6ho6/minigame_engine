@@ -6,6 +6,7 @@
 #include <Windows.h>
 
 
+
 const char* GetKeyName(int key)
 {
     // まずよく使う VK をハードコードで処理
@@ -15,7 +16,6 @@ const char* GetKeyName(int key)
     case VK_UP:      return "Up";
     case VK_RIGHT:   return "Right";
     case VK_DOWN:    return "Down";
-    case VK_ESCAPE:  return "Esc";
     case VK_RETURN:  return "Enter";
     case VK_TAB:     return "Tab";
     case VK_SHIFT:   return "Shift";

@@ -1,9 +1,8 @@
 /*sceneにテクスチャを落とし込むために構造体spriteを宣言*/
 
-#ifndef SCENE_SPRITE
-#define SCENE_SPRITE
+#ifndef SCENE_SPRITE_H
+#define SCENE_SPRITE_H
 
-#pragma once
 #include <string>
 #include "include/assets/texture.h"
 
@@ -12,7 +11,7 @@
 struct SceneSprite
 {
     std::string name;     // スプライト名（テクスチャ名と同じで良い）
-    Texture* texture;    // テクスチャハンドル
+    Texture* texture = 0;    // テクスチャハンドル
 
     // posはTransformコンポーネントから参照
     float pos_x = 0.0f;   // シーン内のX座標
@@ -24,24 +23,22 @@ struct SceneSprite
     int width = 16;  // スプライトの幅
     int height = 16; // スプライトの高さ
     int z_order = 1;   // 描画順序（大きいほど前面に描画）
-	uint64_t id = 0;   // ユニークID
+	int64_t id = 0;   // ユニークID
     bool selected = false; // 選択状態
 };
 
 // hierarchyに登録するための構造体
 struct SceneToHierarchyObj {
-    uint64_t id;           // unique id
     std::string name;
-    Texture* texture;      // nullable
-
-    // x,yも同様に
+	Texture* texture = 0;           // テクスチャハンドル
     float x = 0.0f;
-    float y = 0.0f;            // world (content-left-top 基準, logical px)
+    float y = 0.0f;             // world (左上基準(最終的には中央を原点にする), logical px)
     int width = 0;
-    int height = 0;     // px
+    int height = 0;             // px
     int z_order = 0;
     bool registered = false;    // Componentが追加されたか
+    int64_t id;                // entity id
     bool selected = false;
 };
 
-#endif // !SCENE_SPRITE
+#endif // !SCENE_SPRITE_H

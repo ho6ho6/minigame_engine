@@ -1,5 +1,37 @@
 #include "include/window_editor/window_hierarchy.h"
-#include "include/window_editor/window_editor.h"
+#include "include/window_editor/hierarchy/hierarchy_ui.h"
+#include "include/window_editor/hierarchy/hierarchy_sync.h"
+#include "include/window_editor/window_manager.h"
+
+
+namespace n_windowhierarchy
+{
+
+    void window_hierarchy::Render()
+    {
+        //printf("[WH/Render] this=%p, &hierarchyModel_=%p, sizeof(hierarchyModel)=%zu\n", 
+        //    (void*)this, (void*)&hierarchyModel_, sizeof(n_hierarchy::hierarchyModel));
+        if (!wm_) return;
+        
+        n_hierarchy::ui::DrawHierarchy(hierarchyModel_, wm_);
+	}
+
+    void window_hierarchy::SetWindowManager(n_windowmanager::window_manager* wm)
+    {
+        wm_ = wm;
+    }
+
+    std::optional<EntityId> window_hierarchy::GetSpriteIdForEntity(EntityId eid) const
+    {
+		return n_hierarchy::sync::GetSpriteForEntity(eid);
+    }
+
+}
+
+
+
+/*
+#include "include/window_editor/window_hierarchy.h"
 #include "include/window_editor/window_scene.h"
 #include "include/assets/assets_manager/assets_manager.h"
 #include "include/component/componentDefaults.h"
@@ -10,8 +42,8 @@
 #include "include/component/component_config.hpp"
 #include "include/component/component_manager.hpp"
 #include "imgui_impl_dx11.h"		//ImGuiでDirectX11
-
 #include <mutex>
+
 
 // objを保持するためのコンテナ
 static std::vector<SceneToHierarchyObj> g_SceneToHierarchyObjs;
@@ -26,7 +58,6 @@ static std::mutex g_registryMutex;
 namespace n_windowhierarchy
 {
 	// グローバルインスタンス
-    /*もし使うことがあったら*/
 	window_hierarchy& instance_winHie()
     {
         static window_hierarchy inst;
@@ -161,9 +192,9 @@ namespace n_windowhierarchy
     void window_hierarchy::Render()
     {
         
-        /*------------------------------------------*/
+        //------------------------------------------
 
-        /*windowの座標とサイズ*/
+        //windowの座標とサイズ
         ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Always);
 
         //ImGui::SetNextWindowSizeConstraints(ImVec2(400, 435), ImVec2(400, 480));
@@ -196,7 +227,7 @@ namespace n_windowhierarchy
 
         n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
-        /*------------------------------------------*/
+        //------------------------------------------
 
 		// 描画時にローカルコピーを作成しておく
 		std::vector<SceneToHierarchyObj> localObjs;
@@ -247,7 +278,7 @@ namespace n_windowhierarchy
 
             if (ImGui::BeginPopupContextItem())
             {
-                /*もう少し可読性は上げる*/
+                //もう少し可読性は上げる
 
                 // contextCommands の登録はコンストラクタで行う想定
                 // 直接呼ぶ（引数は id のみ）
@@ -365,3 +396,5 @@ namespace n_windowhierarchy
     }
 
 }
+
+*/

@@ -1,7 +1,6 @@
 #ifndef COMPO_API
 #define COMPO_API
 
-#pragma once
 #include <cstdint>
 #include <optional>
 #include "include/component/componentDefaults.h"

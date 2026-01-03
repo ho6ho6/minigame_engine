@@ -1,7 +1,7 @@
 /*AssetsÇÃä«óù*/
 
-#ifndef ASSETS_MANAGER
-#define ASSETS_MANAGER
+#ifndef ASSETS_MANAGER_H
+#define ASSETS_MANAGER_H
 
 #pragma once
 #include "include/assets/assets_manager/texture_manager.hpp"

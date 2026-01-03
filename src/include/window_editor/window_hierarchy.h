@@ -1,7 +1,36 @@
-#ifndef WINDOW_HIERARCHY
-#define WINDOW_HIERARCHY
+#ifndef WINDOW_HIERARCHY_H
+#define WINDOW_HIERARCHY_H
 
-#pragma once
+#include "window_base.h"
+#include "hierarchy/hierarchy_model.h"
+#include "window_manager.h"
+#include "include/component/componentDefaults.h"
+#include <optional>
+
+namespace n_windowhierarchy
+{
+	class window_hierarchy : public n_windowbase::window_base
+	{
+		public:
+			void Render() override;
+			std::optional<EntityId> GetSpriteIdForEntity(EntityId entityId) const;
+			void SetWindowManager(n_windowmanager::window_manager* wm);
+
+			// äOïîÇ…ÇÕéQè∆ÇæÇØìnÇ∑
+			n_hierarchy::hierarchyModel& GetHierarchyModel() { return hierarchyModel_; }
+
+		private:
+			// èäóLå≥ÇÕwindow_hierarchy
+			n_hierarchy::hierarchyModel hierarchyModel_;
+			n_windowmanager::window_manager* wm_ = nullptr;
+	};
+
+}
+
+
+#endif // !WINDOW_HIERARCHY_H
+
+/*
 #include <imgui.h>
 #include "window_base.h"
 #include <string>
@@ -54,4 +83,4 @@ namespace n_windowhierarchy
 	window_hierarchy& instance_winHie();
 }
 
-#endif // !WINDOW_HIERARCHY
+*/

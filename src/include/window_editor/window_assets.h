@@ -1,7 +1,8 @@
-#ifndef WINDOW_ASSETS
-#define WINDOW_ASSETS
+/*Assetsフォルダにあるアセットを取得し表示、window_sceneに受け渡しも行う*/
 
-#pragma once
+#ifndef WINDOW_ASSETS_H
+#define WINDOW_ASSETS_H
+
 #include <imgui.h>
 #include "window_base.h"
 // パスを修正: assets_manager ディレクトリが include 配下にある場合

@@ -1,7 +1,6 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#pragma once
 #include <array>
 #include <windows.h>
 #include "imgui.h"
@@ -20,4 +19,4 @@ namespace n_input
 	void PollPlayerInputAndEnqueue(int64_t eid);
 }
 
-#endif // INPUT_HPP
+#endif // INPUT_H

@@ -1,9 +1,8 @@
 /*テクスチャのひな形*/
 
-#ifndef TEXTURE
-#define TEXTURE
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
-#pragma once
 #include <string>
 #include <imgui.h>
 

@@ -1,9 +1,10 @@
-﻿#pragma once
+﻿#ifndef COMPO_KEYCAP_H
+#define COMPO_KEYCAP_H
+
 #include <cstdint>
 #include <string>
 #include <functional>
 #include "imgui.h"
-
 
 const char* GetKeyName(int key);
 
@@ -26,3 +27,5 @@ struct KeyCaptureState
     std::function<void(ImGuiKey)> callback;
     // オプション: タイムアウトやキャンセル用フラグ
 };
+
+#endif // !COMPO_KEYCAP_H

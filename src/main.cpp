@@ -1,7 +1,3 @@
-/**************************************************************************
- * WinMain とメインループの呼び出し、各サブシステムの初期化と終了処理を行う        *
- **************************************************************************/
-
 #include "include/window.h"
 #include "include/input.h"
 #include "include/game.h"
@@ -12,8 +8,8 @@
 #include "include/assets/assets_manager/texture_manager.hpp" // texture_manager
 #include "include/window_editor/window_assets.h"
 #include "include/window_editor/window_hierarchy.h"
+#include "include/window_editor/hierarchy/hierarchy_sync.h"
 #include "include/assets/assets_manager/assets_manager.h"
-// #include "include/assets/util.hpp"
 
 #include "include/component/component_api.h"
 
@@ -27,9 +23,7 @@
 #include <iostream>
 #include <filesystem>
 
-//#ifdef PIX_CAPTURE_WAIT
-//Sleep(1000);
-//#endif
+/* classは状態を保持するか　で使い分けている。　保持しない場合はnamespaceのみで処理を記述する */
 
 /*
   WinMain の引数:
@@ -121,7 +115,6 @@ int APIENTRY WinMain(
 	// テクスチャマネージャ初期化
 	n_texturemanager::instance_texmag().Initialize(ResolveTexturesDir());
 
-    n_windowhierarchy::instance_winHie().InitHierarchyScanner();
 
     n_compoapi::InitializeGameThreadId();
 
@@ -131,14 +124,15 @@ int APIENTRY WinMain(
 
     /*-----------------------------ウィンドウの登録------------------------------*/
 
-    n_windowmanager::window_manager wm;
-    wm.Register_SceneWindow();           // ImGui,DX11の初期化
-    wm.Register_GameWindow();
-    //wm.Register_InputWindow();    //別ウィンドウを生成して操作する可能性もある。 <- Component内に付属した
+    n_windowmanager::window_manager wm; // この wm が唯一の実態
     wm.Register_Hierarchywindow();
+    wm.Register_Inspectorwindow();
     wm.Register_Assetswindow();
+    wm.Register_SceneWindow();
+    wm.Register_GameWindow();
 
-
+	n_hierarchy::sync::Initialize(&wm); // hierarchyに同期用ウィンドウマネージャを渡す
+    printf("[WindowManager] hierarchy sync initialized\n");
     /*-----------------------------ウィンドウの登録------------------------------*/
 
 
@@ -188,12 +182,9 @@ int APIENTRY WinMain(
         for (int64_t eid : entities)
         {
             // spriteId を取得（レンダー登録マップを参照）
-            auto spriteOpt = n_windowhierarchy::instance_winHie().GetSpriteIdForEntity(eid);
             if (n_compomanager::g_componentManager.HasComponent<n_component::IsPlayerComponent>(eid)) {
                 n_input::PollPlayerInputAndEnqueue(eid);
             }
-
-            //n_game::instance_game().Render(eid, spriteOpt ? std::optional<int>(*spriteOpt) : std::nullopt);
 
         }
 
@@ -245,11 +236,10 @@ int APIENTRY WinMain(
     /*----------------------------------メイン----------------------------------*/
 
 
-    // 5. 終了処理
+
     ImGui_ImplDX11_Shutdown();        // ImGuiのDirectX11レンダリングを終了
     ImGui_ImplWin32_Shutdown();       // ImGuiのWin32プラットフォームを終了
     ImGui::DestroyContext();            // ImGuiコンテキストを破棄
-    n_windowhierarchy::instance_winHie().ShutdownHierarchyScanner();
 	n_texturemanager::instance_texmag().Shutdown(); // テクスチャマネージャ終了
     n_render::Render_Shutdown();        // render.cpp
     n_window::ShutdownWindow();        // window.cpp

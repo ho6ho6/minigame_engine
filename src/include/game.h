@@ -43,4 +43,4 @@ namespace n_game
 	game& instance_game();
 }
 
-#endif // GAME_HPP
+#endif // GAME_H

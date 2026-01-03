@@ -4,7 +4,6 @@
 #include "include/component/component_manager.hpp"
 #include "include/component/component_api.h"
 #include "include/window_editor/window_scene.h"
-#include "include/window_editor/window_editor.h"
 #include "include/window_editor/window_hierarchy.h"
 
 #include <algorithm>

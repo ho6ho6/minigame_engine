@@ -1,4 +1,7 @@
-#pragma once
+#ifndef COMPONENT_CONFIG_HPP
+#define COMPONENT_CONFIG_HPP
+
+
 #include <cstdint>
 #include <unordered_map>
 #include <functional>
@@ -49,7 +52,6 @@ static const std::unordered_map<ImGuiKey, const char*> g_ImGuiKeyNames = {
     {ImGuiKey_Tab, "Tab"},
     {ImGuiKey_LeftShift, "LeftShift"},
     {ImGuiKey_LeftCtrl, "LeftControl"},
-    {ImGuiKey_Escape, "Escape"},
     {ImGuiKey_RightShift, "RightShift"},
     {ImGuiKey_RightCtrl, "RightCtrl"},
     {ImGuiKey_Enter, "Enter"},
@@ -58,3 +60,5 @@ static const std::unordered_map<ImGuiKey, const char*> g_ImGuiKeyNames = {
     {ImGuiKey_DownArrow, "DownArrow"},
     {ImGuiKey_LeftArrow, "LeftArrow"},
 };
+
+#endif // COMPONENT_CONFIG_HPP

@@ -1,11 +1,6 @@
-/********************************
- *ƒQ[ƒ€“à‚ÌƒtƒŒ[ƒ€ŠÔ‚ğŒˆ‚ß‚é*
- ********************************/
-
 #ifndef TIME_H
 #define TIME_H
 
-#pragma once
 #include <chrono>
 #include <cstdint>
 static std::chrono::high_resolution_clock::time_point lastTime = std::chrono::high_resolution_clock::now();

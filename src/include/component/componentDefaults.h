@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPONENT_DEFAULTS_H
+#define COMPONENT_DEFAULTS_H
 
 #include <array>
 #include <cstdint>
@@ -7,6 +8,7 @@
 // 小さな型エイリアスはヘッダで可。必要なら名前空間に入れる。
 using Vec2 = std::array<float, 2>;
 using Vec3 = std::array<float, 3>;
+using EntityId = int64_t;
 
 // デフォルト値とコンポーネント本体を同じヘッダに置く場合の安全な実装
 namespace n_component {
@@ -103,26 +105,28 @@ namespace n_component {
     struct IsPlayerDefaults {
         bool IsPlayerActive = false;
         bool IsEnemyActive = false;
-        int64_t PlayerId = -1;
-        int64_t EntityId = -2;
+        EntityId PlayerId = 1;
+        EntityId EntityId = -2;
     };
     struct IsPlayerComponent {
         bool IsPlayerActive = false;
         bool IsEnemyActive = false;
-        int64_t PlayerId = -1;
-        int64_t EntityId = -2;
+        EntityId PlayerId = 1;
+        EntityId EntityId = -2;
     };
 
 
     struct SpriteDefaults {
-        int64_t spriteId = -1;
+        EntityId spriteId = 1;
         bool visible = true;
         // 必要なら layer, uv など
     };
     struct SpriteComponent {
-        int64_t spriteId = -1;
+        EntityId spriteId = 1;
         bool visible = true;
         // 必要なら layer, uv 
     };
 
 }
+
+#endif // COMPONENT_DEFAULTS_H

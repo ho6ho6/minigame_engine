@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPONENT_MANAGER_HPP
+#define COMPONENT_MANAGER_HPP
 
 #include <cstdint>
 #include <unordered_map>
@@ -220,3 +221,5 @@ namespace n_compomanager
         masks_[eid].set(static_cast<size_t>(static_cast<Under>(ComponentTypeId<U>::value)));
     }
 }
+
+#endif // COMPONENT_MANAGER_HPP

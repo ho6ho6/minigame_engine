@@ -5,6 +5,7 @@
 #include "include/assets/texture.h"
 #include "include/assets/assets_manager/texture_manager.hpp"
 #include "include/window_editor/window_hierarchy.h"
+#include "include/window_editor/hierarchy/hierarchy_sync.h"
 #include "include/component/component_api.h"
 #include "include/component/game_component.h"
 #include "imgui.h"  //ImGui本体
@@ -12,6 +13,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+
 /* --注1--
     ImGui の API ではウィンドウ局所座標と絶対座標の概念があり、
     GetCursorScreenPos() や SetCursorScreenPos() は絶対座標、GetCursorPos() や SetCursorPos() はウィンドウ局所座標を扱うが
@@ -19,21 +21,21 @@
     (2024年6月時点の ImGui 1.89.8)
 
     尚これはImGuiのドキュメントにも明記されている
-*/
-// instance_texmag のアドレスが違うためにAssetがsceneに追加できない　これを直すにはtexture_manager.cppとwindow_scene.cppを同じ翻訳単位でコンパイルする必要がある //
-// screen座標のマウス位置をscene内の論理ピクセルに変換する
-// contentPos:ImGui::GetCursorScreenPos() で取得した領域のスクリーン左上座標を使う
-// ViewOffset:論理ピクセル単位で管理
-/* ScreenToSceneは、UI->テクスチャマッピングを計算する際には、スクリーン->コンテントローカル-> ÷スケール -> の順で行う テクスチャ上のピクセル位置はViewOffsetを含めない*/
-/*
+
+    instance_texmag のアドレスが違うためにAssetがsceneに追加できない　これを直すにはtexture_manager.cppとwindow_scene.cppを同じ翻訳単位でコンパイルする必要がある //
+    screen座標のマウス位置をscene内の論理ピクセルに変換する
+    contentPos:ImGui::GetCursorScreenPos() で取得した領域のスクリーン左上座標を使う
+    ViewOffset:論理ピクセル単位で管理
+    ScreenToSceneは、UI->テクスチャマッピングを計算する際には、スクリーン->コンテントローカル-> ÷スケール -> の順で行う テクスチャ上のピクセル位置はViewOffsetを含めない
+
     ↑の理由
     スクリーン位置:画面全体のピクセル位置
     コンテントローカル位置:ウィンドウ内のピクセル位置
     論理ピクセル(ImGui座標)とフレームバッファピクセルの違い:高DPI対応のため、論理ピクセルはフレームバッファピクセルと異なる場合がある
     scene座標:シーン内のピクセル位置、ViewOffsetを含む。ズームや移動で変換する
 */
+
 static ImVec2 ViewOffset = ImVec2(0.0f, 0.0f);
-static uint64_t g_NextSpriteId = 1; // ユニークID生成用カウンタ
 std::unordered_map<int64_t, SceneSprite> sprites;
 std::mutex spriteMutex;
 
@@ -56,7 +58,7 @@ ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& ViewOf
 namespace n_windowscene
 {
 
-    uint64_t window_scene::GenerateUniqueSpriteId()
+    int64_t window_scene::GenerateUniqueSpriteId()
     {
         return g_NextSpriteId++;
 	}
@@ -295,6 +297,17 @@ namespace n_windowscene
                     m_SceneSprites[i].dragOffsetY = mouseScene.y - m_SceneSprites[i].pos_y;
                 }
             }
+
+			// window_scene で直接選択されても hierarchy に反映させる
+            if (clickedIndex >= 0)
+            {
+                SetSelectedEntity(m_SceneSprites[clickedIndex].id);
+            }
+            else
+            {
+                SetSelectedEntity(NOT_SELECTED);
+            }
+
         }
 
         // --- ドラッグ移動 ---
@@ -398,32 +411,17 @@ namespace n_windowscene
 
             // --- 選択された状態でEscapeキーが押されたら削除 --- 
 
-            // sceneウィンドウがアクティブ && spriteが選択されている && Escapeキーが押された　時に削除
-            bool isSceneWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-
             // 押下フレームのみ検出
-            if (isSceneWindowFocused && ImGui::IsKeyPressed(ImGuiKey_Escape, false))
+            if (ImGui::IsKeyPressed(ImGuiKey_Escape, false))
             {
-                // ヒエラルキーウィンドウからも削除　後ほど実装
-                for (const auto& s : m_SceneSprites)
+                printf("[window_scene] EscapeKey down \n");
+                EntityId toDelete = selectedEntity_;
+                if (toDelete != NOT_SELECTED)
                 {
-                    if (s.selected)
-                    {
-                        printf("[window_scene/Render] Deleting selected sprite '%s'\n", s.name.c_str());
-                        DeleteAssetFromScene(sprite.id);
-                    }
+					printf("[window_scene] Deleting selected entity id=%lld \n", toDelete);
+                    DeleteAssetFromScene(toDelete);
+                    SetSelectedEntity(NOT_SELECTED);
                 }
-
-                // コンテナから削除
-                m_SceneSprites.erase
-                (
-                    std::remove_if(m_SceneSprites.begin(), m_SceneSprites.end(),
-                        [](const SceneSprite& s) { return s.selected; }),
-                    m_SceneSprites.end()
-                );
-
-                // DBG
-                printf("[window_scene/Render/DBG] Deleted selected sprites on ESC. Remaining count=%zu\n", m_SceneSprites.size());
             }
 
             // ### デバッグ情報表示
@@ -505,7 +503,6 @@ namespace n_windowscene
         m_SceneSprites.push_back(sprite);
 
 		SceneToHierarchyObj Obj;
-		Obj.id = sprite.id; // 一意のIDとしてポインタを使用
 		Obj.name = asset_name_str;
 		Obj.texture = tex;
 		Obj.x = sprite.pos_x;
@@ -514,36 +511,65 @@ namespace n_windowscene
 		Obj.height = sprite.height;
 		Obj.z_order = sprite.z_order;
 		Obj.selected = sprite.selected;
+        Obj.id = sprite.id; // 一意のIDとしてポインタを使用
+
+        printf("[Scene] pushing sprite id=%lld name=%s selected=%d\n", (long long)sprite.id, asset_name_str.c_str(), (int)sprite.selected);
 
         // ヒエラルキーウィンドウへ
-        n_windowhierarchy::instance_winHie().GetObjFromScene(Obj);
+        n_hierarchy::sync::OnSceneObjectAdded(Obj);
+        printf("[Scene] OnSceneObjectAdded returned for id=%lld\n", (long long)Obj.id);
+    }
+
+
+    void window_scene::DeleteAssetFromScene(EntityId eid)
+    {
+        if (eid == 0) return;
+        printf("[window_scene/DeletAsFrScene] DeleteObjFromScene id=%llu\n", (signed long long)eid);
+
+		// コンテナから削除 EntityIdで検索　添え字で削除するとズレてしまい、ヒエラルキーにオブジェクトが残る
+        m_SceneSprites.erase(
+            std::remove_if(
+                m_SceneSprites.begin(),
+                m_SceneSprites.end(),
+                [eid](const SceneSprite& s)
+                {
+                    return s.id == eid;
+                }),
+            m_SceneSprites.end()
+        );
+
+		// ヒエラルキーウィンドウへ
+        n_hierarchy::sync::OnSceneObjectRemoved(eid);
+	}
+
+    /* 新しいwindow_scene関数 */
+    void window_scene::SetSelectedEntity(EntityId eid)
+    {
+		if (selectedEntity_ == eid) return; // 変更なし
+
+		// 選択状態を更新
+        selectedEntity_ = eid;
+        printf("[Scene] SetSelectedEntity eid=%lld\n", (long long)eid);
+        
+		// hierarchyへ通知
+        if (windowManager_)
+        {
+			auto* hierarchy = windowManager_->GetHierarchyWindow();
+            if (hierarchy)
+            {
+				hierarchy->GetHierarchyModel().SetSelectedEntityFromScene(eid);
+            }
+        }
 
     }
 
 
-    void window_scene::DeleteAssetFromScene(uint64_t id)
+    EntityId window_scene::GetSelectedEntity() const
     {
-        if (id == 0) return;
-        printf("[window_scene/DeletAsFrScene] DeleteObjFromScene id=%llu\n", (unsigned long long)id);
+        return selectedEntity_;
+    }
 
-		size_t beforeCount = m_SceneSprites.size();
-
-		// コンテナから削除 id一致で削除
-        m_SceneSprites.erase
-        (
-            std::remove_if(m_SceneSprites.begin(), m_SceneSprites.end(),
-                [id](const SceneSprite& s) { return reinterpret_cast<uint64_t>(&s) == id; }),
-            m_SceneSprites.end()
-		);
-
-		size_t afterCount = m_SceneSprites.size();
-        printf("[window_scene] Deleted %zu sprites (before=%zu after=%zu)\n", beforeCount - afterCount, beforeCount, afterCount);
-
-		// ヒエラルキーウィンドウへ
-		n_windowhierarchy::instance_winHie().DeleteObjFromScene(id);
-	}
-
-    bool window_scene::GetSpritePosition(int64_t eid, std::array<float, 2>& outPos) const
+    bool window_scene::GetSpritePosition(EntityId eid, std::array<float, 2>& outPos) const
     {
         auto it = sprites.find(eid);
         if (it == sprites.end()) return false;
@@ -553,7 +579,7 @@ namespace n_windowscene
         return true;
     };
 
-    bool window_scene::SetSpritePosition(int64_t eid, const std::array<float, 2>& SetPos)
+    bool window_scene::SetSpritePosition(EntityId eid, const std::array<float, 2>& SetPos)
     {
         std::lock_guard<std::mutex> lk(spriteMutex);
         auto it = sprites.find(eid);
@@ -566,7 +592,7 @@ namespace n_windowscene
         return true;
     }
 
-    void window_scene::RegisterSprite(int64_t id, const SceneSprite& sprite)
+    void window_scene::RegisterSprite(EntityId id, const SceneSprite& sprite)
     {
         std::lock_guard<std::mutex> lk(spriteMutex);
         sprites[id] = sprite;

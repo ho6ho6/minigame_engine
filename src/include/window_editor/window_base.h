@@ -1,7 +1,7 @@
 /* Šî’êƒNƒ‰ƒX‚ğì¬‚·‚é */
-// std::unique_ptr<n_windowscene::window_scene> ‚ğ std::unique_ptr<n_windowgame::window_game> ‚É•ÏŠ·‚Å‚«‚È‚¢
 
-#pragma once
+#ifndef WINDOW_BASE_H
+#define WINDOW_BASE_H
 
 namespace n_windowbase
 {
@@ -12,3 +12,4 @@ namespace n_windowbase
 		virtual void Render() = 0;
 	};
 }
+#endif // !WINDOW_BASE_H

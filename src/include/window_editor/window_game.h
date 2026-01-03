@@ -1,7 +1,6 @@
-#ifndef WINDOW_GAME
-#define WINDOW_GAME
+#ifndef WINDOW_GAME_H
+#define WINDOW_GAME_H
 
-#pragma once
 #include <imgui.h>
 #include "window_base.h"
 
@@ -16,4 +15,4 @@ namespace n_windowgame
     };
 }
 
-#endif // !WINDOW_GAME
+#endif // !WINDOW_GAME_H

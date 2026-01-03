@@ -1,9 +1,8 @@
 ﻿/*テクスチャの読み込みを行う.png/.jpeg*/
 
-#ifndef TEXTURE_MANAGER
-#define TEXTURE_MANAGER
+#ifndef TEXTURE_MANAGER_HPP
+#define TEXTURE_MANAGER_HPP
 
-#pragma once
 #include <string>
 #include <unordered_map>
 #include <filesystem>
