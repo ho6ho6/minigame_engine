@@ -18,6 +18,8 @@ GPU : AMD Radeon Graphics（Athlon内蔵）</br>
 - C++
 - CMake
 - Visual Studio 2022
+- (メモ書き)コンパイル方法:Windows PowerShell->cmake --build . --config Debug --target run
+- Cmake:cmake .. -G "Visual Studio 17 2022" -A x64 
 
 # 開発の流れ
 ## 初期段階
