@@ -68,6 +68,7 @@ GPU : AMD Radeon Graphics（Athlon内蔵）</br>
 ![minigame_engine](./img/minigame_engine10.png) </br>
 
 ## 現在取り組み中
+- window_scene.cppは各機能が混在しているためwindow_hierarchy.cpp同様に責務分離
 - 各Component機能の実装
 - window_gameにwindow_sceneに配置されたオブジェクトの投影(実際に出力されるゲーム画面)
 - ここまでを区切りに一通りの不具合の解消
