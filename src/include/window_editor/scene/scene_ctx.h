@@ -22,37 +22,30 @@ struct SceneViewInput
 {
 	ImVec2 mouseScreen;
 
-	bool mouseInSprite;
+	bool mouseInSprite		= false;
+	bool isSceneCaptured	= false;
 
-	bool leftDown;
-	bool rightDown;
+	bool leftDown			= false;
+	bool rightDown			= false;
 
-	bool leftClicked;
-	bool rightClicked;
+	bool leftClicked		= false;
+	bool rightClicked		= false;
 
-	bool leftReleased;
-	bool rightReleased;
+	bool leftReleased		= false;
+	bool rightReleased		= false;
 
-	bool leftDragging;
-	bool rightDragging;
+	bool leftDragging		= false;
+	bool rightDragging		= false;
 
-	bool sceneHovered;
-	bool sceneActive;
-};
-
-struct SceneViewSelection
-{
-	EntityId draggingEntity = -1;
-	bool dragging = false;
-	ImVec2 dragOffset;
+	bool sceneHovered		= false;
+	bool sceneActive		= false;
 };
 
 struct SceneViewContext
 {
-	SceneViewCamera	camera;
-	SceneViewContent content;
-	SceneViewInput	input;
-	SceneViewSelection selection;
+	SceneViewCamera*	camera = nullptr;
+	SceneViewContent	content;
+	SceneViewInput		input;
 };
 
 void BuildSceneViewContext(SceneViewContext& ctx);

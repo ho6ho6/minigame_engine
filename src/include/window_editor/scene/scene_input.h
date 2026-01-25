@@ -18,21 +18,10 @@ namespace n_windowscene::input
     int HandleClick(SceneViewContext& ctx, bool mouseInContent, std::vector<SceneSprite>& sprites);
 
     // どのアセットが選択されたか？
-    int PickSpriteIndex(const SceneViewContext& ctx, const std::vector<SceneSprite>& sprites);
-
-    // ある程度動いたらドラッグ開始
-    void FindDraggingObj(SceneViewContext& ctx, std::vector<SceneSprite>& sprites);
-
-    // ドラッグ処理
-    void BeginDrag(SceneViewContext& ctx, const SceneSprite& sprite);
+    int PickSpriteIndex(const SceneViewContext& ctx, const std::vector<SceneSprite>& sprites, ImVec2 mouseScene);
 
     // 移動を適用
     void ApplyTransformToECS(SceneViewContext& ctx, std::vector<SceneSprite>& sprites);
-
-    void EndDrag(SceneViewContext& ctx);
-
-    // ドラッグ移動
-    bool ComputeDragPosition(const SceneViewContext& ctx, SceneSprite& sprite);
 }
 
 #endif // !SCENE_INPUT_H

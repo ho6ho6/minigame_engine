@@ -22,63 +22,65 @@ namespace n_windowscene::input
         };
 
         return {
-            localLogical.x + ctx.camera.viewOffset.x,
-            localLogical.y + ctx.camera.viewOffset.y
+            localLogical.x + ctx.camera->viewOffset.x,
+            localLogical.y + ctx.camera->viewOffset.y
         };
     }
 
     // 右クリックを動かす処理を論理ピクセルで
     void HandlePan(SceneViewContext& ctx)
     {
-        if (!ctx.input.rightDragging) return;
+        // 右クリックを動かす処理を論理ピクセルで
+        if (ctx.input.rightDragging)
+        {
+            ImVec2 dragFreamebuffer = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right); // 累積 delta
 
-        const ImVec2 deltaFb = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right);
+            // framebuffer -> 論理ピクセル変換
+            float dragX = dragFreamebuffer.x / ctx.content.fbScale.x;
+            float dragY = dragFreamebuffer.y / ctx.content.fbScale.y;
 
-        ctx.camera.viewOffset.x -= deltaFb.x / ctx.content.fbScale.x;
-        ctx.camera.viewOffset.y -= deltaFb.y / ctx.content.fbScale.y;
+            ctx.camera->viewOffset.x -= dragX;
+            ctx.camera->viewOffset.y -= dragY;
 
-        ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right); // 次フレームは 0 から計測
+
+        }
     }
 
     // クリックされたら
     int HandleClick(SceneViewContext& ctx, bool mouseInContent, std::vector<SceneSprite>& sprites)
     {
-        if (!mouseInContent || !ctx.input.leftClicked)
-            return -1;
+
+        ImVec2 mouseScene = ScreenToScene(ctx);
 
         std::cout << "Clicked" << std::endl;
 
-        int clickedIndex = PickSpriteIndex(ctx, sprites);
+        int clickedIndex = PickSpriteIndex(ctx, sprites, mouseScene);
 
-        for (auto& s : sprites)
-            s.selected = false;
+        for (size_t i = 0; i < sprites.size(); ++i)
+        {
+            sprites[i].selected = ((int)i == clickedIndex);
+            if (sprites[i].selected)
+            {
+                // ドラッグオフセットを記録
+                sprites[i].dragOffsetX = mouseScene.x - sprites[i].pos_x;
+                sprites[i].dragOffsetY = mouseScene.y - sprites[i].pos_y;
+            }
+        }
 
-        if (clickedIndex >= 0)
-            sprites[clickedIndex].selected = true;
-
-        return clickedIndex;
+       return clickedIndex;
     }
 
     // どのアセットが選択されたか？
-    int PickSpriteIndex(const SceneViewContext& ctx, const std::vector<SceneSprite>& sprites)
+    int PickSpriteIndex(const SceneViewContext& ctx, const std::vector<SceneSprite>& sprites, ImVec2 mouseScene)
     {
-        ImVec2 mouseScene = ScreenToScene(ctx);
 
         // もっとも最初に中心座標を左上か中心にするかを決めてなかった弊害
         for (int i = (int)sprites.size() - 1; i >= 0; --i)
         {
             const auto& s = sprites[i];
-
-            const float halfW = s.width * 0.5f;
-            const float halfH = s.height * 0.5f;
-
-            const float minX = s.pos_x - halfW;
-            const float maxX = s.pos_x + halfW;
-            const float minY = s.pos_y - halfH;
-            const float maxY = s.pos_y + halfH;
-
-            if (mouseScene.x >= minX && mouseScene.x <= maxX &&
-                mouseScene.y >= minY && mouseScene.y <= maxY)
+            if (mouseScene.x >= s.pos_x && mouseScene.x <= s.pos_x + s.width &&
+                mouseScene.y >= s.pos_y && mouseScene.y <= s.pos_y + s.height)
             {
                 std::cout << "PickObjectIndex = " << i << std::endl;
                 return i;
@@ -87,93 +89,31 @@ namespace n_windowscene::input
         return -1;
     }
 
-    // ある程度動いたらドラッグ開始
-    void FindDraggingObj(SceneViewContext& ctx, std::vector<SceneSprite>& sprites)
+    // 移動を適用 (マウスで操作されたもの) システム寄りのTransformの入り口 dataスクリプトに移動しても良い気がするけど
+    void ApplyTransformToECS(SceneViewContext& ctx, std::vector<SceneSprite>& sprites)
     {
-
-        // 選択されたものを見つける
-        if (!ctx.selection.dragging && ctx.input.sceneActive && ctx.input.leftDown && ctx.input.leftDragging && ctx.input.mouseInSprite)
+        // ドラッグ移動は選択済みのみに
+        if (ctx.input.leftDown && ctx.input.leftDragging)
         {
-            std::cout << "Find Obj" << std::endl;
+            ImVec2 curMouseScene = input::ScreenToScene(ctx);
             for (auto& s : sprites)
             {
-                if (s.selected)
+                if (!s.selected) continue;
+                float newX = curMouseScene.x - s.dragOffsetX;
+                float newY = curMouseScene.y - s.dragOffsetY;
+
+                // Transform 更新
+                auto tOpt = n_compoapi::GetTransformComponent(s.id);
+                if (tOpt)
                 {
-                    input::BeginDrag(ctx, s);
-                    break;
+                    auto t = *tOpt;
+                    t.position[0] = newX;
+                    t.position[1] = newY;
+                    n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid = s.id, t]() {
+                        n_compoapi::SetTransformComponent(eid, t);
+                        });
                 }
             }
         }
-    }
-
-    // ドラッグ処理
-    void BeginDrag(SceneViewContext& ctx, const SceneSprite& sprite)
-    {
-        ImVec2 mouseScene = ScreenToScene(ctx);
-        std::cout << "Begin Dragg" << std::endl;
-        ctx.selection.dragging = true;
-        ctx.selection.draggingEntity = sprite.id;
-        ctx.selection.dragOffset.x = mouseScene.x - sprite.pos_x;
-        ctx.selection.dragOffset.y = mouseScene.y - sprite.pos_y;
-    }
-
-    // 移動を適用
-    void ApplyTransformToECS(SceneViewContext& ctx, std::vector<SceneSprite>& sprites)
-    {
-        // ドラッグ中：SceneSprite だけ更新
-        if (ctx.selection.dragging && ctx.input.sceneActive && ctx.input.leftDragging)
-        {
-            std::cout << "Apply PreMove" << std::endl;
-            for (auto& s : sprites)
-            {
-                ComputeDragPosition(ctx, s);
-            }
-            return;
-        }
-
-        // ドラッグ終了フレームで ECS に反映
-        if (ctx.input.leftReleased && ctx.selection.dragging)
-        {
-            std::cout << "Apply Move" << std::endl;
-            for (auto& s : sprites)
-            {
-                if (s.id != ctx.selection.draggingEntity) continue;
-
-                auto tOpt = n_compoapi::GetTransformComponent(s.id);
-                if (!tOpt) continue;
-
-                auto t = *tOpt;
-                t.position[0] = s.pos_x;
-                t.position[1] = s.pos_y;
-
-                n_gamecomponent::instance_gameFunctions()
-                    .EnqueueGameCommand([eid = s.id, t]()
-                        {
-                            n_compoapi::SetTransformComponent(eid, t);
-                        });
-            }
-
-            ctx.selection.dragging = false;
-            ctx.selection.draggingEntity = NOT_SELECTED;
-        }
-    }
-
-    void EndDrag(SceneViewContext& ctx)
-    {
-        ctx.selection.dragging = false;
-    }
-
-    // ドラッグ移動を行う
-    bool ComputeDragPosition(const SceneViewContext& ctx, SceneSprite& sprite)
-    {
-        if (!ctx.selection.dragging) return false;
-        if (!sprite.selected) return false;
-
-        ImVec2 mouseScene = ScreenToScene(ctx);
-
-        sprite.pos_x = mouseScene.x - ctx.selection.dragOffset.x;
-        sprite.pos_y = mouseScene.y - ctx.selection.dragOffset.y;
-
-        return true;
     }
 }

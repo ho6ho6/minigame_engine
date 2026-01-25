@@ -2,6 +2,8 @@
 #include "include/window_editor/window_scene_sprite.h"
 #include "include/window_editor/scene/scene_ctx.h"
 #include "include/window_editor/scene/scene_input.h"
+#include "include/window_editor/scene/scene_data.h"
+#include "include/window_editor/scene/scene_ui.h"
 
 #include "include/render.h"	//フレームバッファ取得用
 
@@ -41,28 +43,8 @@
     scene座標:シーン内のピクセル位置、ViewOffsetを含む。ズームや移動で変換する
 */
 
-static ImVec2 viewOffset = ImVec2(0.0f, 0.0f);
 std::unordered_map<int64_t, SceneSprite> sprites;
 std::mutex spriteMutex;
-
-/* 当たり判定/選択/ドラッグは、ScreenToSceneを使用*/
-/*
-ImVec2 ScreenToScene(ImVec2 mouseScreen, ImVec2 contentPos, const ImVec2& viewOffset, const ImVec2& contentSize)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    // content 内のローカル座標(screen->content左上基準)
-    ImVec2 local = ImVec2(mouseScreen.x - contentPos.x, mouseScreen.y - contentPos.y);
-
-    // scene 論理ピクセル座標に変換  FramebufferScale を考慮
-    ImVec2 localLogical = ImVec2(local.x / io.DisplayFramebufferScale.x,
-        local.y / io.DisplayFramebufferScale.y);
-
-    // 左上原点のワールド座標（ViewOffset は左上基準のパン）
-    ImVec2 world = ImVec2(localLogical.x + viewOffset.x, localLogical.y + viewOffset.y);
-    return world;
-}
-
-*/
 
 namespace n_windowscene
 {
@@ -80,14 +62,16 @@ namespace n_windowscene
 
     void window_scene::Render()
     {
-
-
+        /*
         ImGui::SetNextWindowPos(ImVec2(920, 0), ImGuiCond_Always);
 
         ImGui::Begin("Scene_View", nullptr, ImGuiWindowFlags_NoResize);
 
         // window サイズを固定
         ImGui::SetWindowSize(ImVec2(1000, 600));
+        */
+
+        ui::SetupScene();
 
         ImVec2 avail = ImGui::GetContentRegionAvail();  // 利用可能な領域を取得
 
@@ -112,15 +96,6 @@ namespace n_windowscene
 
         n_render::Render_Resizeviewport(logical_w, logical_h, fb_w, fb_h);
 
-        // ヒット領域を先に作る（描画と同じサイズ・位置にするため cursor を取得）
-        //ImVec2 contentPos = ImGui::GetCursorScreenPos(); // 領域のスクリーン左上 ****注1****
-        //ImVec2 contentSize = avail;                       // content のサイズ（ヒット領域として使用）
-
-        // mouseのscreen座標
-        //ImVec2 mouseScreen = ImGui::GetMousePos();
-        ImDrawList* draw = ImGui::GetWindowDrawList();
-
-        //ImVec2 mouseScene = ScreenToScene(mouseScreen, contentPos, viewOffset, contentSize);    // シーン座標に変換
 
         SceneViewContext ctx;
         BuildSceneViewContext(ctx);
@@ -131,85 +106,19 @@ namespace n_windowscene
 
         ctx.input.mouseScreen   = ImGui::GetMousePos();
 
-        ctx.camera.viewOffset   = viewOffset;
+        ctx.camera              = &m_camera;
+
+        // ヒット領域を先に作る（描画と同じサイズ・位置にするため cursor を取得）
+        ImDrawList* draw = ImGui::GetWindowDrawList();
 
         //### デバック
-
-        // SRV (D3D11) からテクスチャサイズを取得
-        int texW = 0, texH = 0;
-        {
-            ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(n_render::Render_GetSceneSRV());
-            if (srv) {
-                ID3D11Resource* res = nullptr;
-                srv->GetResource(&res);
-                if (res) {
-                    ID3D11Texture2D* tex = nullptr;
-                    if (SUCCEEDED(res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&tex)) && tex) {
-                        D3D11_TEXTURE2D_DESC desc;
-                        tex->GetDesc(&desc);
-                        texW = desc.Width;
-                        texH = desc.Height;
-                        tex->Release();
-                    }
-                    res->Release();
-                }
-            }
-        }
-
-        // 視覚デバッグ：ヒット領域の枠とマウス位置
-        ImVec2 rect_a = ctx.content.screenPos;
-        ImVec2 rect_b = ImVec2(ctx.content.screenPos.x + ctx.content.size.x, ctx.content.screenPos.y + ctx.content.size.y);
-        draw->AddRect(rect_a, rect_b, IM_COL32(255, 0, 0, 200), 0.0f, 0, 2.0f); // 赤枠：ヒット領域
-
-        draw->AddCircleFilled(ctx.input.mouseScreen, 4.0f, IM_COL32(255, 255, 0, 200)); // 黄色：実マウス
-
-        // マウスのローカル座標（ヒット領域左上を原点）
-        ImVec2 localTex = ImVec2(ctx.input.mouseScreen.x - ctx.content.screenPos.x, ctx.input.mouseScreen.y - ctx.content.screenPos.y);
-
-        // テクスチャ上のピクセル座標に変換（重要：desc.Width/Height を使う）
-        float mappedTexX = 0.0f, mappedTexY = 0.0f;
-        if (ctx.content.screenPos.x > 0.0f && ctx.content.screenPos.y > 0.0f && texW > 0 && texH > 0) {
-            mappedTexX = (localTex.x / io.DisplayFramebufferScale.x) * (float)texW / ctx.content.screenPos.x;
-            mappedTexY = (localTex.y / io.DisplayFramebufferScale.y) * (float)texH / ctx.content.screenPos.y;
-        }
-
-        // 再び ImGui 上に戻して、マッピング位置を描画（緑十字）
-        ImVec2 mappedOnImage = ImVec2(ctx.content.screenPos.x + (mappedTexX / (float)texW) * ctx.content.screenPos.x,
-                                      ctx.content.size.y + (mappedTexY / (float)texH) * ctx.content.size.y);
-        draw->AddLine(ImVec2(mappedOnImage.x - 8, mappedOnImage.y), ImVec2(mappedOnImage.x + 8, mappedOnImage.y), IM_COL32(0, 255, 0, 200), 2.0f);
-        draw->AddLine(ImVec2(mappedOnImage.x, mappedOnImage.y - 8), ImVec2(mappedOnImage.x, mappedOnImage.y + 8), IM_COL32(0, 255, 0, 200), 2.0f);
-
+        ui::DebugSceneFrame(ctx, draw);
         //###
 
 
-    // --- 以下は座標系／グリッド描画（クリップや origin 計算はそのまま） ---
-    //ImDrawList* draw = ImGui::GetWindowDrawList();
-        const ImVec2 winPos = ImGui::GetWindowPos();
-        const ImVec2 winSize = ImGui::GetWindowSize();
-        draw->PushClipRect(winPos, ImVec2(winPos.x + winSize.x, winPos.y + winSize.y), true);
-
-        float centerX = winPos.x + winSize.x * 0.5f - viewOffset.x;
-        float centerY = winPos.y + winSize.y * 0.5f - viewOffset.y;
-        ImVec2 origin(centerX, centerY);
-
-        const float gridStep = 20.0f;
-        const ImU32 colGrid = IM_COL32(200, 200, 200, 50);
-
-        for (float x = fmodf(origin.x, gridStep); x < winPos.x + winSize.x; x += gridStep)
-            draw->AddLine(ImVec2(x, origin.y - winSize.y * 0.5f), ImVec2(x, origin.y + winSize.y * 0.5f), colGrid);
-        for (float y = fmodf(origin.y, gridStep); y < winPos.y + winSize.y; y += gridStep)
-            draw->AddLine(ImVec2(origin.x - winSize.x * 0.5f, y), ImVec2(origin.x + winSize.x * 0.5f, y), colGrid);
-
-        const ImU32 colAxisX = IM_COL32(255, 0, 0, 255);
-        draw->AddLine(ImVec2(origin.x - winSize.x * 10.0f, origin.y), ImVec2(origin.x + winSize.x * 10.0f, origin.y), colAxisX, 2.0f);
-        const ImU32 colAxisY = IM_COL32(0, 255, 0, 255);
-        draw->AddLine(ImVec2(origin.x, origin.y - winSize.y * 10.0f), ImVec2(origin.x, origin.y + winSize.y * 10.0f), colAxisY, 2.0f);
-
-        const ImU32 colText = IM_COL32(255, 255, 255, 200);
-        draw->AddText(origin, colText, "(0,0)");
-
-        draw->PopClipRect();
-
+        // --- 以下は座標系／グリッド描画（クリップや origin 計算はそのまま） ---
+        
+        ui::DrawSceneGrid(ctx, draw);
 
         // --- ヒット領域の InvisibleButton を作成 ---
 
@@ -223,95 +132,24 @@ namespace n_windowscene
 
 
         // assetsのドラッグ＆ドロップを受け取る
-        if (ImGui::BeginDragDropTarget())
-        {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PAYLOAD"))
-            {
-                const char* data = reinterpret_cast<const char*>(payload->Data);
-                int data_size = payload->DataSize;
-
-                std::string asset_name(data, data + data_size); // 文字列化
-
-                if (!asset_name.empty() && asset_name.back() == '\0') asset_name.pop_back();
-
-                // マウス座標　論理座標
-                ImVec2 mouse_pos = ImGui::GetMousePos();
-
-                // 論理ピクセルで保存
-                ImVec2 localLogical = ImVec2((mouse_pos.x - ctx.content.screenPos.x) / ctx.content.fbScale.x,
-                                             (mouse_pos.y - ctx.content.screenPos.y) / ctx.content.fbScale.y);
-
-                ImGui::EndDragDropTarget();
+        data::EnqueuePayloadFromAssetsWindow(ctx, m_PendingDrop, m_PendingDropPos);
 
 
-                // 遅延キューへ登録（ImGui の外で処理する） クラッシュの原因回避
-                m_PendingDrop.push_back(std::move(asset_name));
-                m_PendingDropPos.push_back(localLogical);
-
-            }
-            else
-            {
-                ImGui::EndDragDropTarget();
-            }
-        }
-
-
-
-        bool isRightActive = ImGui::IsItemActive();     // 押されている間 true
-
-        // 右クリックを動かす処理を論理ピクセルで
-        if (isRightActive && ImGui::IsMouseDragging(ImGuiMouseButton_Right))
-        {
-            ImVec2 dragFreamebuffer = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right); // 累積 delta
-
-            //ImGuiIO& io = ImGui::GetIO();   // ImGuiIO を再取得
-
-            // framebuffer -> 論理ピクセル変換
-            float dragX = dragFreamebuffer.x / ctx.content.fbScale.x;
-            float dragY = dragFreamebuffer.y / ctx.content.fbScale.y;
-
-            viewOffset.x -= dragX;
-            viewOffset.y -= dragY;
-
-            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right); // 次フレームは 0 から計測
-        }
-
-        //mouseScreen = ImGui::GetMousePos(); // 再取得
-        ImVec2 mouseScene = input::ScreenToScene(ctx);    // シーン座標に変換
+        // カメラ視点
+        input::HandlePan(ctx);
 
         // ヒット領域内か -> クリックがUIのその領域内で発生したかどうかの判定に使用 スクリーン座標で判定
 
         bool mouseInContent = (ctx.input.mouseScreen.x >= ctx.content.size.x) && (ctx.input.mouseScreen.x <= ctx.content.screenPos.x + ctx.content.size.x) &&
-            (ctx.input.mouseScreen.y >= ctx.content.screenPos.y) && (ctx.input.mouseScreen.y <= ctx.content.screenPos.y + ctx.content.size.y);
+                              (ctx.input.mouseScreen.y >= ctx.content.screenPos.y) && (ctx.input.mouseScreen.y <= ctx.content.screenPos.y + ctx.content.size.y);
 
         // --- クリックで選択 ---
-        int clickedIndex = -1;
-        if (mouseInContent && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDown(ImGuiMouseButton_Right)
-            && ImGui::IsWindowHovered() && ImGui::IsWindowFocused())
+        int clickedIndex = NOT_SELECTED;
+        if (mouseInContent && ctx.input.leftClicked && !ctx.input.rightDown && ImGui::IsWindowHovered() && ImGui::IsWindowFocused())
         {
-            for (int i = (int)m_SceneSprites.size() - 1; i >= 0; --i)
-            {
-                const auto& s = m_SceneSprites[i];
-                if (mouseScene.x >= s.pos_x && mouseScene.x <= s.pos_x + s.width &&
-                    mouseScene.y >= s.pos_y && mouseScene.y <= s.pos_y + s.height)
-                {
-                    clickedIndex = i;
-                    break;
-                }
-            }
+            ctx.input.isSceneCaptured = true;
+            clickedIndex = input::HandleClick(ctx, mouseInContent, m_SceneSprites);
 
-            for (size_t i = 0; i < m_SceneSprites.size(); ++i)
-            {
-                m_SceneSprites[i].selected = ((int)i == clickedIndex);
-                if (m_SceneSprites[i].selected)
-                {
-                    // ドラッグオフセットを記録
-                    m_SceneSprites[i].dragOffsetX = mouseScene.x - m_SceneSprites[i].pos_x;
-                    m_SceneSprites[i].dragOffsetY = mouseScene.y - m_SceneSprites[i].pos_y;
-                }
-            }
-
-            // window_scene で直接選択されても hierarchy に反映させる
             if (clickedIndex >= 0)
             {
                 SetSelectedEntity(m_SceneSprites[clickedIndex].id);
@@ -320,36 +158,11 @@ namespace n_windowscene
             {
                 SetSelectedEntity(NOT_SELECTED);
             }
-
         }
 
         // --- ドラッグ移動 ---
 
-        // ドラッグ移動は選択済みのみに
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
-        {
-            ImVec2 curMouseScene = input::ScreenToScene(ctx);
-            for (auto& s : m_SceneSprites)
-            {
-                if (!s.selected) continue;
-                float newX = curMouseScene.x - s.dragOffsetX;
-                float newY = curMouseScene.y - s.dragOffsetY;
-
-                // Transform 更新
-                auto tOpt = n_compoapi::GetTransformComponent(s.id);
-                if (tOpt)
-                {
-                    auto t = *tOpt;
-                    t.position[0] = newX;
-                    t.position[1] = newY;
-                    n_gamecomponent::instance_gameFunctions().EnqueueGameCommand([eid = s.id, t]() {
-                        n_compoapi::SetTransformComponent(eid, t);
-                        });
-                }
-            }
-        }
-
-
+        input::ApplyTransformToECS(ctx, m_SceneSprites);
 
         // --- ドロップされたアセットを処理 ---
 
@@ -364,39 +177,20 @@ namespace n_windowscene
             Texture* tex = n_texturemanager::instance_texmag().GetTextureByName(asset_name);
             if (tex)
             {
-                AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos, ctx.content.size);    // sceneに追加
+                AddAssetToScene(tex, asset_name, guiLocalPos, guiWindowPos, ctx);    // sceneに追加
             }
             else
             {
                 printf("[window_scene] Texture not found for dropped asset: %s\n", asset_name.c_str());
             }
 
-
-            // 受け取った名前
-            // printf("[window_scene] Dropped raw name: '%s' (len=%zu)\n", asset_name.c_str(), asset_name.size());
-
-            // 列挙（GetTextureNames() が pair<string, ...> を返すことを仮定）
-            //printf("[window_scene] Registered texture keys:\n");
-            //for (const auto& kv : n_texturemanager::instance_texmag().GetTextureNames()) {
-            //    printf("  '%s'\n", kv.first.c_str());
-            //}
-
         }
 
-
-        //printf("[window_scene/Render] m_SceneSprites.count=%zu\n", m_SceneSprites.size());
 
         // シーンオブジェクト一覧を走査
         for (auto& sprite : m_SceneSprites)
         {
             if (!sprite.texture) continue;
-
-            //ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(sprite.texture->tx_id);
-            //if (!srv) {
-            //    printf("[window_scene/Render/ERR] sprite '%s' has null srv\n", sprite.name.c_str());
-            //    continue;
-            //}
-
 
             // Transform Component から座標を取得
             auto tOpt = n_compoapi::GetTransformComponent(sprite.id);
@@ -408,21 +202,22 @@ namespace n_windowscene
             }
 
             // sprite.pos_x/pos_y はシーン内ピクセル座標（AddAssetToSceneで設定済み）
-            ImVec2 screenPos = ImVec2(ctx.content.screenPos.x + (sprite.pos_x - viewOffset.x) * ctx.content.fbScale.x,
-                                      ctx.content.screenPos.y + (sprite.pos_y - viewOffset.y) * ctx.content.fbScale.y);
+            ImVec2 screenPos = ImVec2(ctx.content.screenPos.x + (sprite.pos_x - ctx.camera->viewOffset.x) * ctx.content.fbScale.x,
+                                      ctx.content.screenPos.y + (sprite.pos_y - ctx.camera->viewOffset.y) * ctx.content.fbScale.y);
             ImGui::SetCursorScreenPos(screenPos);
 
 
             ImVec2 drawSize = ImVec2((float)sprite.width, (float)sprite.height);
 
             // 左クリックで選択され && ドラッグ中
-            if (sprite.selected && ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+            if (sprite.selected && ctx.input.leftDown && ctx.input.leftDragging)
             {
                 // 再計算して現在のマウスのscene座標を取得
                 ImVec2 curMouseScene = input::ScreenToScene(ctx);
                 sprite.pos_x = curMouseScene.x - sprite.dragOffsetX;    // ドラッグオフセットを考慮
                 sprite.pos_y = curMouseScene.y - sprite.dragOffsetY;
             }
+
 
             // --- 選択された状態でEscapeキーが押されたら削除 --- 
 
@@ -434,22 +229,17 @@ namespace n_windowscene
                 if (toDelete != NOT_SELECTED)
                 {
                     printf("[window_scene] Deleting selected entity id=%lld \n", toDelete);
-                    DeleteAssetFromScene(toDelete);
+                    data::DeleteAssetFromScene(toDelete, m_SceneSprites);
                     SetSelectedEntity(NOT_SELECTED);
                 }
             }
 
-            // ### デバッグ情報表示
-            //printf("[window_scene/Render/DBG] localTex=(%f,%f) mouseScene=(%f,%f) contentPos=(%f,%f) mouseScreen=(%f,%f) ViewOffset=(%f,%f) sprite.pos=(%f,%f)\n",
-            //    localTex.x, localTex.y, mouseScene.x, mouseScene.y, contentPos.x, contentPos.y, mouseScreen.x, mouseScreen.y,ViewOffset.x, ViewOffset.y, sprite.pos_x, sprite.pos_y);
-
-            //printf("[window_scene/Render/DBG] sprite='%s' pos=(%f,%f) dragOffset=(%f,%f) selected=%d\n",
-            //    sprite.name.c_str(), sprite.pos_x, sprite.pos_y, sprite.dragOffsetX, sprite.dragOffsetY, sprite.selected);
-
-
             // ImGui_ImplDX11はImTextureIDにSRV ポインタを渡す実装が標準
             ImGui::Image(sprite.texture->tx_id, drawSize);
         }
+
+        // 入力処理が camera を変更したら戻す
+        m_camera.viewOffset = ctx.camera->viewOffset;
 
         m_PendingDrop.clear();
         m_PendingDropPos.clear();
@@ -458,7 +248,7 @@ namespace n_windowscene
 
 
 
-    void window_scene::AddAssetToScene(Texture* tex, const std::string& asset_name_str, ImVec2 guiLocalPos, ImVec2 guiWindowPos, const ImVec2& ContentSize)
+    void window_scene::AddAssetToScene(Texture* tex, const std::string& asset_name_str, ImVec2 guiLocalPos, ImVec2 guiWindowPos, const SceneViewContext& ctx)
     {
 
         //printf("[AddAssetToScene] tex_ptr=%p tx_id=%p width=%d height=%d asset='%s' guiLocal=(%f,%f) guiWin=(%f,%f)\n",
@@ -478,8 +268,8 @@ namespace n_windowscene
         ImVec2 guiAbsPos = ImVec2(guiWindowPos.x + guiLocalPos.x, guiWindowPos.y + guiLocalPos.y);
 
         // scene座標(=論理ピクセル)
-        float sceneX = guiLocalPos.x + viewOffset.x;
-        float sceneY = guiLocalPos.y + viewOffset.y;
+        float sceneX = guiLocalPos.x + ctx.camera->viewOffset.x;
+        float sceneY = guiLocalPos.y + ctx.camera->viewOffset.y;
 
         // 実ピクセル -> 論理ピクセルに変換
         float logicalW = (float)(tex->width > 0 ? tex->width : 16) / fbscale.x;
@@ -535,27 +325,6 @@ namespace n_windowscene
         printf("[Scene] OnSceneObjectAdded returned for id=%lld\n", (long long)Obj.id);
     }
 
-
-    void window_scene::DeleteAssetFromScene(EntityId eid)
-    {
-        if (eid == NOT_SELECTED) return;
-        printf("[window_scene/DeletAsFrScene] DeleteObjFromScene id=%llu\n", (signed long long)eid);
-
-        // コンテナから削除 EntityIdで検索　添え字で削除するとズレてしまい、ヒエラルキーにオブジェクトが残る
-        m_SceneSprites.erase(
-            std::remove_if(
-                m_SceneSprites.begin(),
-                m_SceneSprites.end(),
-                [eid](const SceneSprite& s)
-                {
-                    return s.id == eid;
-                }),
-            m_SceneSprites.end()
-        );
-
-        // ヒエラルキーウィンドウへ
-        n_hierarchy::sync::OnSceneObjectRemoved(eid);
-    }
 
     /* 新しいwindow_scene関数 */
     void window_scene::SetSelectedEntity(EntityId eid)
