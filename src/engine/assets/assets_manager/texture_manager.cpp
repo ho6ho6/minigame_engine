@@ -338,7 +338,7 @@ namespace n_texturemanager {
 
     LoadStatus texture_manager::GetLoadStatus(RequestId id) const
     {
-        // 簡易実装: 非同期キューの状態を確認する（詳細な状態管理は拡張可能）
+        // 非同期キューの状態を確認する（詳細な状態管理は拡張可能）
         LoadStatus st;
         st.id = id;
         // check request queue
@@ -646,16 +646,20 @@ namespace n_texturemanager {
     }
 
 
-	// ワーカースレッド関数
+	// ワーカースレッド関数 CPUの非同期処理
     static void WorkerThreadFunc()
     {
         g_workerRunning.store(true);
-        while (g_workerRunning.load()) {
+        while (g_workerRunning.load())
+        {
+            // テクスチャのリクエストを取得
             std::unique_ptr<n_texturemanager::LoadRequest> req;
             {
                 std::unique_lock<std::mutex> lk(g_reqMutex);
                 g_reqCv.wait(lk, [] { return !g_reqQueue.empty() || !g_workerRunning.load(); });
                 if (!g_workerRunning.load() && g_reqQueue.empty()) break;
+
+                // 先頭からリクエストを取り出す
                 req = std::move(g_reqQueue.front());
                 g_reqQueue.pop_front();
             }
@@ -663,12 +667,14 @@ namespace n_texturemanager {
             if (!req) continue;
             if (req->cancel.load()) continue;
 
+            // 画像ロード結果を格納する構造体
             n_texturemanager::LoadResult res;
             res.id = req->id;
             res.name = req->path.filename().string();
 
+            // 画像ファイルの読み込みとデコード
             int w, h, n;
-            unsigned char* data = stbi_load(req->path.string().c_str(), &w, &h, &n, 4);
+            unsigned char* data = stbi_load(req->path.string().c_str(), &w, &h, &n, 4); // メインスレッドとは非同期の部分
             if (!data) {
                 res.success = false;
                 res.error = "failed to load";

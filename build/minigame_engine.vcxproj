@@ -352,8 +352,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\hierarchy\hierarchy_model.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\hierarchy\hierarchy_sync.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\hierarchy\hierarchy_ui.cpp" />
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_ctx.cpp" />
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_data.cpp" />
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_input.cpp" />
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_sync.cpp" />
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_ui.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_assets.cpp" />
-    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_editor.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_game.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_hierarchy.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_inspector.cpp" />
@@ -365,7 +369,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\imgui_widgets.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\third_party\imgui\backends\imgui_impl_dx11.cpp" />
-    <ClInclude Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\include\window_editor\window_inspector.h" />
+    <ClInclude Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\include\window_editor\scene\scene_ctx.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

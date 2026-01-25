@@ -61,10 +61,22 @@
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\hierarchy\hierarchy_ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_assets.cpp">
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_ctx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_editor.cpp">
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_sync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\scene\scene_ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_assets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\engine\window_editor\window_game.cpp">
@@ -102,7 +114,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\include\window_editor\window_inspector.h">
+    <ClInclude Include="E:\プログラミング\DevWorkspace\repos\minigame_engine\src\include\window_editor\scene\scene_ctx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

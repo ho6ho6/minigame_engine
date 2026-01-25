@@ -29,6 +29,7 @@ namespace n_hierarchy::ui
         //    printf("[HierarchyUI] obj[%zu] id=%lld name=%s registered=%d selected=%d\n", i, (long long)o.id, o.name.c_str(), (int)o.registered, (int)o.selected);
         //}
 
+        // sceneに配置されたオブジェクトを表示
         for (const auto& obj : objects)
         {
             bool isSelected = (obj.id == selected);

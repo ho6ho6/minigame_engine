@@ -3,7 +3,7 @@
 #ifndef WINDOW_SCENE_H
 #define WINDOW_SCENE_H
 
-#define NOT_SELECTED 0
+#define NOT_SELECTED -1
 
 #include <imgui.h>
 #include "window_base.h"
@@ -19,39 +19,38 @@ namespace n_windowscene
 {
 	class window_scene : public n_windowbase::window_base
 	{
-	public:
-		void Render() override;
-		void AddAssetToScene(Texture* tex, const std::string& asset_name, ImVec2 guiLocalPos, ImVec2 guiWindowPos, const ImVec2& ContentSize);
-		void DeleteAssetFromScene(EntityId id);
-		EntityId GenerateUniqueSpriteId();	// ユニークID生成 <-　これはスプライト自身のID
+		public:
+			void Render() override;
+			void AddAssetToScene(Texture* tex, const std::string& asset_name, ImVec2 guiLocalPos, ImVec2 guiWindowPos, const ImVec2& ContentSize);
+			void DeleteAssetFromScene(EntityId id);
+			EntityId GenerateUniqueSpriteId();	// ユニークID生成 <-　これはスプライト自身のID
 
-		/*　int64_t は基本的にCompoentが付与されるオブジェクトのID　*/
-		bool GetSpritePosition(EntityId id, std::array<float, 2>& outPos) const;
-		bool SetSpritePosition(EntityId id, const std::array<float, 2>& SetPos);
-		void RegisterSprite(EntityId id, const SceneSprite& sprite);
+			/*　int64_t は基本的にCompoentが付与されるオブジェクトのID　*/
+			bool GetSpritePosition(EntityId id, std::array<float, 2>& outPos) const;
+			bool SetSpritePosition(EntityId id, const std::array<float, 2>& SetPos);
+			void RegisterSprite(EntityId id, const SceneSprite& sprite);
 
 
 
-		/* 新しいwindow_scene関数 */
-		void SetSelectedEntity(EntityId eid);
-		EntityId GetSelectedEntity() const;
+			/* 新しいwindow_scene関数 */
+			void SetSelectedEntity(EntityId eid);
+			EntityId GetSelectedEntity() const;
 
-		void SetWindowManager(n_windowmanager::window_manager* wm) { windowManager_ = wm; }
-		/* 新しいwindow_scene関数 */
+			void SetWindowManager(n_windowmanager::window_manager* wm) { windowManager_ = wm; }
+			/* 新しいwindow_scene関数 */
 
-	private:
-		ImVec2 m_LastSize = { 0, 0 };   // 最後に記憶したサイズ
-		ImVec2 m_PanOffset = { 0, 0 };  // パン（ドラッグ移動）用
-		std::vector<SceneSprite> m_SceneSprites; // シーンに配置されたスプライトのリスト
-		std::vector<std::string> m_PendingDrop; // ドロップ待ちのアセット名リスト
-		std::vector<ImVec2> m_PendingDropPos; // ドロップ待ちのアセット位置リスト
-		//std::unordered_map<int64_t, SceneSprite> sprites;
+		private:
+			ImVec2 m_LastSize = { 0, 0 };   // 最後に記憶したサイズ
+			ImVec2 m_PanOffset = { 0, 0 };  // パン（ドラッグ移動）用
+			std::vector<SceneSprite> m_SceneSprites; // シーンに配置されたスプライトのリスト
+			std::vector<std::string> m_PendingDrop; // ドロップ待ちのアセット名リスト
+			std::vector<ImVec2> m_PendingDropPos; // ドロップ待ちのアセット位置リスト
 
-		/* 新しいwindow_scene関数 */
-		n_windowmanager::window_manager* windowManager_ = nullptr;
-		EntityId selectedEntity_ = NOT_SELECTED;
-		EntityId g_NextSpriteId = 1; // ユニークID生成用カウンタ
-		/* 新しいwindow_scene関数 */
+			/* 新しいwindow_scene関数 */
+			n_windowmanager::window_manager* windowManager_ = nullptr;
+			EntityId selectedEntity_ = NOT_SELECTED;
+			EntityId g_NextSpriteId = 0; // ユニークID生成用カウンタ
+			/* 新しいwindow_scene関数 */
 	};
 
 	window_scene& instance_winSce();

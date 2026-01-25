@@ -25,13 +25,6 @@ file(GLOB_RECURSE ENGINE_SOURCES
     #"${PROJECT_SOURCE_DIR}/src/engine/window_editor/*.cpp"
 )
 
-# シェーダーファイルも収集
-file(GLOB_RECURSE SHADER_FILES
-    "${PROJECT_SOURCE_DIR}/shaders/*.hlsl"
-)
-
-
-
 # Assets/フォルダを出力先へコピー　(これはテクスチャフォルダを見つけるため)
 #add_custom_target(
 #    CopyAssets ALL
@@ -52,7 +45,7 @@ add_executable(minigame_engine
     src/main.cpp
     src/external/stb_image_impl.cpp
     ${ENGINE_SOURCES}
-    ${IMGUI_SOURCES} "src/include/window_editor/window_inspector.h" "src/engine/window_editor/window_inspector.cpp")
+    ${IMGUI_SOURCES} "src/engine/window_editor/scene/scene_ui.cpp" "src/engine/window_editor/scene/scene_input.cpp" "src/engine/window_editor/scene/scene_data.cpp" "src/engine/window_editor/scene/scene_sync.cpp" "src/include/window_editor/scene/scene_ctx.h" "src/engine/window_editor/scene/scene_ctx.cpp")
 
 
 # debug用の定義
