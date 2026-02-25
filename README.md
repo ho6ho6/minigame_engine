@@ -18,7 +18,7 @@ GPU : AMD Radeon Graphics（Athlon内蔵）</br>
 ## 非同期テクスチャロード設計
 - CPU側でstb_imageによるデコード（ワーカースレッド）
 - メインスレッドでGPUリソース生成
-- staging → CopyResource構造
+- staging -> CopyResource構造
 - 1フレームあたりアップロード制限
 
 ## レンダリングに関する課題
@@ -26,6 +26,16 @@ GPU : AMD Radeon Graphics（Athlon内蔵）</br>
 - Resize時のRTV再生成問題
 - ワーカースレッド停止処理
 - SRV解放タイミング
+
+## コンポーネント構造
+- UI Thread
+- EnqueueGameCommand
+- Game Thread
+- ComponentManager更新
+- Scene同期
+
+# コンポーネントに関する課題
+- AddLightComponent,AddMoveComponentなどをテンプレート抽象化
 
 # 実際にminigame_engineを用いてゲームを作成する時
 - ユーザは「大乱闘スマッシュブラザーズ｣にある｢ステージ作り｣のように、元々ある地形・動くものなどをAssetsウィンドウから選択して、ステージを作成する。
