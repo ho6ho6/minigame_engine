@@ -1,6 +1,11 @@
 # minigame_engine
 
-# 設計思想
+# 概要
+以下のYouTubeリンクからミニゲームエンジンの概要解説、内容確認を行えます </br>
+[minigame_engine概要解説](https://youtu.be/hTtWyzAT5uM) </br>
+[minigame_engine内容確認](https://youtu.be/BEkCKfG-fzU) </br>
+
+## 設計思想
 - C++ および Win32 API をベースに、メインウィンドウの生成と、game・scene・input などのサブウィンドウの管理を行うミニゲームエンジンを構築。
 - ユーザーはソースコードを記述することなく、シーン上に配置されたオブジェクトに対してキー割り当てを選択することでキャラクターを制御できる。
 - 条件分岐や挙動の変化は、Component を追加することで制御可能とし、ノードベースの拡張性ある設計を目指す。
