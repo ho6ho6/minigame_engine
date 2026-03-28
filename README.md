@@ -112,6 +112,11 @@ Cmake:cmake .. -G "Visual Studio 17 2022" -A x64  </br>
 - 起動直後のフレームでテクスチャ/リソースのアップロード（UpdateSubresource / CopyTextureRegion）が GPU タイムライン上で発生しており、PCIe バス使用率が高い </br>
 - ↑非同期処理にテクスチャの読み込みは変更したハズだが、同じデバック方法が出来ない。
 
+非同期処理にした際に、CPUはWorkerThreadFunc()によって非同期になりましたが、GPUはProcessPendingResults() の中で “フレーム中に</br>
+バラバラに実行される”ようになったことが原因だと考えています。</br>
+特に、GPUではGPU アップロードを「フレームの最後にまとめる」やロード結果を「GPU Upload Job」として扱うといった処理を作成していないため</br>
+ランダムなタイミングでGPUの処理が行われてしまい、同じデバックが不可能になったと予想しています。</br>
+
 ### 予想
 - UpdateSubresource / Copy が GPU タイムラインにある → テクスチャやバッファの転送がフレーム中に実行されている </br>
 - PCIe 使用率が高い → CPU→GPU 転送（ホスト→VRAM）がボトルネックになっている </br>
